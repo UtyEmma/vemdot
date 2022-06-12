@@ -17,17 +17,13 @@ class CreateUsersTable extends Migration
             $table->id();
             $table->string('unique_id')->unique();
             $table->string('email')->unique();
-            $table->string('firstname');
-            $table->string('lastname');
+            $table->string('name');
             $table->string('phone');
 
-            $table->string('account_type')->default('user');
-            $table->string('status')->default('active');
+            $table->string('role')->default('user');
+            $table->string('status')->default('pending');
             $table->string('country')->nullable();
             $table->string('gender')->nullable();
-            $table->text('address')->nullable();
-            $table->decimal('main_balance', 13,2)->default(0);
-            $table->decimal('ref_balance', 13,2)->default(0);
 
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
@@ -35,6 +31,9 @@ class CreateUsersTable extends Migration
             $table->string('avatar')->default('default.png');
             $table->string('referral_id');
             $table->string('referred_id')->nullable();
+
+            $table->decimal('main_balance', 13,2)->default(0);
+            $table->decimal('ref_balance', 13,2)->default(0);
 
             $table->string('first_time_login')->default('yes');
 
