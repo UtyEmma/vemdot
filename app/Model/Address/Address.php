@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Model\Country;
+namespace App\Address;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class CountryList extends Model
+class Address extends Model
 {
     use HasFactory, SoftDeletes;
 
