@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
-use App\Model\User;
+use App\Models\User;
 use Auth;
 
 class AuthController extends Controller
@@ -18,7 +18,8 @@ class AuthController extends Controller
             'email' => 'required|email|string',
             'password' => 'required|string'
         ]);
-
+        
+        return $request;
 
         if(!Auth::attempt($validData)){
             return response([

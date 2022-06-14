@@ -1,15 +1,16 @@
 <?php
 
 namespace App\Traits;
-use App\Models\Settings\SiteSetting;
+use App\Models\Site\SiteSettings;
 
 trait ReturnTemplate {
 
     //method that return the messages template
     public function returnMessageTemplate($status = true, $message = '', $payload = [], $other = []) {
-        $appSettings = SiteSetting::first();
+        $appSettings = SiteSettings::first();
 
-        return response()->json([
+        return response()
+        ->json([
             'status' => $status ? 'success' : 'error',
             'message' => $message,
             'payload' => $payload,
@@ -21,10 +22,10 @@ trait ReturnTemplate {
     //method that return error messages
     public function returnErrorMessage($keyword) {
         $messageArray = [
-            'wrong_login_crendential'=>'Wrong login credentials, Please check you email and password',
+            'wrong_crendential'=>'Wrong login credentials, Please check you email and password',
             'account_blocked'=>'Your account is blocked, please contact support via live chat for further details',
             'email_not_found'=>'This email is not registerd with us, plases proceed to register an account',
-            'incorrect_refferral_id'=>'the refferral Id you inputed is incorrect, please confirm it and try again',
+            'refferral_not_found'=>'refferral code not correct, please confirm it and try again',
             'login_reqiured'=>'Email and Password must be provided ',
             'invalid_token'=>'Invalid Token Supplied',
             'token_reqiured'=>'Token must be provided ',

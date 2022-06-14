@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Model;
+namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
-use Laravel\Passport\HasApiTokens;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable{
     use HasApiTokens,Notifiable,HasRoles, SoftDeletes;
@@ -23,17 +23,15 @@ class User extends Authenticatable{
      */
     protected $fillable = [
         'unique_id',
-        'firstname',
-        'lastname',
+        'name',
         'email',
         'referral_id',
         'referred_id',
-        'account_type',
+        'role',
         'status',
         'country',
         'phone',
         'gender',
-        'address',
         'avatar',
         'main_balance',
         'ref_balance',
@@ -54,6 +52,18 @@ class User extends Authenticatable{
         'email_verified_at' => 'datetime',
     ];
 
+    
+    public function getAllUsers($condition, $id = 'id', $desc = "desc"){
+        return User::where($condition)->orderBy($id, $desc)->get();
+    }
+
+    public function paginateUsers($num, $condition, $id = 'id', $desc = "desc"){
+        return User::where($condition)->orderBy($id, $desc)->paginate($num);
+    }
+
+    public function getUser($condition){
+        return User::where($condition)->first();
+    }
 
     public function get_roles(){
         $roles = [];
