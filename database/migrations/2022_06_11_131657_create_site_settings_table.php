@@ -24,9 +24,9 @@ class CreateSiteSettingsTable extends Migration
             $table->string('site_logo')->default('default.png');
             $table->string('referral_bonus')->default(5);
             $table->string('account_verification')->default('no');
-            $table->string('verification_token_length')->default(5);
-            $table->string('send_login_alert_mail')->default('no');
-            $table->string('send_welcome_message_mail')->default('no');
+            $table->string('token_length')->default(5);
+            $table->string('login_alert')->default('no');
+            $table->string('welcome_message')->default('no');
             $table->string('send_basic_emails')->default('no');
 
             $table->softDeletes();  //add this line

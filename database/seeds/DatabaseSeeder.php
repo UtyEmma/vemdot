@@ -1,10 +1,13 @@
 <?php
 
-use App\Model\Country\CountryList;
-use App\Model\Site\SiteSettings;
-use App\Model\Address\Address;
-use App\Model\Bank\BankDetail;
-use App\Model\User;
+use App\Models\Country\CountryList;
+use App\Models\Site\SiteSettings;
+use App\Models\Address\Address;
+use App\Models\Bank\BankDetail;
+use App\Models\Meal\MealCategory;
+use App\Models\Plan\SubscriptionPlan;
+use App\Models\Role\AccountRole;
+use App\Models\User;
 use App\Traits\Generics;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -20,10 +23,9 @@ class DatabaseSeeder extends Seeder{
     {
         $user = new User();
         $user->unique_id  = $this->createUniqueId('users', 'unique_id');
-        $user->firstname = "Super";
-        $user->lastname = "Admin";
+        $user->name = "Super Admin";
         $user->email = "support@".env('APP_DOMAIN');
-        $user->account_type = "super_admin";
+        $user->role = "super_admin";
         $user->phone = "0392372831";
         $user->gender = "Male";
         $user->referral_id = $this->createUniqueId('users', 'referral_id');
@@ -56,6 +58,24 @@ class DatabaseSeeder extends Seeder{
             $country->save();
         }
 
+        $categories = ["Pastries", "Soup", "Vegetables", "Native Dish", "Fast Food"];
+        foreach ($categories as $item){
+            $category = new MealCategory();
+            $category->unique_id  = $this->createUniqueId('meal_categories', 'unique_id');
+            $category->name = $item;
+            $category->description = $item;
+            $category->save();
+        }
+
+        $plans = ["Basic", "Flat", "Advance", "Premium", "Contract"];
+        foreach ($plans as $item){
+            $plan = new SubscriptionPlan();
+            $plan->unique_id  = $this->createUniqueId('subscription_plans', 'unique_id');
+            $plan->name = $item;
+            $plan->description = $item;
+            $plan->save();
+        }
+
         $settings = new SiteSettings();
         $settings->unique_id  = 'OGU9ZhIK0e66e8b70e91fea8';
         $settings->site_name = env('APP_NAME');
@@ -64,5 +84,13 @@ class DatabaseSeeder extends Seeder{
         $settings->site_address = "United Kingdom: Ægisgardur 5, Reykjavik's Old Harbor";
         $settings->site_domain = env('APP_URL');
         $settings->save();
+
+        $roles = ["Super Admin", "Admin", "Vendor", "Logistic", "User"];
+        foreach ($roles as $item){
+            $role = new AccountRole();
+            $role->unique_id  = $this->createUniqueId('account_roles', 'unique_id');
+            $role->name = $item;
+            $role->save();
+        }
     }
 }

@@ -3,6 +3,11 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\LoginController;
+use App\Http\Controllers\Api\RegisterController;
+use App\Http\Controllers\Api\AccountActivationController;
+use App\Http\Controllers\Api\ResetPasswordContoller;
+use App\Http\Controllers\Api\UpdatePasswordContoller;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RolesController;
 use App\Http\Controllers\Api\PermissionController;
@@ -18,12 +23,25 @@ use App\Http\Controllers\Api\PermissionController;
 |
 */
 
+// log users in 
+Route::post('login', [LoginController::class,'loginUser']);
+//create new accounts for users
+Route::post('register', [RegisterController::class,'register']);
+//send verification token to users
+Route::post('send-code', [AccountActivationController::class, 'sendActivationCode']);
+//verify token
+Route::post('verify-code', [AccountActivationController::class, 'verifyAndActivateAccount']);
 
-Route::post('login', [AuthController::class,'login']);
+//reset user password
+Route::post('send-reset-code', [ResetPasswordContoller::class, 'passwordResetCode']);
+Route::post('resend-reset-code', [ResetPasswordContoller::class, 'resendResetCode']);
+Route::post('verify-reset-code', [ResetPasswordContoller::class, 'verifySentResetCode']);
+Route::post('reset-password', [ResetPasswordContoller::class, 'resetPassword']);
 
-Route::group(['middleware' => 'auth:api'], function(){
+Route::group(['middleware' => 'auth:sanctum'], function(){
 	
-	Route::get('logout', [AuthController::class,'logout']);
+	Route::get('logout', [LoginController::class,'logoutUser']);
+	Route::post('update-password', [UpdatePasswordContoller::class, 'updateUserPassword']);
 
 	Route::get('profile', [AuthController::class,'profile']);
 	Route::post('change-password', [AuthController::class,'changePassword']);
