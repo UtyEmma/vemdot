@@ -83,8 +83,8 @@ class LoginController extends Controller
         return $this->returnMessageTemplate(true, $this->returnSuccessMessage('successful_login'), $payload);
     }
 
-     // method for user logoutUser and delete token
-     public function logoutUserUser(){
+    // method for user logoutUser and delete token
+    public function logoutUser(){
         auth()->user()->tokens()->delete();
         return $this->returnMessageTemplate(true, $this->returnSuccessMessage('successful_logout'));
     }
