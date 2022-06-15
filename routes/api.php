@@ -40,7 +40,9 @@ Route::post('reset-password', [ResetPasswordContoller::class, 'resetPassword']);
 
 Route::group(['middleware' => 'auth:sanctum'], function(){
 	
+	//log user out
 	Route::get('logout', [LoginController::class,'logoutUser']);
+	//update user password
 	Route::post('update-password', [UpdatePasswordContoller::class, 'updateUserPassword']);
 
 	Route::get('profile', [AuthController::class,'profile']);
