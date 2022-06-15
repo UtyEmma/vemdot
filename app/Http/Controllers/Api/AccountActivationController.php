@@ -28,6 +28,7 @@ class AccountActivationController extends Controller
         $validator = Validator::make($data, [
             'userId' => 'required',
         ]);
+
         if($validator->fails()){
             return $this->returnMessageTemplate(false, $validator->messages());
         }
@@ -50,7 +51,7 @@ class AccountActivationController extends Controller
 
             //return the account activation code and email
             $payload = [
-                'user' => $user,  
+                'user' => $user,
                 'token' => $verificationCode['payload']
             ];
             return $this->returnMessageTemplate(true, $this->returnSuccessMessage('activation_token_sent'), $payload);
@@ -74,13 +75,13 @@ class AccountActivationController extends Controller
         $user = $this->user->getUser([
             ['unique_id', $data['userId']],
         ]);
-            
+
         if($user == null){
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('user_not_found'));
         }
 
         $appSettings = $this->appSettings->getSettings();
-        
+
         //verify the token
         $verificationCode = $this->verification->verifyTokenValidity($data['code'], 'account-activation', $user);
         if($verificationCode['status'] == 'error'){
