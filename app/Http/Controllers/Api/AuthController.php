@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
-use App\User;
-use Auth;
+use App\Model\User;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -26,11 +26,11 @@ class AuthController extends Controller
                 'success' => 0
             ]);
         }
-        
+
         $accessToken = Auth::user()->createToken('authToken')->accessToken;
 
         return  response([
-                    'user' => Auth::user(), 
+                    'user' => Auth::user(),
                     'access_token' => $accessToken,
                     'success' => 1
                 ]);
@@ -69,7 +69,7 @@ class AuthController extends Controller
                         'message' => 'Password has been changed',
                         'status'  => 1
                     ]);
-            
+
         }
             return response([
                         'message' => 'Password not matched!',
@@ -101,7 +101,7 @@ class AuthController extends Controller
 
         $user->update($validData);
 
-        
+
         return response([
                     'message' => 'Profile updated successfully!',
                     'status'  => 1

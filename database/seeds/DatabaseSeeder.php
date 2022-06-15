@@ -1,6 +1,6 @@
 <?php
 
-use App\Country\CountryList;
+use App\Model\Country\CountryList;
 use App\Model\Site\SiteSettings;
 use App\Model\User;
 use App\Traits\Generics;
