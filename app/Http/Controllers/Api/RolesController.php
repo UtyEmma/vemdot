@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class RolesController extends Controller
 {
@@ -20,7 +20,7 @@ class RolesController extends Controller
         $request->validate([
             'name'     => 'required| unique:roles'
         ]);
-        
+
         // store user information
         $role = Role::create(['guard_name' => 'web','name' => $request->name]);
 
@@ -43,7 +43,7 @@ class RolesController extends Controller
             ]);
     }
 
-    
+
     public function show($id,Request $request)
     {
         $role = Role::with('permissions')->find($id);
@@ -71,12 +71,12 @@ class RolesController extends Controller
         $request->validate([
             'permissions'     => 'required'
         ]);
-        
+
         // update role permissions
         $role = Role::find($id);
         if($role){
             // assign permission to role
-            $role->syncPermissions($request->permissions);    
+            $role->syncPermissions($request->permissions);
             return response([
                 'message' => 'Permission changed successfully!',
                 'success' => 1

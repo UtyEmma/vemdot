@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class PermissionController extends Controller
 {
@@ -20,7 +20,7 @@ class PermissionController extends Controller
         $request->validate([
             'name'     => 'required| unique:permissions'
         ]);
-        
+
         // store user information
         $permission = Permission::create(['guard_name' => 'web','name' => $request->name]);
 
@@ -39,7 +39,7 @@ class PermissionController extends Controller
             ]);
     }
 
-    
+
     public function show($id,Request $request)
     {
         $permission = Permission::with('roles')->find($id);

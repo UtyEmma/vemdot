@@ -58,10 +58,10 @@ class LoginController extends Controller
                     $this->verification->sendActivationMail($verificationCode['payload'], $user);
 
                     $this->logoutUser();
-    
+
                     //return the account activation code and email
                     $payload = [
-                        'user' => $user,  
+                        'user' => $user,
                         'token' => $verificationCode['payload']
                     ];
                     return $this->returnMessageTemplate(true, $this->returnSuccessMessage('activation_token_sent'), $payload);
@@ -71,7 +71,7 @@ class LoginController extends Controller
 
         if($appSettings->login_alert != 'no'){
             $currentDate = Carbon::now();
-            $dateFormat = $currentDate->format('l jS \\of F Y h:i:s A'); 
+            $dateFormat = $currentDate->format('l jS \\of F Y h:i:s A');
             //send login notifier to users
             $this->verification->procastLoginMailToUser($user, $dateFormat);
         }

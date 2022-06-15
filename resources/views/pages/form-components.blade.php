@@ -1,4 +1,4 @@
-@extends('layouts.main') 
+@extends('layouts.main')
 @section('title', 'Form Components')
 @section('content')
 
@@ -143,7 +143,7 @@
                                 <label for="exampleInputPassword4">{{ __('Password')}}</label>
                                 <input type="password" class="form-control" id="exampleInputPassword4" placeholder="Password">
                             </div>
-                            
+
                             <div class="form-group">
                                 <label>{{ __('File upload')}}</label>
                                 <input type="file" name="img[]" class="file-upload-default">
@@ -302,7 +302,7 @@
                         <form class="form-inline">
                             <label class="sr-only" for="inlineFormInputName2">{{ __('Name')}}</label>
                             <input type="text" class="form-control mb-2 mr-sm-2" id="inlineFormInputName2" placeholder="Shanker Raj">
-                          
+
                             <label class="sr-only" for="inlineFormInputGroupUsername2">{{ __('Username')}}</label>
                             <div class="input-group mb-2 mr-sm-2">
                                 <div class="input-group-prepend">
@@ -412,7 +412,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- push external js -->
     @push('script')
         <script src="{{ asset('js/form-components.js') }}"></script>

@@ -26,7 +26,7 @@ class UserController extends Controller
             'password' => 'required | confirmed',
             'role'     => 'required'
         ]);
-        
+
         // store user information
         $user = User::create([
                     'name'     => $request->name,
@@ -79,12 +79,12 @@ class UserController extends Controller
         $request->validate([
             'roles'     => 'required'
         ]);
-        
+
         // update user roles
         $user = User::find($id);
         if($user){
             // assign role to user
-            $user->syncRoles($request->roles);    
+            $user->syncRoles($request->roles);
             return response([
                 'message' => 'Roles changed successfully!',
                 'success' => 1

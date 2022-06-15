@@ -19,8 +19,7 @@ class DatabaseSeeder extends Seeder{
      *
      * @return void
      */
-    public function run()
-    {
+    public function run(){
         $user = new User();
         $user->unique_id  = $this->createUniqueId('users', 'unique_id');
         $user->name = "Super Admin";
