@@ -35,10 +35,10 @@ class LoginController extends Controller
         if (!Auth::attempt($request->only('email', 'password'))){
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('wrong_crendential'));
         }
-        return $request;
+     
         $user = User::where('email', $request['email'])->firstOrFail();
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken('auth_token', ['auth:give_access'])->plainTextToken;
 
         //check if the user is blocked
         if($user->status === 'inactive'){
