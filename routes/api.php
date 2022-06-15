@@ -39,7 +39,6 @@ Route::post('verify-reset-code', [ResetPasswordContoller::class, 'verifySentRese
 Route::post('reset-password', [ResetPasswordContoller::class, 'resetPassword']);
 
 Route::group(['middleware' => 'auth:sanctum'], function(){
-	
 	//log user out
 	Route::get('logout', [LoginController::class,'logoutUser']);
 	//update user password
@@ -66,7 +65,6 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
 		Route::get('/role/delete/{id}', [RolesController::class,'delete']);
 		Route::post('/role/change-permission/{id}', [RolesController::class,'changePermissions']);
 	});
-
 
 	//only those have manage_permission permission will get access
 	Route::group(['middleware' => 'can:manage_permission|manage_user'], function(){
