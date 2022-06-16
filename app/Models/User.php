@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Restaurant\Restaurant;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -10,7 +11,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable{
-    use HasApiTokens,Notifiable,HasRoles, SoftDeletes;
+    use HasApiTokens, Notifiable, HasRoles, SoftDeletes;
 
     protected $primaryKey = 'unique_id';
     public $incrementing = false;
@@ -52,7 +53,7 @@ class User extends Authenticatable{
         'email_verified_at' => 'datetime',
     ];
 
-    
+
     public function getAllUsers($condition, $id = 'id', $desc = "desc"){
         return User::where($condition)->orderBy($id, $desc)->get();
     }
@@ -72,5 +73,9 @@ class User extends Authenticatable{
         }
 
         return $roles;
+    }
+
+    public function restaurants (){
+        return $this->hasMany(Restaurant::class, 'user_id', 'unique_id');
     }
 }

@@ -11,6 +11,8 @@ use App\Http\Controllers\Api\UpdatePasswordContoller;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RolesController;
 use App\Http\Controllers\Api\PermissionController;
+use App\Http\Controllers\Api\RestaurantController;
+use App\Http\Controllers\Api\Users\VendorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +25,7 @@ use App\Http\Controllers\Api\PermissionController;
 |
 */
 
-// log users in 
+// log users in
 Route::post('login', [LoginController::class,'loginUser']);
 //create new accounts for users
 Route::post('register', [RegisterController::class,'register']);
@@ -38,8 +40,9 @@ Route::post('resend-reset-code', [ResetPasswordContoller::class, 'resendResetCod
 Route::post('verify-reset-code', [ResetPasswordContoller::class, 'verifySentResetCode']);
 Route::post('reset-password', [ResetPasswordContoller::class, 'resetPassword']);
 
+
 Route::group(['middleware' => 'auth:sanctum'], function(){
-	//log user out
+    //log user out
 	Route::get('logout', [LoginController::class,'logoutUser']);
 	//update user password
 	Route::post('update-password', [UpdatePasswordContoller::class, 'updateUserPassword']);
@@ -48,23 +51,42 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
 	Route::post('change-password', [AuthController::class,'changePassword']);
 	Route::post('update-profile', [AuthController::class,'updateProfile']);
 
+    Route::get('user', [UserController::class, 'show']);
+    Route::post('/user/update', [UserController::class, 'update']);
+
+
+    Route::post('/user/complete-profile', [VendorController::class, 'vendorAccountRequest']);
+
+    Route::post('/restaurant/create', [RestaurantController::class, 'create']);
+    Route::get('/restaurant/show/{restaurant_id}', [RestaurantController::class, 'show']);
+    Route::get('/restaurant/delete/{restaurant_id}', [RestaurantController::class, 'destroy']);
+    Route::post('/restaurant/update/{restaurant_id}', [RestaurantController::class, 'update']);
+
+    Route::prefix('user', function(){
+        // Route::get('', [UserController::class, 'show']);
+    });
+
+
 	//only those have manage_user permission will get access
-	Route::group(['middleware' => 'can:manage_user'], function(){
-		Route::get('/users', [UserController::class,'list']);
-		Route::post('/user/create', [UserController::class,'store']);
-		Route::get('/user/{id}', [UserController::class,'profile']);
-		Route::get('/user/delete/{id}', [UserController::class,'delete']);
-		Route::post('/user/change-role/{id}', [UserController::class,'changeRole']);
-	});
+	// Route::group(['middleware' => 'can:manage_user'], function(){
+	// 	Route::get('/users', [UserController::class,'list']);
+	// 	Route::post('/user/create', [UserController::class,'store']);
+	// 	Route::get('/user/{id}', [UserController::class,'profile']);
+	// 	Route::get('/user/delete/{id}', [UserController::class,'delete']);
+	// 	Route::post('/user/change-role/{id}', [UserController::class,'changeRole']);
+	// });
+
+
+
 
 	//only those have manage_role permission will get access
-	Route::group(['middleware' => 'can:manage_role|manage_user'], function(){
-		Route::get('/roles', [RolesController::class,'list']);
-		Route::post('/role/create', [RolesController::class,'store']);
-		Route::get('/role/{id}', [RolesController::class,'show']);
-		Route::get('/role/delete/{id}', [RolesController::class,'delete']);
-		Route::post('/role/change-permission/{id}', [RolesController::class,'changePermissions']);
-	});
+	// Route::group(['middleware' => 'can:manage_role|manage_user'], function(){
+	// 	Route::get('/roles', [RolesController::class,'list']);
+	// 	Route::post('/role/create', [RolesController::class,'store']);
+	// 	Route::get('/role/{id}', [RolesController::class,'show']);
+	// 	Route::get('/role/delete/{id}', [RolesController::class,'delete']);
+	// 	Route::post('/role/change-permission/{id}', [RolesController::class,'changePermissions']);
+	// });
 
 	//only those have manage_permission permission will get access
 	Route::group(['middleware' => 'can:manage_permission|manage_user'], function(){
@@ -73,5 +95,5 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
 		Route::get('/permission/{id}', [PermissionController::class,'show']);
 		Route::get('/permission/delete/{id}', [PermissionController::class,'delete']);
 	});
-	
+
 });

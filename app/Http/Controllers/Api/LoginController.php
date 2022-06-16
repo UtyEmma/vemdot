@@ -35,7 +35,7 @@ class LoginController extends Controller
         if (!Auth::attempt($request->only('email', 'password'))){
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('wrong_crendential'));
         }
-     
+
         $user = User::where('email', $request['email'])->firstOrFail();
 
         $token = $user->createToken('auth_token', ['auth:give_access'])->plainTextToken;
@@ -80,6 +80,7 @@ class LoginController extends Controller
             'token' => $token,
             'user' => $user,
         ];
+
         return $this->returnMessageTemplate(true, $this->returnSuccessMessage('successful_login'), $payload);
     }
 

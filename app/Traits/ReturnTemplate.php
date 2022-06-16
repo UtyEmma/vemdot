@@ -17,7 +17,7 @@ trait ReturnTemplate {
             'additional_data' => $other,
             'site_details' => $appSettings,
         ]);
-    }    
+    }
 
     //method that return error messages
     public function returnErrorMessage($keyword) {
@@ -30,13 +30,13 @@ trait ReturnTemplate {
             'invalid_token'=>'Invalid Token Supplied',
             'token_reqiured'=>'Token must be provided ',
             'expired_token'=>'Token has expired',
-            'user_not_found'=>'User was not found',
+            'user_not_found'=>'The requested User was not found',
             'failed_data_returned'=>'Data failed to return',
             'no_data_returned'=>'No Data was returned',
             'no_user'=>'This user is not registerd with us, please select a valid user',
             'unknown_error'=>'An error occurred, please try again',
             'insufficiant_fund'=>'Insufficiant Fund',
-            'not_equal_password'=>'The provided password does not match your current password.',            
+            'not_equal_password'=>'The provided password does not match your current password.',
         ];
         return $messageArray[$keyword];
     }
@@ -62,7 +62,7 @@ trait ReturnTemplate {
             'transaction_unconfirmed'=>'Payment was unconfrimed successfully',
             'fund_sent'=>'You fund transfer was successful',
             'mail_sent'=>'Mail was successfully sent',
-            'password_reset'=>'You new password is set, navigate to the login page',           
+            'password_reset'=>'You new password is set, navigate to the login page',
         ];
         return $messageArray[$keyword];
     }
