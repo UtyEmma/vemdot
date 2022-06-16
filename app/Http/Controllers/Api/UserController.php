@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Users\CompleteProfileRequest;
+use App\Http\Requests\Api\Users\ProfileCompletionRequest;
 use App\Http\Requests\Api\Users\UpdateUserRequest;
 use App\Models\Restaurant\Restaurant;
 use Illuminate\Http\Request;
@@ -105,13 +106,47 @@ class UserController extends Controller{
             ]);
     }
 
-    public function update(UpdateUserRequest $request, $id){
-        if(!$user = User::find($id))
-                    return $this->returnMessageTemplate(false, $this->returnErrorMessage('user_not_found'));
+    public function completeProfileSetup(UpdateUserRequest $request){
+        $user = $this->user();
+
+        $avatar = $this->uploadImageHandler($request, 'avatar', 'users');
+        $id_image = $this->uploadImageHandler($request, 'id_image', 'verifications');
+        $logo = $this->uploadImageHandler($request, 'logo', 'logos');
+
+        $user->update($request->safe()->merge([
+            'avatar' => $avatar,
+            'verification' => 'pending',
+            'id_image' => $id_image,
+            'logo' => $logo
+        ])->all());
+
+
+        // $notification = $this->notification->text('Your Vendor Account Request has been received and is pending!')
+        //                                     ->text('This process might take a few days depending ')
+        //                                     ->image(asset('img/auth/login-bg.jpg'));
+
+        // $notification->send($user, "Your Vendor Application has been received", ['mail']);
+
+        return $this->returnMessageTemplate(true, "Your Profile has been Updated Sucessfully!", [
+            'user' => $user
+        ]);
+    }
+
+    public function update(UpdateUserRequest $request){
+        $user = $this->user();
 
         $avatar = $this->uploadImageHandler($request,'avatar', 'users', $user->avatar);
 
-        $user->update($request->safe()->merge(['avatar' => $avatar])->all());
+        if(in_array($user->role, ['vendor', 'logistics'])){
+            $id_image = $this->uploadImageHandler($request, 'id_image', 'verifications');
+            $logo = $this->uploadImageHandler($request, 'logo', 'logos');
+        }
+
+        $user->update($request->safe()->merge([
+            'avatar' => $avatar,
+            'id_image' => $id_image ?? null,
+            'logo' => $logo ?? null
+        ])->all());
 
         return $this->returnMessageTemplate(true, "Your account was updated Successfully", $user);
     }

@@ -52,15 +52,11 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
 	Route::post('update-profile', [AuthController::class,'updateProfile']);
 
     Route::get('user', [UserController::class, 'show']);
+
     Route::post('/user/update', [UserController::class, 'update']);
 
 
-    Route::post('/user/complete-profile', [VendorController::class, 'vendorAccountRequest']);
-
-    Route::post('/restaurant/create', [RestaurantController::class, 'create']);
-    Route::get('/restaurant/show/{restaurant_id}', [RestaurantController::class, 'show']);
-    Route::get('/restaurant/delete/{restaurant_id}', [RestaurantController::class, 'destroy']);
-    Route::post('/restaurant/update/{restaurant_id}', [RestaurantController::class, 'update']);
+    Route::post('/user/complete-profile', [UserController::class, 'completeProfileSetup']);
 
     Route::prefix('user', function(){
         // Route::get('', [UserController::class, 'show']);

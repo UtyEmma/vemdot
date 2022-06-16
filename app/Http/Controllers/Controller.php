@@ -17,11 +17,10 @@ class Controller extends BaseController{
 
     function __construct(NotificationService $notificationService){
         $this->notification = $notificationService;
-        $this->user();
     }
 
     protected function user (){
         $user = Auth::user();
-        return $user ? User::find($user->unique_id) : null;
+        return $user ? User::findOrFail($user->unique_id) : null;
     }
 }
