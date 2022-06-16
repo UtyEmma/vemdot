@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace App\Http\Middleware\User;
 
 use Closure;
 use Illuminate\Http\Request;
 
-class CheckKycStatus
+class CheckUserStatus
 {
     /**
      * Handle an incoming request.

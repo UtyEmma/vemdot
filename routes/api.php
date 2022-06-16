@@ -58,11 +58,6 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
 
     Route::post('/user/complete-profile', [UserController::class, 'completeProfileSetup']);
 
-    Route::prefix('user', function(){
-        // Route::get('', [UserController::class, 'show']);
-    });
-
-
 	//only those have manage_user permission will get access
 	// Route::group(['middleware' => 'can:manage_user'], function(){
 	// 	Route::get('/users', [UserController::class,'list']);
