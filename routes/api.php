@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\AccountActivationController;
+use App\Http\Controllers\Api\MealsController;
 use App\Http\Controllers\Api\ResetPasswordContoller;
 use App\Http\Controllers\Api\UpdatePasswordContoller;
 use App\Http\Controllers\Api\UserController;
@@ -84,9 +85,12 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
     });
 
     // Add a middleware for role here
-    Route::middleware('kyc.status')->group(function(){
+    Route::middleware('kyc.status:Vendor')->group(function(){
         Route::prefix('meals')->group(function(){
-
+            Route::get('/', [MealsController::class, 'fetchAllMeals']);
+            Route::post('/create', [MealsController::class, 'create']);
+            Route::post('/update/{meal_id}', [MealsController::class, 'update']);
+            Route::get('/vendor/{vendor_id?}', [MealsController::class, 'vendorMeals']);
         });
     });
 

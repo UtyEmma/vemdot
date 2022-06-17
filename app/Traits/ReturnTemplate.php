@@ -8,6 +8,8 @@ trait ReturnTemplate {
     public $paginate = 12;
     public $active = 'active';
     public $pending = 'pending';
+    public $suspended = 'suspended';
+    public $confirmed = 'confirmed'; // For KYC
 
     //method that return the messages template
     public function returnMessageTemplate($status = true, $message = '', $payload = [], $other = []) {
@@ -73,7 +75,8 @@ trait ReturnTemplate {
             'created' => "$item was created successfully",
             'fetched_single' => "$item was retrieved",
             'fetched_all' => $item."s were retrieved",
-            'updated' => "$item updated successfully"
+            'updated' => "$item updated successfully",
+            'deleted' => "$item was deleted successfully"
         ];
         return $messageArray[$keyword];
     }
