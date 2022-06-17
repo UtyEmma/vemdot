@@ -109,23 +109,9 @@ class UserController extends Controller{
     public function completeProfileSetup(UpdateUserRequest $request){
         $user = $this->user();
 
-        $avatar = $this->uploadImageHandler($request, 'avatar', 'users');
-        $id_image = $this->uploadImageHandler($request, 'id_image', 'verifications');
-        $logo = $this->uploadImageHandler($request, 'logo', 'logos');
-
         $user->update($request->safe()->merge([
-            'avatar' => $avatar,
-            'verification' => 'pending',
-            'id_image' => $id_image,
-            'logo' => $logo
+            'verification' => 'pending'
         ])->all());
-
-
-        // $notification = $this->notification->text('Your Vendor Account Request has been received and is pending!')
-        //                                     ->text('This process might take a few days depending ')
-        //                                     ->image(asset('img/auth/login-bg.jpg'));
-
-        // $notification->send($user, "Your Vendor Application has been received", ['mail']);
 
         return $this->returnMessageTemplate(true, "Your Profile has been Updated Sucessfully!", [
             'user' => $user
@@ -134,19 +120,7 @@ class UserController extends Controller{
 
     public function update(UpdateUserRequest $request){
         $user = $this->user();
-
-        $avatar = $this->uploadImageHandler($request,'avatar', 'users', $user->avatar);
-
-        if(in_array($user->role, ['vendor', 'logistics'])){
-            $id_image = $this->uploadImageHandler($request, 'id_image', 'verifications');
-            $logo = $this->uploadImageHandler($request, 'logo', 'logos');
-        }
-
-        $user->update($request->safe()->merge([
-            'avatar' => $avatar,
-            'id_image' => $id_image ?? null,
-            'logo' => $logo ?? null
-        ])->all());
+        $user->update($request->safe()->all());
 
         return $this->returnMessageTemplate(true, "Your account was updated Successfully", $user);
     }

@@ -17,17 +17,9 @@ class MealsController extends Controller{
         $user = $this->user();
         $unique_id = $this->createUniqueId('meals');
 
-        $meal = Meal::create($request->safe()->merge([
+        Meal::create($request->safe()->merge([
             'unique_id' => $unique_id
         ])->all());
-
-        if($this->getSiteSettings()->send_basic_emails == 'yes'){
-            // Send Notification
-            $this->notification
-                    ->subject('Meal Sent Successfully')
-                    ->text("We are glad and pleased to have you on board, feel free to explore our platform and enjoy our services")
-                    ->send($user, ['mail']);
-        }
 
         return $this->returnMessageTemplate(true, "Your Meal was created Successfully!");
     }
