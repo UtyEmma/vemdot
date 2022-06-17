@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Meal\Meal;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -10,24 +11,14 @@ use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable{
-    use HasApiTokens,Notifiable,HasRoles, SoftDeletes;
+    use HasApiTokens, Notifiable, HasRoles, SoftDeletes;
 
     protected $primaryKey = 'unique_id';
     public $incrementing = false;
     protected $keyType = 'string';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'unique_id',
-        'name',
-        'email',
-        'referral_id',
-        'referred_id',
-        'role',
+        'unique_id', 'name', 'email', 'referral_id', 'referred_id', 'role',
         'status',
         'country',
         'phone',
@@ -36,6 +27,17 @@ class User extends Authenticatable{
         'main_balance',
         'ref_balance',
         'password',
+        'business_name',
+        'city',
+        'state',
+        'state',
+        'address',
+        'avg_time',
+        'logo',
+        'id_number',
+        'id_image',
+        'kyc_status',
+        'availability'
     ];
 
     protected $hidden = [
@@ -52,7 +54,11 @@ class User extends Authenticatable{
         'email_verified_at' => 'datetime',
     ];
 
-    
+    protected $attributes = [
+        'kyc_status' => 'pending'
+    ];
+
+
     public function getAllUsers($condition, $id = 'id', $desc = "desc"){
         return User::where($condition)->orderBy($id, $desc)->get();
     }
@@ -72,5 +78,9 @@ class User extends Authenticatable{
         }
 
         return $roles;
+    }
+
+    public function meals (){
+        return $this->hasMany(Meal::class, 'user_id', 'unique_id');
     }
 }

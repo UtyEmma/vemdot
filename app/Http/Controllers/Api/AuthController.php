@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -28,7 +28,7 @@ class AuthController extends Controller
             ]);
         }
 
-        $accessToken = Auth::user()->createToken('authToken')->accessToken;
+        // $accessToken = Auth::user()->createToken('authToken')->accessToken;
 
         return  response([
                     'user' => Auth::user(),
@@ -87,6 +87,7 @@ class AuthController extends Controller
         ]);
 
         $user = Auth::user();
+
         // check unique email except this user
         if(isset($request->email)){
             $check = User::where('email', $request->email)

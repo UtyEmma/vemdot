@@ -41,6 +41,7 @@ class RegisterController extends Controller
             'email' => 'required|email|unique:users|max:50',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
+
         if($validator->fails()){
             return $this->returnMessageTemplate(false, $validator->messages());
         }
@@ -84,15 +85,17 @@ class RegisterController extends Controller
         if($appSettings->account_verification != 'no'){
             //send the user an email for activation of account and redirect the user to the page where they will enter code
             $verificationCode = $this->verification->createActivationCode($user);
+            // dd($verificationCode);
             if($verificationCode['status'] == 'success'){
                 //send the activation code via email to the user
-                $this->verification->sendActivationMail($verificationCode['payload'], $user);
+                $this->verification->sendActivationMail($verificationCode['token'], $user);
 
                 //return the account activation code and email
                 $payload = [
-                    'user' => $user,  
-                    'token' => $verificationCode['payload']
+                    'user' => $user,
+                    'token' => $verificationCode['token']
                 ];
+
                 return $this->returnMessageTemplate(true, $this->returnSuccessMessage('activation_token_sent'), $payload);
             }
         }
@@ -101,7 +104,9 @@ class RegisterController extends Controller
             //send welcome message to newly registerd user
             $this->verification->sendWelcomeMail($user);
         }
+
         $payload = ['user' => $user];
+
         return $this->returnMessageTemplate(true, $this->returnSuccessMessage('account_registered'), $payload);
     }
 }

@@ -21,10 +21,11 @@ trait ReturnTemplate {
             'additional_data' => $other,
             'site_details' => $appSettings,
         ]);
-    }    
+    }
 
     //method that return error messages
-    public function returnErrorMessage($keyword) {
+    public function returnErrorMessage($keyword, $append = '') {
+        $item = $append ?? 'Item';
         $messageArray = [
             'wrong_crendential'=>'Wrong login credentials, Please check you email and password',
             'account_blocked'=>'Your account is blocked, please contact support via live chat for further details',
@@ -34,18 +35,20 @@ trait ReturnTemplate {
             'invalid_token'=>'Invalid Token Supplied',
             'token_reqiured'=>'Token must be provided ',
             'expired_token'=>'Token has expired',
-            'user_not_found'=>'User was not found',
+            'user_not_found'=>'The requested User was not found',
             'failed_data_returned'=>'Data failed to return',
             'no_data_returned'=>'No Data was returned',
             'no_user'=>'This user is not registerd with us, please select a valid user',
             'unknown_error'=>'An error occurred, please try again',
             'insufficiant_fund'=>'Insufficiant Fund',
-            'not_equal_password'=>'The provided password does not match your current password.',            
+            'not_equal_password'=>'The provided password does not match your current password.',
+            'not_found' => "$item was not Found"
         ];
         return $messageArray[$keyword];
     }
 
-    public function returnSuccessMessage($keyword) {
+    public function returnSuccessMessage($keyword, $append = '') {
+        $item = $append ?? 'Item';
         $messageArray = [
             'successful_token_creation'=>'Code was successfully created',
             'successful_creation'=>'You request was successfully created',
@@ -66,7 +69,8 @@ trait ReturnTemplate {
             'transaction_unconfirmed'=>'Payment was unconfrimed successfully',
             'fund_sent'=>'You fund transfer was successful',
             'mail_sent'=>'Mail was successfully sent',
-            'password_reset'=>'You new password is set, navigate to the login page',           
+            'password_reset'=>'You new password is set, navigate to the login page',
+            'created' => "$item was created successfully"
         ];
         return $messageArray[$keyword];
     }
