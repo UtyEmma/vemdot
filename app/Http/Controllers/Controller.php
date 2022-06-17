@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Site\SiteSettings;
 use App\Models\User;
 use App\Services\NotificationService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -15,13 +16,17 @@ class Controller extends BaseController{
 
     protected $notification;
 
-    function __construct(NotificationService $notificationService){
+    function __construct(NotificationService $notificationService, SiteSettings $siteSettings){
         $this->notification = $notificationService;
-        $this->user();
+        $this->appSettings = $siteSettings;
     }
 
     protected function user (){
         $user = Auth::user();
-        return $user ? User::find($user->unique_id) : null;
+        return $user ? User::findOrFail($user->unique_id) : null;
+    }
+
+    protected function getSiteSettings(){
+        return $this->appSettings->getSettings();
     }
 }

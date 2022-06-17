@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Users\CompleteProfileRequest;
+use App\Http\Requests\Api\Users\ProfileCompletionRequest;
 use App\Http\Requests\Api\Users\UpdateUserRequest;
 use App\Models\Restaurant\Restaurant;
 use Illuminate\Http\Request;
@@ -105,20 +106,31 @@ class UserController extends Controller{
             ]);
     }
 
-    public function update(UpdateUserRequest $request, $id){
-        if(!$user = User::find($id))
-                    return $this->returnMessageTemplate(false, $this->returnErrorMessage('user_not_found'));
+    public function completeProfileSetup(UpdateUserRequest $request){
+        $user = $this->user();
 
-        $avatar = $this->uploadImageHandler($request,'avatar', 'users', $user->avatar);
+        $user->update($request->safe()->merge([
+            'verification' => 'pending'
+        ])->all());
 
-        $user->update($request->safe()->merge(['avatar' => $avatar])->all());
+        return $this->returnMessageTemplate(true, "Your Profile has been Updated Sucessfully!", [
+            'user' => $user
+        ]);
+    }
+
+    public function update(UpdateUserRequest $request){
+        $user = $this->user();
+        $user->update($request->safe()->all());
 
         return $this->returnMessageTemplate(true, "Your account was updated Successfully", $user);
     }
 
     public function show(){
-        $user = Auth::user();
-        return $this->returnMessageTemplate(true, "", $user);
+        $user = $this->user();
+        $user->notifications;
+        return $this->returnMessageTemplate(true, "", [
+            'user' => $user,
+        ]);
     }
 
 }

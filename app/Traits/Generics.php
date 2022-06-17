@@ -37,7 +37,7 @@ trait Generics{
     }
 
     //create a unique id
-    public function createUniqueId($table_name, $column){
+    public function createUniqueId($table_name, $column = 'unique_id'){
 
         /*$unique_id = Controller::picker();*/
         $unique_id = $this->random_string();
@@ -61,7 +61,7 @@ trait Generics{
 
     public  function createConfirmationNumbers($table_name, $column, $length = 5){
 
-        $unique = $this->createRrandomNumber($length);
+        $unique = $this->createRandomNumber($length);
 
         //check for the database count from the database"unique_id"
         $rowcount = DB::table($table_name)->where($column, $unique)->count();

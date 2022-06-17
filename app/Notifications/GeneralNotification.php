@@ -7,18 +7,18 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class GeneralNotification extends Notification
-{
+class GeneralNotification extends Notification {
     use Queueable;
 
     private $subject;
     private $channels;
     private $message;
 
-    public function __construct($subject, $channels, $message){
+    public function __construct($subject, $channels, $message, $data){
         $this->subject = $subject;
         $this->channels = $channels;
         $this->message = $message;
+        $this->data = $data;
     }
 
     /**
@@ -27,8 +27,7 @@ class GeneralNotification extends Notification
      * @param  mixed  $notifiable
      * @return array
      */
-    public function via($notifiable)
-    {
+    public function via($notifiable) {
         return $this->channels;
     }
 
@@ -53,10 +52,7 @@ class GeneralNotification extends Notification
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toArray($notifiable)
-    {
-        return [
-            //
-        ];
+    public function toArray($notifiable){
+        return $this->data;
     }
 }

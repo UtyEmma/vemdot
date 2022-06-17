@@ -16,7 +16,7 @@ class CreateMealsTable extends Migration
         Schema::create('meals', function (Blueprint $table) {
             $table->id();
             $table->string('unique_id');
-            $table->string('restaurant_id');
+            $table->string('user_id');
             $table->string('category_id');
             $table->string('name');
             $table->string('thumbnail');

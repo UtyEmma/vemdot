@@ -6,6 +6,7 @@ use App\Traits\ReturnTemplate;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends FormRequest{
     use ReturnTemplate;
@@ -27,14 +28,19 @@ class UpdateUserRequest extends FormRequest{
      *
      * @return array
      */
-    public function rules()
-    {
+    public function rules(){
         return [
+            'avatar' => 'nullable|image|max:2000000',
             'name' => 'required|string',
-            'country' => 'nullable|string',
-            'phone' => 'nullable|string',
-            'gender' => 'nullable|string|in:male,female',
-            'avatar' => 'nullable|image|max:2000000'
+            'phone' => 'required|string',
+            'id_number' => [Rule::requiredIf(in_array($this->role, ['vendor', 'logistics'])), 'string'],
+            'id_image' => [Rule::requiredIf(in_array($this->role, ['vendor', 'logistics'])), 'image', 'max:2000000'],
+            'logo' => 'nullable|image|max:2000000',
+            'business_name' => [Rule::requiredIf(in_array($this->role, ['vendor', 'logistics'])), 'string'],
+            'city' => [Rule::requiredIf(in_array($this->role, ['vendor', 'logistics'])), 'string'],
+            'state' => [Rule::requiredIf(in_array($this->role, ['vendor', 'logistics'])), 'string'],
+            'address' => [Rule::requiredIf(in_array($this->role, ['vendor', 'logistics'])), 'string'],
+            'avg_time' => [Rule::requiredIf(in_array($this->role, ['vendor', 'logistics'])), 'string'],
         ];
     }
 }
