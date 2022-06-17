@@ -13,6 +13,10 @@ class HomeController extends Controller
         return view('home');
     }
 
+    public function showDashoardPage(){
+        return view('pages.dashboard');
+    }
+
     public function clearCache()
     {
         \Artisan::call('cache:clear');

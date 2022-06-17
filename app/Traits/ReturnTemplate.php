@@ -5,6 +5,10 @@ use App\Models\Site\SiteSettings;
 
 trait ReturnTemplate {
 
+    public $paginate = 12;
+    public $active = 'active';
+    public $pending = 'pending';
+
     //method that return the messages template
     public function returnMessageTemplate($status = true, $message = '', $payload = [], $other = []) {
         $appSettings = SiteSettings::first();
@@ -48,7 +52,7 @@ trait ReturnTemplate {
             'successful_updated'=>'You request was successfully updated',
             'successful_deleted'=>'You request was successfully deleted',
             'successful_declined'=>'You request was successfully declined',
-            'successful_data_returned'=>'Data was successfully returned',
+            'data_returned'=>'Data was successfully returned',
             'successful_logout'=>'You have successfully logged out and the token was successfully deleted',
             'successful_login'=>'Login was successful',
             'activation_token_sent'=>'Hi, an account activation mail have been sent to your email address. Please provide the code in the mail in the box below',

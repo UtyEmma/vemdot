@@ -13,4 +13,16 @@ class MealCategory extends Model
     protected $primaryKey = 'unique_id';
     public $incrementing = false;
     protected $keyType = 'string';
+
+    public function getAllMealCategorys($condition, $id = 'id', $desc = "desc"){
+        return MealCategory::where($condition)->orderBy($id, $desc)->get();
+    }
+
+    public function paginateMealCategorys($num, $condition, $id = 'id', $desc = "desc"){
+        return MealCategory::where($condition)->orderBy($id, $desc)->paginate($num);
+    }
+
+    public function getMealCategory($condition){
+        return MealCategory::where($condition)->first();
+    }
 }
