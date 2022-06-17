@@ -18,7 +18,8 @@ class Meal extends Model{
     public $incrementing = false;
 
     protected $attributes = [
-        'availability' => true
+        'availability' => true,
+        'rating' => 1
     ];
 
     function owner(){

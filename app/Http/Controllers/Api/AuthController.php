@@ -87,6 +87,7 @@ class AuthController extends Controller
         ]);
 
         $user = Auth::user();
+
         // check unique email except this user
         if(isset($request->email)){
             $check = User::where('email', $request->email)

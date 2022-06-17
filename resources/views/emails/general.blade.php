@@ -1,219 +1,38 @@
-<!DOCTYPE html>
-<html>
-<head>
+@extends('components.email.index')
 
-    <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    {{-- <title>Welcome To {{ucfirst($user->settings->site_name)}}</title> --}}
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style type="text/css">
-        /**
-         * Google webfonts. Recommended to include the .woff version for cross-client compatibility.
-         */
-        @media screen {
-            @font-face {
-                font-family: 'Merriweather';
-                font-style: normal;
-                font-weight: 400;
-                src: local('Merriweather'), local('Merriweather'), url(http://fonts.gstatic.com/s/merriweather/v8/ZvcMqxEwPfh2qDWBPxn6nmB7wJ9CoPCp9n30ZBThZ1I.woff) format('woff');
-            }
+@section('content')
+    <table style="width:100%;max-width:620px;margin:0 auto;background-color:#ffffff;">
+        <tbody>
+            <tr>
+                <td style="padding: 30px 30px 20px;" >
 
-            @font-face {
-                font-family: 'Merriweather Bold';
-                font-style: normal;
-                font-weight: 700;
-                src: local('Merriweather Bold'), local('Merriweather-Bold'), url(http://fonts.gstatic.com/s/merriweather/v8/ZvcMqxEwPfh2qDWBPxn6nhAPw1J91axKNXP_-QX9CC8.woff) format('woff');
-            }
-        }
-
-        /**
-         * Avoid browser level font resizing.
-         * 1. Windows Mobile
-         * 2. iOS / OSX
-         */
-        body,
-        table,
-        td,
-        a {
-            -ms-text-size-adjust: 100%; /* 1 */
-            -webkit-text-size-adjust: 100%; /* 2 */
-        }
-
-        /**
-         * Remove extra space added to tables and cells in Outlook.
-         */
-        table,
-        td {
-            mso-table-rspace: 0pt;
-            mso-table-lspace: 0pt;
-        }
-
-        /**
-         * Better fluid images in Internet Explorer.
-         */
-        img {
-            -ms-interpolation-mode: bicubic;
-        }
-
-        /**
-         * Remove blue links for iOS devices.
-         */
-        a[x-apple-data-detectors] {
-            font-family: inherit !important;
-            font-size: inherit !important;
-            font-weight: inherit !important;
-            line-height: inherit !important;
-            color: inherit !important;
-            text-decoration: none !important;
-        }
-
-        /**
-         * Fix centering issues in Android 4.4.
-         */
-        div[style*="margin: 16px 0;"] {
-            margin: 0 !important;
-        }
-
-        body {
-            width: 100% !important;
-            height: 100% !important;
-            padding: 0 !important;
-            margin: 0 !important;
-        }
-
-        /**
-         * Collapse table borders to avoid space between cells.
-         */
-        table {
-            border-collapse: collapse !important;
-        }
-
-        a {
-            color: #CC7953;
-        }
-
-        img {
-            height: auto;
-            line-height: 100%;
-            text-decoration: none;
-            border: 0;
-            outline: none;
-        }
-    </style>
-
-</head>
-<body style="background-color: #D2C7BA;">
-
-<!-- start preheader -->
-<div class="preheader" style="display: none; max-width: 0; max-height: 0; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opacity: 0;">
-    {{-- Welcome to {{ucfirst($user->settings->site_name)}} - Your number one food vendor. --}}
-</div>
-<!-- end preheader -->
-
-<!-- start body -->
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
-
-    <!-- start logo -->
-    <tr>
-        <td align="center" bgcolor="#D2C7BA">
-            {{-- <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
-                <tr>
-                    <td align="center" valign="top" style="padding: 36px 24px;">
-                        <a href="{{$user->settings->site_domain}}" target="_blank" style="display: inline-block;">
-                            <img src="{{$user->settings->site_logo}}" alt="Logo" border="0" width="48" style="display: block; width: 48px; max-width: 48px; min-width: 48px;">
-                        </a>
-                    </td>
-                </tr>
-            </table> --}}
-        </td>
-    </tr>
-    <!-- end logo -->
-
-    <!-- start hero -->
-    <tr>
-        <td align="center" bgcolor="#D2C7BA">
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
-                <tr>
-                    <td align="left" bgcolor="#ffffff" style="padding: 36px 24px 0; font-family: 'Merriweather Bold', serif; border-top: 5px solid #1b1363;">
-                        {{-- <h3 style="margin: 0;  line-height: 28px; text-align:center">Welcome To {{ucfirst($user->settings->site_name)}}</h3> --}}
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-    <!-- end hero -->
-
-    <!-- start copy block -->
-    <tr>
-        <td align="center" bgcolor="#D2C7BA">
-            <!--[if (gte mso 9)|(IE)]>
-            <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
-                <tr>
-                    <td align="center" valign="top" width="600">
-            <![endif]-->
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
-
-                <tr>
-                    <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Merriweather', serif; font-size: 16px; line-height: 24px;">
-                        <p style="margin: 0;">
-                            @if (isset($details['greeting']))
-                                {{$details['greeting']}}
-                            @else
-                                Hi, {{$user->name}}
-                            @endif
+                    <p style="margin-bottom: 10px;">
+                        @if (isset($details['greeting']))
+                            {!! $details['greeting'] !!}
+                        @else
+                            Hi, {{$user->name ?? ''}}
+                        @endif
                     </p>
-                    </td>
-                </tr>
 
-                @forelse ($details as $detail)
-                    @if ($detail['type'] === 'text')
-                        <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Merriweather', serif; font-size: 16px; line-height: 24px;">
-                            <p style="margin: 0;">{!! $detail['value'] !!}</p>
-                        </td>
-                    @elseif ($detail['type'] === 'image')
-                        <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Merriweather', serif; font-size: 16px; line-height: 24px;">
-                            <img src="{{$detail['value']}}" alt="">
-                        </td>
-                    @elseif ($detail['type'] === 'action')
-                        <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Merriweather', serif; font-size: 16px; line-height: 24px;">
-                            <a href="{{$detail['value']['link']}}">{{$detail['value']['action']}}</a>
-                        </td>
+                    @foreach ($details as $item)
+                        @if(isset($item['type']) && $item['type'] === 'text')
+                            <div style="margin-bottom: 10px;">{!! $item['value'] !!}</div>
+                        @elseif (isset($item['type']) && $item['type'] === 'image')
+                            <img style="width:90px; margin-bottom:24px;" src="{{$item['value']}}" alt="img">
+                        @elseif (isset($item['type']) && $item['type'] === 'action')
+                            <a href="{{$item['value']['link']}}" style="background-color: #309255;border-radius:4px;color:#ffffff;display:inline-block;font-size:13px;font-weight:600;line-height:44px; margin-bottom: 25px; text-align:center;text-decoration:none;text-transform: uppercase; padding: 0 25px">{{$item['value']['action']}}</a>
+                        @elseif (isset($item['type']) && $item['type'] === 'code')
+                            <h1 style="padding: 10px 40px; border-radius: 6px; margin-bottom: 20px; text-align: center; background: #f05a23;"><b>{{$item['value']}}</b></h1>
+                        @endif
+                    @endforeach
+
+                    @if(isset($details['goodbye']))
+                        <p style="margin-top: 25px; margin-bottom: 15px;">{{$details['goodbye']}}</p>
+                    @else
+                        <p style="margin-top: 25px; margin-bottom: 15px;">---- <br> Regards<br>{{env('APP_NAME')}} Team</p>
                     @endif
-                @empty
-                @endforelse
-
-                {{-- <tr>
-                    <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Merriweather', serif; font-size: 16px; line-height: 24px;">
-                        <p style="margin: 0;"><b>Thanks for giving {{ucfirst($user->settings->site_name)}} a try</b></p>
-                        <p style="margin: 0;">We’re thrilled to have you on board. We’d like you to get the most out of {{ucfirst($user->settings->site_name)}}, our state of the art platform is here to help you get the best out of {{ucfirst($user->settings->site_name)}}</p>
-                    </td>
-                </tr> --}}
-            </table>
-        </td>
-    </tr>
-    <!-- end copy block -->
-
-    <!-- start footer -->
-    <tr>
-        <td align="center" bgcolor="#D2C7BA" style="padding: 24px;">
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
-
-                <!-- start permission -->
-                {{-- <tr> --}}
-                    {{-- <td align="center" bgcolor="#D2C7BA" style="padding: 12px 24px; font-family: 'Merriweather', serif; font-size: 14px; line-height: 20px; color: #666;">
-                        <p style="margin: 0;">{{$user->settings->site_address}}</p>
-                        <p style="margin: 0;">Powered by {{ucfirst($user->settings->site_name)}}.</p>
-                    </td>
-                </tr> --}}
-                <!-- end permission -->
-
-            </table>
-        </td>
-    </tr>
-    <!-- end footer -->
-
-</table>
-<!-- end body -->
-
-</body>
-</html>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+@endsection

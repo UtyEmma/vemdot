@@ -13,8 +13,9 @@ use App\Mail\LoginAlert;
 use App\Mail\WelcomeMail;
 use App\Mail\ResetToken;
 use App\Mail\ResetMail;
-
+use App\Models\Role\AccountRole;
 use App\Models\Site\SiteSettings;
+use App\Services\NotificationService;
 use Carbon\Carbon;
 
 class Verification extends Model
@@ -27,43 +28,44 @@ class Verification extends Model
 
     public function getVerification($condition, $id = 'id', $desc = "desc"){
         return Verification::where($condition)->orderBy($id, $desc)->get();
-    } 
+    }
 
     public function getSingleVerification($condition){
         return Verification::where($condition)->first();
     }
 
     public function createActivationCode($user, $type = "account-activation") {
-    
+
         //check if there is an existing code for current type of action
         $codeDetails  = $this->getSingleVerification([
             ["user_id", "=", $user->unique_id],
             ["status", "=", "un-used"],
             ["type", "=", $type],
-        ]);    
-    
+        ]);
+
         //check if the query returned null
         if($codeDetails !== null){
             $codeDetails->status = 'failed';
             $codeDetails->save();
         }
-        
+
         $setting = new SiteSettings();
         $appSettings = $setting->getSettings();
-    
+
         $token = $this->createConfirmationNumbers('verifications', 'token', $appSettings->token_length);
-    
+
         //call the function that creates the confirmation code
         $dataToSave = $this->returnObject([
             'unique_id' => $this->createUniqueId('verifications', 'unique_id'),
             'user_id' => $user->unique_id,
             'token' => $token,
-            'type' => $type
+            'type' => $type,
         ]);
-    
-        $this->createVerification($dataToSave);
 
-        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('successful_token_creation'), $token);
+        $verification = $this->createVerification($dataToSave);
+        $verification->status = 'success';
+        return $verification;
+        // return $this->returnMessageTemplate(true, $this->returnSuccessMessage('successful_token_creation'), $token);
     }
 
     //create new confirmation code
@@ -79,7 +81,7 @@ class Verification extends Model
     }
 
     //verify token
-    function verifyTokenValidity($token, string $token_type, $user):array {
+    function verifyTokenValidity($token, string $token_type, $user) : array {
         try{
             //validate the token from the verification table
             $tokenDetails = $this->getSingleVerification([
@@ -87,12 +89,12 @@ class Verification extends Model
                 ["token", $token],
                 ["type", $token_type],
             ]);
-          
+
             //send the error message to the view
             if($tokenDetails === null){
                 return $this->returnMessageTemplate(false, $this->returnErrorMessage('invalid_token'));
             }
-           
+
             //add fifty minutes to the time for the code that was created
             $currentTime = Carbon::now()->toDateTimeString();
             $expirationTime = Carbon::parse($tokenDetails->created_at)->addMinutes(50)->toDateTimeString();
@@ -116,7 +118,22 @@ class Verification extends Model
         $appSettings = new SiteSettings();
         $user['settings'] = $appSettings->getSettings();
         $user['code'] = $token;
-        \Mail::to($user)->send(new AccountActivation($user));
+
+        $role = AccountRole::find($user->role);
+
+        $notification = new NotificationService();
+
+        $notification->subject("Activate your ".$appSettings->site_name.' '.$role->name ?? ''." Account")
+                        ->greeting('How you dey?')
+                        ->text('Your have successfully created an account with' .ucfirst($appSettings->site_name))
+                        ->text("Below is a ".$appSettings->token_length.' digit code for the activation of your account. Please provide this code in your App to proceed')
+                        ->code($token)
+                        ->text('Thanks for being part of the'.ucfirst($appSettings->site_name).'family.')
+                        ->text("We are glad and pleased to have you on board, feel free to explore our platform and enjoy our services.")
+                        ->data('This is the notification Message')
+                        ->send($user, ['mail', 'database']);
+
+        // \Mail::to($user)->send(new AccountActivation($user));
     }
 
     //send the login admit mail to user

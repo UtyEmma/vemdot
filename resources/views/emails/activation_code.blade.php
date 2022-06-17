@@ -175,7 +175,7 @@
                                 <td align="center" bgcolor="#ffffff" style="padding: 12px;">
                                     <table border="0" cellpadding="0" cellspacing="0">
                                         <tr>
-                                            <td align="center" bgcolor="#f05a23" style="border-radius: 6px;">
+                                            <td align="center" bgcolor="#f05a23" style="padding: 10px 40px; border-radius: 6px; background: #f05a23; text-align: center;">
                                                 <h1 style="padding: 10px 40px"><b>{{$user->code}}</b></h1>
                                             </td>
                                         </tr>

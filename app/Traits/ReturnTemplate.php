@@ -20,7 +20,8 @@ trait ReturnTemplate {
     }
 
     //method that return error messages
-    public function returnErrorMessage($keyword) {
+    public function returnErrorMessage($keyword, $append = '') {
+        $item = $append ?? 'Item';
         $messageArray = [
             'wrong_crendential'=>'Wrong login credentials, Please check you email and password',
             'account_blocked'=>'Your account is blocked, please contact support via live chat for further details',
@@ -37,11 +38,13 @@ trait ReturnTemplate {
             'unknown_error'=>'An error occurred, please try again',
             'insufficiant_fund'=>'Insufficiant Fund',
             'not_equal_password'=>'The provided password does not match your current password.',
+            'not_found' => "$item was not Found"
         ];
         return $messageArray[$keyword];
     }
 
-    public function returnSuccessMessage($keyword) {
+    public function returnSuccessMessage($keyword, $append = '') {
+        $item = $append ?? 'Item';
         $messageArray = [
             'successful_token_creation'=>'Code was successfully created',
             'successful_creation'=>'You request was successfully created',
@@ -63,6 +66,7 @@ trait ReturnTemplate {
             'fund_sent'=>'You fund transfer was successful',
             'mail_sent'=>'Mail was successfully sent',
             'password_reset'=>'You new password is set, navigate to the login page',
+            'created' => "$item was created successfully"
         ];
         return $messageArray[$keyword];
     }

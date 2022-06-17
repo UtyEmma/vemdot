@@ -85,14 +85,15 @@ class RegisterController extends Controller
         if($appSettings->account_verification != 'no'){
             //send the user an email for activation of account and redirect the user to the page where they will enter code
             $verificationCode = $this->verification->createActivationCode($user);
+            // dd($verificationCode);
             if($verificationCode['status'] == 'success'){
                 //send the activation code via email to the user
-                $this->verification->sendActivationMail($verificationCode['payload'], $user);
+                $this->verification->sendActivationMail($verificationCode['token'], $user);
 
                 //return the account activation code and email
                 $payload = [
                     'user' => $user,
-                    'token' => $verificationCode['payload']
+                    'token' => $verificationCode['token']
                 ];
 
                 return $this->returnMessageTemplate(true, $this->returnSuccessMessage('activation_token_sent'), $payload);

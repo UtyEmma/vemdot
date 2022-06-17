@@ -152,8 +152,11 @@ class UserController extends Controller{
     }
 
     public function show(){
-        $user = Auth::user();
-        return $this->returnMessageTemplate(true, "", $user);
+        $user = $this->user();
+        $user->notifications;
+        return $this->returnMessageTemplate(true, "", [
+            'user' => $user,
+        ]);
     }
 
 }

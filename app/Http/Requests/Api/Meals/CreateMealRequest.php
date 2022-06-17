@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Requests\Api\Restaurant;
+namespace App\Http\Requests\Api\Meals;
 
-use App\Traits\Generics;
-use App\Traits\ReturnTemplate;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
-class CreateRestaurantRequest extends FormRequest{
-    use ReturnTemplate;
+class CreateMealRequest extends FormRequest
+{
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -28,16 +27,17 @@ class CreateRestaurantRequest extends FormRequest{
      *
      * @return array
      */
-    public function rules(){
-        $user = $this->user();
+    public function rules()
+    {
         return [
-            'name' => 'required|string',
-            'city' => 'required|string',
-            'state' => 'required|string',
-            'address' => 'required|string',
-            'avg_time' => 'required|string',
-            'logo' => 'nullable|image',
-            'availability' => 'nullable|boolean',
+            'name' => ['required','string'],
+            'thumbnail' => 'required|image',
+            'description' => 'required|string',
+            'price' => 'required|numeric',
+            'images*' => 'required|image',
+            'video' => 'required|mimetypes:video/mp4',
+            'discount' => 'nullable|numeric',
+            'tax' => 'nullable|numeric'
         ];
     }
 }
