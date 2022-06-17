@@ -62,6 +62,7 @@ class DatabaseSeeder extends Seeder{
             $category = new MealCategory();
             $category->unique_id  = $this->createUniqueId('meal_categories', 'unique_id');
             $category->name = $item;
+            $category->status = 'active';
             $category->description = $item;
             $category->save();
         }
