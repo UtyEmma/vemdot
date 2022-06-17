@@ -9,6 +9,9 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\Meals\CategoryController;
+use App\Http\Controllers\Subscription\PlansController;
+use App\Http\Controllers\Subscription\SiteSettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,14 +44,32 @@ Route::group(['middleware' => 'auth'], function(){
 	Route::get('/clear-cache', [HomeController::class,'clearCache']);
 
 	// dashboard route
-	Route::get('/dashboard', function () {
-		return view('pages.dashboard');
-	})->name('dashboard');
+	Route::get('/dashboard', [HomeController::class,'showDashoardPage'])->name('dashboard');
+
+	// meal category handler
+	Route::get('/meal-category', [CategoryController::class,'showCreateCategoryPage']);
+	Route::get('/view/categories', [CategoryController::class,'viewCategories']);
+	Route::post('/create/category', [CategoryController::class,'createCategory']);
+	Route::post('/update/category/{id?}', [CategoryController::class,'updateCategory']);
+	Route::post('/delete/category', [CategoryController::class,'deleteCategory']);
+	Route::get('/edit/category/{id?}', [CategoryController::class,'viewSingleCategory']);
+	
+	// plan subscription handler
+	Route::get('/subscription-plan', [PlansController::class,'showCreatePlanPage']);
+	Route::get('/view/plans', [PlansController::class,'viewPlans']);
+	Route::post('/create/plan', [PlansController::class,'createPlan']);
+	Route::post('/update/plan/{id?}', [PlansController::class,'updatePlan']);
+	Route::post('/delete/plan', [PlansController::class,'deletePlan']);
+	Route::get('/edit/plan/{id?}', [PlansController::class,'editPlan']);
+
+	//site settings
+	Route::get('/site/settings', [SiteSettingsController::class,'viewSiteSettings']);
+	Route::get('/site/settings', [SiteSettingsController::class,'viewSiteSettings']);
 
 	//only those have manage_user permission will get access
 	Route::group(['middleware' => 'can:manage_user'], function(){
-	Route::get('/users', [UserController::class,'index']);
-	Route::get('/user/get-list', [UserController::class,'getUserList']);
+		Route::get('/users', [UserController::class,'index']);
+		Route::get('/user/get-list', [UserController::class,'getUserList']);
 		Route::get('/user/create', [UserController::class,'create']);
 		Route::post('/user/create', [UserController::class,'store'])->name('create-user');
 		Route::get('/user/{id}', [UserController::class,'edit']);

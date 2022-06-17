@@ -20,6 +20,28 @@
                 <div class="nav-item {{ ($segment1 == 'dashboard') ? 'active' : '' }}">
                     <a href="{{route('dashboard')}}"><i class="ik ik-bar-chart-2"></i><span>{{ __('Dashboard')}}</span></a>
                 </div>
+                <div class="nav-lavel">{{ __('Using')}} </div>
+                <div class="nav-item {{ ($segment1 == 'form-components'||$segment1 == 'form-addon') ? 'active open' : '' }} has-sub">
+                    <a href="#"><i class="ik ik-edit"></i><span>{{ __('Meal Category')}}</span></a>
+                    <div class="submenu-content">
+                        <a href="{{url('meal-category')}}" class="menu-item {{ ($segment1 == 'form-components') ? 'active' : '' }}">{{ __('Create Category ')}}</a>
+                        <a href="{{url('view/categories')}}" class="menu-item {{ ($segment1 == 'form-addon') ? 'active' : '' }}">{{ __('View Categories')}}</a>
+                    </div>
+                </div>
+                <div class="nav-item {{ ($segment1 == 'add-plan'||$segment1 == 'view-plan') ? 'active open' : '' }} has-sub">
+                    <a href="#"><i class="ik ik-cloud"></i><span>{{ __('Subscription Plan')}}</span></a>
+                    <div class="submenu-content">
+                        <a href="{{url('subscription-plan')}}" class="menu-item {{ ($segment1 == 'add-plan') ? 'active' : '' }}">{{ __('Create Plan')}}</a>
+                        <a href="{{url('view/plans')}}" class="menu-item {{ ($segment1 == 'view-plan') ? 'active' : '' }}">{{ __('View Plan')}}</a>
+                    </div>
+                </div>
+                <div class="nav-item {{ ($segment1 == 'site-settings') ? 'active' : '' }}">
+                    <a href="{{url('site/settings')}}"><i class="ik ik-unlock"></i><span>{{ __('Site Settings')}}</span> </a>
+                </div>
+                <div class="nav-lavel">{{ __('Documentation')}} </div>
+                <div class="nav-item {{ ($segment1 == 'rest-api') ? 'active' : '' }}">
+                    <a href="{{url('rest-api')}}"><i class="ik ik-cloud"></i><span>{{ __('REST API')}}</span> <span class=" badge badge-success badge-right">{{ __('New')}}</span></a>
+                </div>
                 <div class="nav-item {{ ($segment1 == 'users' || $segment1 == 'roles'||$segment1 == 'permission' ||$segment1 == 'user') ? 'active open' : '' }} has-sub">
                     <a href="#"><i class="ik ik-user"></i><span>{{ __('Adminstrator')}}</span></a>
                     <div class="submenu-content">
@@ -37,10 +59,6 @@
                         <a href="{{url('permission')}}" class="menu-item {{ ($segment1 == 'permission') ? 'active' : '' }}">{{ __('Permission')}}</a>
                         @endcan
                     </div>
-                </div>
-                <div class="nav-lavel">{{ __('Documentation')}} </div>
-                <div class="nav-item {{ ($segment1 == 'rest-api') ? 'active' : '' }}">
-                    <a href="{{url('rest-api')}}"><i class="ik ik-cloud"></i><span>{{ __('REST API')}}</span> <span class=" badge badge-success badge-right">{{ __('New')}}</span></a>
                 </div>
                 <div class="nav-item {{ ($segment1 == 'permission-example') ? 'active' : '' }}">
                     <a href="{{url('permission-example')}}"><i class="ik ik-unlock"></i><span>{{ __('Laravel Permission')}}</span> </a>

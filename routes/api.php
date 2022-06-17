@@ -11,6 +11,9 @@ use App\Http\Controllers\Api\UpdatePasswordContoller;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RolesController;
 use App\Http\Controllers\Api\PermissionController;
+
+use App\Http\Controllers\Meals\CategoryController;
+use App\Http\Controllers\Subscription\PlansController;
 use App\Http\Controllers\Api\RestaurantController;
 use App\Http\Controllers\Api\Users\VendorController;
 
@@ -51,7 +54,30 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
 	Route::post('change-password', [AuthController::class,'changePassword']);
 	Route::post('update-profile', [AuthController::class,'updateProfile']);
 
-    Route::prefix('user')->group(function(){
+	// meal category handler
+	Route::post('/create/category', [CategoryController::class,'createCategory']);
+	Route::get('/view/categories', [CategoryController::class,'viewCategories'])->name('view/categories');
+	Route::post('/update/category/{id?}', [CategoryController::class,'updateCategory']);
+	Route::get('/edit/category/{id?}', [CategoryController::class,'viewSingleCategory']);
+	Route::post('/delete/category', [CategoryController::class,'deleteCategory']);
+
+	// plan subscription handler
+	Route::get('/view/plans', [PlansController::class,'viewPlans']);
+	Route::post('/create/plan', [PlansController::class,'createPlan']);
+	Route::post('/update/plan/{id?}', [PlansController::class,'updatePlan']);
+	Route::post('/delete/plan', [PlansController::class,'deletePlan']);
+	Route::get('/edit/plan/{id?}', [PlansController::class,'editPlan']);
+
+  //only those have manage_user permission will get access
+  Route::group(['middleware' => 'can:manage_user'], function(){
+		Route::get('/users', [UserController::class,'list']);
+		Route::post('/user/create', [UserController::class,'store']);
+		Route::get('/user/{id}', [UserController::class,'profile']);
+		Route::get('/user/delete/{id}', [UserController::class,'delete']);
+		Route::post('/user/change-role/{id}', [UserController::class,'changeRole']);
+	});
+
+   Route::prefix('user')->group(function(){
         Route::get('/', [UserController::class, 'show'])->name('user.single');
         Route::post('update', [UserController::class, 'update'])->name('user.update');
         Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
@@ -59,12 +85,11 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
 
     // Add a middleware for role here
     Route::middleware('kyc.status')->group(function(){
-
         Route::prefix('meals')->group(function(){
 
         });
-
     });
+
 
 
 
