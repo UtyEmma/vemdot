@@ -70,7 +70,10 @@ trait ReturnTemplate {
             'fund_sent'=>'You fund transfer was successful',
             'mail_sent'=>'Mail was successfully sent',
             'password_reset'=>'You new password is set, navigate to the login page',
-            'created' => "$item was created successfully"
+            'created' => "$item was created successfully",
+            'fetched_single' => "$item was retrieved",
+            'fetched_all' => $item."s were retrieved",
+            'updated' => "$item updated successfully"
         ];
         return $messageArray[$keyword];
     }

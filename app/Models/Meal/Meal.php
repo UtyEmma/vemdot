@@ -26,5 +26,9 @@ class Meal extends Model{
         return $this->belongsTo(User::class, 'user_id', 'unique_id');
     }
 
+    function category(){
+        return $this->belongsTo(MealCategory::class, 'category_id', 'unique_id');
+    }
+
 
 }
