@@ -50,6 +50,8 @@ class UserController extends Controller{
     public function list($role){
         $query = User::query();
 
+
+
         if($role === 'Vendor'){
             $query->with(['meals']);
         }

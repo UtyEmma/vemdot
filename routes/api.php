@@ -87,8 +87,11 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
         Route::prefix('addresses')->group(function(){
             Route::post('/', [AddressController::class, 'list']);
             Route::post('create', [AddressController::class, 'create']);
-            Route::post('update', [AddressController::class, 'update']);
-            Route::post('delete', [AddressController::class, 'delete']);
+
+            Route::prefix('{id}')->group(function(){
+                Route::post('update', [AddressController::class, 'update']);
+                Route::post('delete', [AddressController::class, 'delete']);
+            });
         });
 
 
