@@ -86,18 +86,17 @@ class AccountActivationController extends Controller
             return $this->returnMessageTemplate(false, $verificationCode['message']);
         }
 
-        //activation was successful, activate the user account
-        $user->email_verified_at = Carbon::now()->toDateTimeString();
-        if($user->save()){
+        $user->update([
+            'email_verified_at' => Carbon::now()->toDateTimeString(),
+            'two_factor' => 'yes',
+        ]);
 
-            if($appSettings->welcome_message != 'no'){
-                //send welcome message to newly registerd user
-                $this->verification->sendWelcomeMail($user, $appSettings);
-            }
-
-            $payload = ['user' => $user];
-            return $this->returnMessageTemplate(true, $this->returnSuccessMessage('account_verified'), $payload);
+        if($appSettings->welcome_message != 'no'){
+            //send welcome message to newly registerd user
+            $this->verification->sendWelcomeMail($user, $appSettings);
         }
-        return $this->returnMessageTemplate(false, $this->returnErrorMessage('unknown_error'));
+
+        $payload = ['user' => $user];
+        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('account_verified'), $payload);
     }
 }

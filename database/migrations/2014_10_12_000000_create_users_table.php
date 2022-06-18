@@ -26,6 +26,8 @@ class CreateUsersTable extends Migration
             $table->string('gender')->nullable();
 
             $table->timestamp('email_verified_at')->nullable();
+            $table->string('two_factor')->default('no');
+            $table->timestamp('two_factor_verified_at')->nullable();
             $table->string('password');
 
             $table->string('avatar')->default('default.png');

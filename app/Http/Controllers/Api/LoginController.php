@@ -34,14 +34,8 @@ class LoginController extends Controller
 
         $user = User::where('email', $request['email'])->firstOrFail();
 
-        $token = $user->createToken('auth_token', ['auth:give_access'])->plainTextToken;
-
-        //check if the user is blocked
-        if($user->status === 'inactive'){
-            $this->logoutUser();
-            return $this->returnMessageTemplate(false, $this->returnErrorMessage('account_blocked'));
-        }
-
+        $token = $user->createToken('auth_token', ['twofa_access'])->plainTextToken;
+        
         $appSettings = $this->getSiteSettings();
 
         if($appSettings->account_verification != 'no'){
@@ -65,19 +59,62 @@ class LoginController extends Controller
             }
         }
 
-        if($appSettings->login_alert != 'no'){
-            $currentDate = Carbon::now();
-            $dateFormat = $currentDate->format('l jS \\of F Y h:i:s A');
-            //send login notifier to users
-            $this->verification->procastLoginMailToUser($user, $dateFormat, $appSettings);
+        //check if the user is blocked
+        if($user->status == 'blocked'){
+            $this->logoutUser();
+            return $this->returnMessageTemplate(false, $this->returnErrorMessage('account_blocked'));
         }
+
+        $user->two_factor_verified_at = null;
+        $user->save();
+
+        $data = $user->generateCode();
 
         $payload = [
             'token' => $token,
-            'user' => $user,
+            '2fa_code' => $data['code'],
         ];
 
-        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('successful_login'), $payload);
+        if($data['status']){
+            return $this->returnMessageTemplate(true, $this->returnSuccessMessage('2fa_code_sent'), $payload);
+        }else{
+            return $this->returnMessageTemplate(false, $data['message']);
+        }
+    }
+
+    public function processUserlogin(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required',
+            'code' => 'required',
+        ]);
+        if($validator->fails()){
+            return $this->returnMessageTemplate(false, $validator->messages());
+        }
+
+        $process = $this->verifyTwofactor($request);
+
+        if($process['status']){
+            
+            if($this->getSiteSettings()->login_alert != 'no'){
+                $currentDate = Carbon::now();
+                $dateFormat = $currentDate->format('l jS \\of F Y h:i:s A');
+                //send login notifier to users
+                $this->verification->procastLoginMailToUser($process['payload']->users, $dateFormat, $this->getSiteSettings());
+            }
+
+            $this->logoutUser();
+            $token = $process['payload']->users->createToken('auth_token', ['full_access'])->plainTextToken;
+
+            $payload = [
+                'token' => $token,
+                'user' => $process['payload']->users,
+            ];
+            return $this->returnMessageTemplate(true, $this->returnSuccessMessage('successful_login'), $payload);
+
+        }else{
+            return $this->returnMessageTemplate(false, $process['message']);
+        }
     }
 
     // method for user logoutUser and delete token
