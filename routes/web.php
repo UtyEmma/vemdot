@@ -11,7 +11,7 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\Meals\CategoryController;
 use App\Http\Controllers\Subscription\PlansController;
-use App\Http\Controllers\Subscription\SiteSettingsController;
+use App\Http\Controllers\Settings\SiteSettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,7 +64,7 @@ Route::group(['middleware' => 'auth'], function(){
 
 	//site settings
 	Route::get('/site/settings', [SiteSettingsController::class,'viewSiteSettings']);
-	Route::get('/site/settings', [SiteSettingsController::class,'viewSiteSettings']);
+	Route::post('/update/site/settings', [SiteSettingsController::class,'updateSiteSettings']);
 
 	//only those have manage_user permission will get access
 	Route::group(['middleware' => 'can:manage_user'], function(){

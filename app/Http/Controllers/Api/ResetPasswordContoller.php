@@ -5,11 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use App\Models\Site\SiteSettings;
 use App\Models\User;
 use App\Models\Verification\Verification;
-use App\Traits\Generics;
-use App\Traits\ReturnTemplate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules;
@@ -17,10 +14,8 @@ use Carbon\Carbon;
 
 class ResetPasswordContoller extends Controller
 {
-    use Generics, ReturnTemplate;
     //
-    function __construct(SiteSettings $appSettings, User $user, Verification $verification){
-        $this->appSettings = $appSettings;
+    function __construct(User $user, Verification $verification){
         $this->user = $user;
         $this->verification = $verification;
     }
@@ -46,15 +41,17 @@ class ResetPasswordContoller extends Controller
                 return $this->returnMessageTemplate(false, $this->returnErrorMessage('user_not_found'));
             }
 
+            $appSettings = $this->getSiteSettings();
+
             //send the user an email for activation of account and redirect the user to the page where they will enter code
-            $verificationCode = $this->verification->createActivationCode($user, "password-reset");
+            $verificationCode = $this->verification->createActivationCode($user, $appSettings, "password-reset");
             if($verificationCode['status'] == 'success'){
                 //send the activation code via email to the user
-                $this->verification->sendPwdResetTokenMail($verificationCode['payload'], $user);
+                $this->verification->sendPwdResetTokenMail($verificationCode['token'], $user, $appSettings);
                 //return the account activation code and email
                 $payload = [
                     'user' => $user,  
-                    'token' => $verificationCode['payload']
+                    'token' => $verificationCode['token']
                 ];
                 return $this->returnMessageTemplate(true, $this->returnSuccessMessage('activation_token_sent'), $payload);
             }
@@ -82,15 +79,17 @@ class ResetPasswordContoller extends Controller
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('user_not_found'));
         }
 
+        $appSettings = $this->getSiteSettings();
+
         //send the user an email for activation of account and redirect the user to the page where they will enter code
-        $verificationCode = $this->verification->createActivationCode($user, "password-reset");
+        $verificationCode = $this->verification->createActivationCode($user, $appSettings, "password-reset");
         if($verificationCode['status'] == 'success'){
             //send the activation code via email to the user
-            $this->verification->sendPwdResetTokenMail($verificationCode['payload'], $user);
+            $this->verification->sendPwdResetTokenMail($verificationCode['token'], $user, $appSettings);
             //return the account activation code and email
             $payload = [
                 'user' => $user,  
-                'token' => $verificationCode['payload']
+                'token' => $verificationCode['token']
             ];
             return $this->returnMessageTemplate(true, $this->returnSuccessMessage('activation_token_sent'), $payload);
         }
@@ -135,7 +134,7 @@ class ResetPasswordContoller extends Controller
         try{
             $data = $request->all();
 
-            $appSettings = $this->appSettings->getSettings();
+            $appSettings = $this->getSiteSettings();
 
             $validator = Validator::make($data, [
                 'userId' => 'required',
@@ -159,7 +158,7 @@ class ResetPasswordContoller extends Controller
                     $currentDate = Carbon::now();
                     $dateFormat = $currentDate->format('l jS \\of F Y h:i:s A'); 
                     //send reset password mail to user
-                    $this->verification->sendUserPasswordResetMail($user, $dateFormat);
+                    $this->verification->sendUserPasswordResetMail($user, $dateFormat, $appSettings);
                 }
 
                 //password reset was successful, login to continue

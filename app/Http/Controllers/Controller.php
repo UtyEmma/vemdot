@@ -16,9 +16,8 @@ class Controller extends BaseController{
 
     protected $notification;
 
-    function __construct(NotificationService $notificationService, SiteSettings $siteSettings){
+    function __construct(NotificationService $notificationService){
         $this->notification = $notificationService;
-        $this->appSettings = $siteSettings;
     }
 
     protected function user (){
@@ -27,6 +26,7 @@ class Controller extends BaseController{
     }
 
     protected function getSiteSettings(){
-        return $this->appSettings->getSettings();
+        $settings = new SiteSettings();
+        return $settings->getSettings();
     }
 }

@@ -5,16 +5,12 @@ namespace App\Http\Controllers\Subscription;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Traits\Generics;
-use App\Traits\ReturnTemplate;
-use App\Traits\FileUpload;
 use App\Models\Plan\SubscriptionPlan;
 
 use RealRashid\SweetAlert\Facades\Alert;
 
 class PlansController extends Controller
 {
-    use Generics, ReturnTemplate, FileUpload;
     //
     function __construct(SubscriptionPlan $subscriptionPlan){
         $this->subscriptionPlan = $subscriptionPlan;
