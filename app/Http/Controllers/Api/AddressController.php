@@ -40,7 +40,7 @@ class AddressController extends Controller{
         $user = $this->user();
 
         if($address->user_id !== $user->unique_id)
-                    return $this->returnMessageTemplate(false, $this->returnErrorMessage('not_owner', "Address". 'the current User'));
+                    return $this->returnMessageTemplate(false, $this->returnErrorMessage('not_owner', "Address", 'the current User'));
 
         $address->update($request->safe()->all());
 
