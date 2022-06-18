@@ -8,17 +8,13 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-use App\Traits\ReturnTemplate;
-use App\Models\Site\SiteSettings;
 use App\Models\Verification\Verification;
 use Carbon\Carbon;
 
 class LoginController extends Controller
 {
-    use ReturnTemplate;
 
-    function __construct(SiteSettings $appSettings, Verification $verification){
-        $this->appSettings = $appSettings;
+    function __construct(Verification $verification){
         $this->verification = $verification;
     }
     //
@@ -46,23 +42,23 @@ class LoginController extends Controller
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('account_blocked'));
         }
 
-        $appSettings = $this->appSettings->getSettings();
+        $appSettings = $this->getSiteSettings();
 
         if($appSettings->account_verification != 'no'){
             //check for unactivated account
             if($user->email_verified_at == null){
                 //send the user an email for activation of account and redirect the user to the page where they will enter code
-                $verificationCode = $this->verification->createActivationCode($user);
+                $verificationCode = $this->verification->createActivationCode($user, $appSettings);
                 if($verificationCode['status'] == 'success'){
                     //send the activation code via email to the user
-                    $this->verification->sendActivationMail($verificationCode['payload'], $user);
+                    $this->verification->sendActivationMail($verificationCode['token'], $user, $appSettings);
 
                     $this->logoutUser();
 
                     //return the account activation code and email
                     $payload = [
                         'user' => $user,
-                        'token' => $verificationCode['payload']
+                        'token' => $verificationCode['token']
                     ];
                     return $this->returnMessageTemplate(true, $this->returnSuccessMessage('activation_token_sent'), $payload);
                 }
@@ -73,7 +69,7 @@ class LoginController extends Controller
             $currentDate = Carbon::now();
             $dateFormat = $currentDate->format('l jS \\of F Y h:i:s A');
             //send login notifier to users
-            $this->verification->procastLoginMailToUser($user, $dateFormat);
+            $this->verification->procastLoginMailToUser($user, $dateFormat, $appSettings);
         }
 
         $payload = [

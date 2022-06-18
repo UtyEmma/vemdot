@@ -5,10 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Meals\CreateMealRequest;
 use App\Models\Meal\Meal;
+
 use App\Services\NotificationService;
-use App\Traits\FileUpload;
-use App\Traits\Generics;
-use App\Traits\ReturnTemplate;
 use Illuminate\Support\Facades\Request;
 
 class MealsController extends Controller{

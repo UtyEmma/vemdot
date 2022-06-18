@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use App\Models\Site\SiteSettings;
 use App\Models\User;
 use App\Traits\ReturnTemplate;
 use Illuminate\Support\Facades\Auth;
@@ -17,8 +16,7 @@ class UpdatePasswordContoller extends Controller
 {
     use ReturnTemplate;
     //
-    function __construct(SiteSettings $appSettings, User $user){
-        $this->appSettings = $appSettings;
+    function __construct( User $user){
         $this->user = $user;
     }
 

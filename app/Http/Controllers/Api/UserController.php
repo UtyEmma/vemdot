@@ -3,22 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Users\CompleteProfileRequest;
-use App\Http\Requests\Api\Users\ProfileCompletionRequest;
 use App\Http\Requests\Api\Users\UpdateUserRequest;
-use App\Models\Restaurant\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use App\Models\Users\KycVerification;
-use App\Services\NotificationService;
-use App\Traits\FileUpload;
-use App\Traits\Generics;
-use App\Traits\ReturnTemplate;
-use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller{
-    use ReturnTemplate, FileUpload, Generics;
 
     public function list(Request $request)
     {
