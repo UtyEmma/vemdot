@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Meals\CreateMealRequest;
 use App\Models\Meal\Meal;
 
+use App\Services\NotificationService;
+use Illuminate\Support\Facades\Request;
+
 class MealsController extends Controller{
 
     function create(CreateMealRequest $request){
@@ -25,7 +28,40 @@ class MealsController extends Controller{
 
         $meal->update($request->safe()->all());
 
-        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('created', "Meal"));
+        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('updated', "Meal"));
+    }
+
+    function vendorMeals(Request $request){
+        $user = $this->user();
+        $meals = $user->meals();
+
+        $meals->when($request->has('category'), function($query, $category){
+            $query->whereRelation('category', 'category_id', $category);
+        });
+
+        $meals->when($request->has('status'), function($query, $status){
+            $availability = $status === 'available';
+            $query->where('availability', $availability);
+        });
+
+        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('fetched_all', "Meals"), [
+            'meals' => $meals->get()
+        ]);
+    }
+
+    function fetchAllMeals(Request $request){
+        $meals = Meal::query();
+
+        $meals->whereRelation('owner', 'status', false);
+
+        $meals->when($request->has('category'), function($query, $category){
+            $query->whereRelation('category', $category);
+        });
+
+        $meals->when($request->has('status'), function($query, $status){
+            $availability = $status === 'available';
+            $query->where('availability', $availability);
+        });
     }
 
 
