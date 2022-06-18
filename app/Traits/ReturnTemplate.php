@@ -26,7 +26,7 @@ trait ReturnTemplate {
     }
 
     //method that return error messages
-    public function returnErrorMessage($keyword, $append = '') {
+    public function returnErrorMessage($keyword, $append = '', $prepend = '') {
         $item = $append ?? 'Item';
         $messageArray = [
             'wrong_crendential'=>'Wrong login credentials, Please check you email and password',
@@ -44,12 +44,13 @@ trait ReturnTemplate {
             'unknown_error'=>'An error occurred, please try again',
             'insufficiant_fund'=>'Insufficiant Fund',
             'not_equal_password'=>'The provided password does not match your current password.',
-            'not_found' => "$item was not Found"
+            'not_found' => "$item was not Found",
+            'not_owner' => "$item does not belong to $prepend"
         ];
         return $messageArray[$keyword];
     }
 
-    public function returnSuccessMessage($keyword, $append = '') {
+    public function returnSuccessMessage($keyword, $append = '', $prepend = '') {
         $item = $append ?? 'Item';
         $messageArray = [
             'successful_token_creation'=>'Code was successfully created',

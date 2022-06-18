@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Meals\CreateMealRequest;
 use App\Models\Meal\Meal;
+use App\Models\Meal\MealCategory;
 use App\Models\User;
 use App\Services\MealService;
 use App\Services\NotificationService;
@@ -22,6 +23,9 @@ class MealsController extends Controller{
 
     function create(CreateMealRequest $request){
         $user = $this->user();
+
+        if(!MealCategory::find($request->category)) return abort(400, "The Selected Meal Category Does not Exist");
+
         $unique_id = $this->createUniqueId('meals');
 
         $meal = Meal::create($request->safe()->merge([
@@ -35,21 +39,20 @@ class MealsController extends Controller{
     }
 
     function update(CreateMealRequest $request, $meal_id){
-        if(!$meal = Meal::find($meal_id))
-                return $this->returnMessageTemplate(false, $this->returnErrorMessage('not_found', 'Meal'));
+        $meal = Meal::findOrFail($meal_id);
         $meal->update($request->safe()->all());
+
         return $this->returnMessageTemplate(true, $this->returnSuccessMessage('updated', "Meal"), [
             'meal' => $meal
         ]);
     }
 
     function vendorMeals(Request $request, $vendor_id = null){
-        if(!$user = User::where('unique_id', $vendor_id)->first() ?? $this->user())
-                                        return $this->returnErrorMessage('user_not_found');
+        if(!$user = User::where('unique_id', $vendor_id)->first() ?? $this->user()) return $this->returnErrorMessage('user_not_found');
 
         $meals = $user->meals();
         $query = new MealService($request, $meals);
-        $meals = $query->query->orderByCategory()->status()->query();
+        $meals = $query->category()->status()->query();
 
         return $this->returnMessageTemplate(true, $this->returnSuccessMessage('fetched_all', "Meals"), [
             'meals' => $meals->get()
@@ -63,9 +66,8 @@ class MealsController extends Controller{
 
     function fetchAllMeals(MealService $mealService){
         $meals = $mealService
-                        ->hasVendor('active')
-                        ->owner()
-                        ->category()
+                        ->hasVendor($this->pending)
+                        ->owner()->category()
                         ->sortByRating()
                         ->orders()
                         ->query();
@@ -75,10 +77,21 @@ class MealsController extends Controller{
         ]);
     }
 
-    function fetchSingleMeal(MealService $mealService, $meal_id){
-        $meal = $mealService->query->find($meal_id)->owner()->reviews()->query();
+    function vendorFetchSingleMeal(MealService $mealService, $meal_id){
+        $meal = $mealService->find($meal_id)->owner()->reviews()->orders()->query();
         return $this->returnMessageTemplate(true, '', [
             'meal' => $meal->get()
         ]);
+    }
+
+    function fetchSingleMeal(MealService $mealService, $meal_id){
+        $meal = $mealService->find($meal_id)->owner()->reviews()->query();
+        return $this->returnMessageTemplate(true, '', [
+            'meal' => $meal->get()
+        ]);
+    }
+
+    function updateAvailabilityStatus(){
+
     }
 }

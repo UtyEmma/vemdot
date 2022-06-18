@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\CheckUserRole;
 use App\Http\Middleware\User\CheckKycStatus;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
@@ -65,5 +66,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'kyc.status' => CheckKycStatus::class,
+        'user.status' => CheckUserRole::class,
     ];
 }

@@ -18,6 +18,7 @@ class MealService {
     function __construct(Request $request, Meal $meal = null){
         $this->request = $request ?? request();
         $this->query = $meal ?? Meal::query();
+        return $this->query;
     }
 
 
@@ -100,6 +101,7 @@ class MealService {
 
     function reviews(){
         // return $this->query = $query;
+        return $this;
     }
 }
 

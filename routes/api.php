@@ -6,7 +6,9 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\AccountActivationController;
+use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\MealsController;
+use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\ResetPasswordContoller;
 use App\Http\Controllers\Api\UpdatePasswordContoller;
 use App\Http\Controllers\Api\UserController;
@@ -47,6 +49,7 @@ Route::post('reset-password', [ResetPasswordContoller::class, 'resetPassword']);
 
 Route::group(['middleware' => 'auth:sanctum'], function(){
     //log user out
+    Route::post('upload', [MediaController::class, 'upload']);
 	Route::get('logout', [LoginController::class,'logoutUser']);
 	//update user password
 	Route::post('update-password', [UpdatePasswordContoller::class, 'updateUserPassword']);
@@ -69,29 +72,43 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
 	Route::post('/delete/plan', [PlansController::class,'deletePlan']);
 	Route::get('/edit/plan/{id?}', [PlansController::class,'editPlan']);
 
-  //only those have manage_user permission will get access
-  Route::group(['middleware' => 'can:manage_user'], function(){
-		Route::get('/users', [UserController::class,'list']);
-		Route::post('/user/create', [UserController::class,'store']);
-		Route::get('/user/{id}', [UserController::class,'profile']);
-		Route::get('/user/delete/{id}', [UserController::class,'delete']);
-		Route::post('/user/change-role/{id}', [UserController::class,'changeRole']);
-	});
 
-   Route::prefix('user')->group(function(){
-        Route::get('/', [UserController::class, 'show'])->name('user.single');
-        Route::post('update', [UserController::class, 'update'])->name('user.update');
-        Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
+    Route::get('user', [UserController::class, 'show'])->name('users.current');
+    Route::prefix('users')->group(function(){
+        Route::prefix('{role}')->group(function(){
+            Route::get('/', [UserController::class, 'list'])->name('users.list');
+            Route::get('/{id}', [UserController::class, 'single'])->name('users.single');
+        });
+        Route::post('update', [UserController::class, 'update'])->name('users.update');
+    });
+
+    Route::middleware('user.status:User')->group(function(){
+
+        Route::prefix('addresses')->group(function(){
+            Route::post('/', [AddressController::class, 'list']);
+            Route::post('create', [AddressController::class, 'create']);
+            Route::post('update', [AddressController::class, 'update']);
+            Route::post('delete', [AddressController::class, 'delete']);
+        });
+
+
     });
 
     // Add a middleware for role here
-    Route::middleware('kyc.status:Vendor')->group(function(){
-        Route::prefix('meals')->group(function(){
-            Route::get('/', [MealsController::class, 'fetchAllMeals']);
-            Route::post('/create', [MealsController::class, 'create']);
-            Route::post('/update/{meal_id}', [MealsController::class, 'update']);
-            Route::get('/vendor/{vendor_id?}', [MealsController::class, 'vendorMeals']);
+    Route::middleware('user.status:Vendor')->group(function(){
+        Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
+
+        Route::middleware('kyc.status:Vendor')->group(function(){
+            Route::prefix('meals')->group(function(){
+                Route::get('/', [MealsController::class, 'fetchAllMeals']);
+                Route::post('/create', [MealsController::class, 'create']);
+                Route::post('/update/{meal_id}', [MealsController::class, 'update']);
+                Route::get('/vendor/{vendor_id?}', [MealsController::class, 'vendorMeals']);
+            });
+
+
         });
+
     });
 
 

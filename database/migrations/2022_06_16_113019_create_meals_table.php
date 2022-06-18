@@ -17,7 +17,7 @@ class CreateMealsTable extends Migration
             $table->id();
             $table->string('unique_id');
             $table->string('user_id');
-            $table->string('category_id');
+            $table->string('category');
             $table->string('name');
             $table->string('thumbnail');
             $table->string('description');

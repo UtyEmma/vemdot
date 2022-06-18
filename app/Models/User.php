@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Address\Address;
 use App\Models\Meal\Meal;
+use App\Models\Role\AccountRole;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -82,5 +84,13 @@ class User extends Authenticatable{
 
     public function meals (){
         return $this->hasMany(Meal::class, 'user_id', 'unique_id');
+    }
+
+    public function addresses(){
+        return $this->hasMany(Address::class, 'user_id', 'unique_id');
+    }
+
+    public function userRole(){
+        return $this->belongsTo(AccountRole::class, 'role', 'unique_id');
     }
 }
