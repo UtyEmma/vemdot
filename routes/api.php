@@ -9,13 +9,10 @@ use App\Http\Controllers\Api\AccountActivationController;
 use App\Http\Controllers\Api\ResetPasswordContoller;
 use App\Http\Controllers\Api\UpdatePasswordContoller;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\RolesController;
-use App\Http\Controllers\Api\PermissionController;
+use App\Http\Controllers\Api\TwoFAController;
 
 use App\Http\Controllers\Meals\CategoryController;
 use App\Http\Controllers\Subscription\PlansController;
-use App\Http\Controllers\Api\RestaurantController;
-use App\Http\Controllers\Api\Users\VendorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +27,7 @@ use App\Http\Controllers\Api\Users\VendorController;
 
 // log users in
 Route::post('login', [LoginController::class,'loginUser']);
+
 //create new accounts for users
 Route::post('register', [RegisterController::class,'register']);
 //send verification token to users
@@ -43,13 +41,19 @@ Route::post('resend-reset-code', [ResetPasswordContoller::class, 'resendResetCod
 Route::post('verify-reset-code', [ResetPasswordContoller::class, 'verifySentResetCode']);
 Route::post('reset-password', [ResetPasswordContoller::class, 'resetPassword']);
 
+Route::group(['middleware' => 'auth:sanctum', 'ability:twofa_access'], function(){
+	//2fa handler
+	Route::post('user/2fa/verify', [LoginController::class, 'processUserlogin']);
+});
 
-Route::group(['middleware' => 'auth:sanctum'], function(){
+
+Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function(){
     //log user out
 	Route::get('logout', [LoginController::class,'logoutUser']);
 	//update user password
 	Route::post('update-password', [UpdatePasswordContoller::class, 'updateUserPassword']);
 
+	//user profile
 	Route::get('profile', [AuthController::class,'profile']);
 	Route::post('change-password', [AuthController::class,'changePassword']);
 	Route::post('update-profile', [AuthController::class,'updateProfile']);

@@ -42,7 +42,9 @@ trait ReturnTemplate {
             'unknown_error'=>'An error occurred, please try again',
             'insufficiant_fund'=>'Insufficiant Fund',
             'not_equal_password'=>'The provided password does not match your current password.',
-            'not_found' => "$item was not Found"
+            'not_found' => "$item was not Found",
+            'wrong_code' => "You entered a wrong code.",
+            'used_code' => "You entered a code that was previously used",
         ];
         return $messageArray[$keyword];
     }
@@ -60,6 +62,7 @@ trait ReturnTemplate {
             'successful_login'=>'Login was successful',
             'activation_token_sent'=>'Hi, an account activation mail have been sent to your email address. Please provide the code in the mail in the box below',
             'valid_token'=>'Valid Token',
+            '2fa_code_sent'=>'We sent you code on your mobile number.',
             'account_verified'=>'Your account have been successfully verified, please login to continue',
             'account_registered'=>'Your account was created successfully, please login to continue',
             'user_deleted'=>'Selected User(s) was deleted successfully',
