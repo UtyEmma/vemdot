@@ -27,6 +27,8 @@ use App\Http\Controllers\Subscription\PlansController;
 
 // log users in
 Route::post('login', [LoginController::class,'loginUser']);
+//2fa handler
+Route::post('user/2fa/verify', [LoginController::class, 'processUserlogin']);
 
 //create new accounts for users
 Route::post('register', [RegisterController::class,'register']);
@@ -40,11 +42,6 @@ Route::post('send-reset-code', [ResetPasswordContoller::class, 'passwordResetCod
 Route::post('resend-reset-code', [ResetPasswordContoller::class, 'resendResetCode']);
 Route::post('verify-reset-code', [ResetPasswordContoller::class, 'verifySentResetCode']);
 Route::post('reset-password', [ResetPasswordContoller::class, 'resetPassword']);
-
-Route::group(['middleware' => 'auth:sanctum', 'ability:twofa_access'], function(){
-	//2fa handler
-	Route::post('user/2fa/verify', [LoginController::class, 'processUserlogin']);
-});
 
 
 Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function(){

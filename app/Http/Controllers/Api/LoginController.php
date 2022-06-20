@@ -14,8 +14,9 @@ use Carbon\Carbon;
 class LoginController extends Controller
 {
 
-    function __construct(Verification $verification){
+    function __construct(Verification $verification, User $user){
         $this->verification = $verification;
+        $this->user = $user;
     }
     //
 
@@ -33,8 +34,6 @@ class LoginController extends Controller
         }
 
         $user = User::where('email', $request['email'])->firstOrFail();
-
-        $token = $user->createToken('auth_token', ['twofa_access'])->plainTextToken;
         
         $appSettings = $this->getSiteSettings();
 
@@ -68,10 +67,9 @@ class LoginController extends Controller
         $user->two_factor_verified_at = null;
         $user->save();
 
-        $data = $user->generateCode();
+        $data = $user->generateCode($user);
 
         $payload = [
-            'token' => $token,
             '2fa_code' => $data['code'],
         ];
 
@@ -83,16 +81,17 @@ class LoginController extends Controller
     }
 
     public function processUserlogin(Request $request){
+        $data = $request->all();
 
-        $validator = Validator::make($request->all(), [
-            'phone' => 'required',
+        $validator = Validator::make($data, [
+            'user_id' => 'required',
             'code' => 'required',
         ]);
         if($validator->fails()){
             return $this->returnMessageTemplate(false, $validator->messages());
         }
 
-        $process = $this->verifyTwofactor($request);
+        $process = $this->verifyTwofactor($data);
 
         if($process['status']){
             
@@ -103,7 +102,6 @@ class LoginController extends Controller
                 $this->verification->procastLoginMailToUser($process['payload']->users, $dateFormat, $this->getSiteSettings());
             }
 
-            $this->logoutUser();
             $token = $process['payload']->users->createToken('auth_token', ['full_access'])->plainTextToken;
 
             $payload = [
