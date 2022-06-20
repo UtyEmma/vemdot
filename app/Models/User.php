@@ -60,10 +60,10 @@ class User extends Authenticatable{
         'kyc_status' => 'pending'
     ];
 
-    public function generateCode(){
+    public function generateCode($auth){
         $code = rand(1000, 9999);
 
-        $auth = auth()->user();
+       // $auth = auth()->user();
 
         $faildCode = UserCode::where([
             ['user_id', $auth->unique_id],

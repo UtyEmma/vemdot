@@ -35,12 +35,15 @@ class Controller extends BaseController{
         return $settings->getSettings();
     }
 
-    protected function verifyTwofactor($request)
+    protected function verifyTwofactor($data)
     {
-        $find = UserCode::where('user_id', $this->user()->unique_id)
-            ->where('code', $request->code)
+        $user = User::where('unique_id', $data['user_id'])
             ->first();
-
+       
+        $find = UserCode::where('user_id', $user->unique_id)
+            ->where('code', $data['code'])
+            ->first();
+           
         if($find->status == 'used'){
             return ['status' => false, 'message' => $this->returnErrorMessage('used_code')];
         } 
@@ -54,8 +57,8 @@ class Controller extends BaseController{
         }
         
         if (!is_null($find)) {
-            $this->user()->two_factor_verified_at = Carbon::now()->toDateTimeString();
-            $this->user()->save();
+            $user->two_factor_verified_at = Carbon::now()->toDateTimeString();
+            $user->save();
             
             $find->status = 'used';
             $find->save();
