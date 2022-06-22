@@ -9,7 +9,7 @@ trait FileUpload {
     public function uploadImageHandler($request, $file, $folder, $image = 'default.png',  $width = 2000, $height = 1163){
         $image_hold = $image;
         if ($request->hasFile($file)) {
-            $image_hold = Cloudinary::upload($request->file($file)->getRealPath(), 
+            $image_hold = Cloudinary::upload($request->file($file)->getRealPath(),
                 [
                 'folder' => 'vemdot/'.$folder,
                 'transformation' => [
@@ -43,9 +43,7 @@ trait FileUpload {
         if ($request->hasFile($file)) {
             // Upload any File to Cloudinary with One line of Code
             $file_hold = Cloudinary::uploadFile($request->file($file)->getRealPath(),
-                [
-                'folder' => 'vemdot/'.$folder,
-                ]
+                ['folder' => 'vemdot/'.$folder,]
             )->getSecurePath();
         }
         return $file_hold;

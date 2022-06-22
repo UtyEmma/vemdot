@@ -12,6 +12,7 @@ use Illuminate\Validation\Rules;
 use Illuminate\Auth\Events\Registered;
 use App\Models\Address\Address;
 use App\Models\Verification\Verification;
+use Illuminate\Support\Facades\Response;
 
 class RegisterController extends Controller
 {
@@ -25,6 +26,7 @@ class RegisterController extends Controller
 
         $data = $request->all();
 
+        // return Response::json(['data' => $data]);
         $validator = Validator::make($data, [
             'name' => 'required|between:2,100',
             'address' => 'required',
