@@ -86,6 +86,7 @@ class DatabaseSeeder extends Seeder{
         $settings->save();
 
         $roles = ["Super Admin", "Admin", "Vendor", "Logistic", "User"];
+
         foreach ($roles as $item){
             $role = new AccountRole();
             $role->unique_id  = $this->createUniqueId('account_roles', 'unique_id');

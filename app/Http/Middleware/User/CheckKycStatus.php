@@ -22,7 +22,10 @@ class CheckKycStatus{
         $user = $request->user();
         $userRole = AccountRole::find($user->role);
 
-        if(in_array($userRole->name, ['Vendor', 'Logistic']) && $user->kyc_status === $this->confirmed && $role === $userRole->name) {
+        // return Response::json([
+        //     'userRole' => $userRole,
+        // ]);
+        if(in_array($userRole->name, ['Vendor', 'Logistic']) && $user->kyc_status == $this->confirmed && $role == $userRole->name) {
             return $next($request);
         }
 

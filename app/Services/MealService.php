@@ -7,16 +7,14 @@ use App\Models\User;
 use App\Traits\Generics;
 use App\Traits\ReturnTemplate;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Request;
 
 class MealService {
     use ReturnTemplate, Generics;
 
     private $query;
-    private $request;
 
-    function __construct(Request $request, Meal $meal = null){
-        $this->request = $request ?? request();
+    function __construct(Meal $meal = null){
         $this->query = $meal ?? Meal::query();
         return $this->query;
     }
@@ -47,6 +45,11 @@ class MealService {
         return $this;
     }
 
+    function byUser($user_id){
+        $this->query = $this->query->where('user_id', $user_id);
+        return $this;
+    }
+
     function orders(string|bool $count = false){
         if(!$count) $this->query = $this->query->with('orders');
         if($count) $this->query = $this->query->withCount('orders');
@@ -55,29 +58,29 @@ class MealService {
     }
 
     function orderByCategory($category = 'category'){
-        $this->query = $this->query->when($this->request->has($category), function($query, $category){
+        $this->query = $this->query->when(request()->has($category), function($query, $category){
             $query->whereRelation('category', $category);
         });
         return $this;
     }
 
     function status($keyword = 'status'){
-        $this->query = $this->query->when($this->request->has($keyword), function($query, $status){
-            $availability = $status === 'available';
+        $this->query = $this->query->when(request()->has($keyword), function($query, $status){
+            $availability = $status === 'available' ? 'yes' : 'no';
             $query->where('availability', $availability);
         });
         return $this;
     }
 
     function search($keyword = 'search'){
-        $this->query = $this->query->when($this->request->has($keyword), function($query, $keyword){
+        $this->query = $this->query->when(request()->has($keyword), function($query, $keyword){
             $query->where('name', '%like%', $keyword);
         });
         return $this;
     }
 
     function sortByPopularity($keyword = 'sortBy'){
-        $this->query= $this->query->when($this->request->has($keyword), function($query, $sort){
+        $this->query= $this->query->when(request()->has($keyword), function($query, $sort){
             if($sort === 'popularity'){
                 $query->orderBy(User::where('unique_id', $query->user_id)->count());
             }

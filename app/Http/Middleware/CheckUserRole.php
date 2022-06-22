@@ -6,6 +6,7 @@ use App\Models\Role\AccountRole;
 use App\Traits\ReturnTemplate;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
 
 class CheckUserRole{
     use ReturnTemplate;
@@ -18,8 +19,11 @@ class CheckUserRole{
      */
     public function handle(Request $request, Closure $next, $role){
         $user = $request->user();
-        $role = AccountRole::find($user->role);
-        if($role->name === $role) return $next($request);
+        $accountRole = AccountRole::find($user->role);
+
+
+
+        if($accountRole->name === $role) return $next($request);
 
         abort(401, "You are not authorized to make this request");
     }

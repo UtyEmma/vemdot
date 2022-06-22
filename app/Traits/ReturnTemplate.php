@@ -45,12 +45,8 @@ trait ReturnTemplate {
             'insufficiant_fund'=>'Insufficiant Fund',
             'not_equal_password'=>'The provided password does not match your current password.',
             'not_found' => "$item was not Found",
-<<<<<<< HEAD
-            'not_owner' => "$item does not belong to $prepend"
-=======
             'wrong_code' => "You entered a wrong code.",
             'used_code' => "You entered a code that was previously used",
->>>>>>> 215f196050188cfc1b6faeb1f2744aea21a27d5e
         ];
         return $messageArray[$keyword];
     }

@@ -5,21 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Meals\CreateMealRequest;
 use App\Models\Meal\Meal;
-<<<<<<< HEAD
 use App\Models\Meal\MealCategory;
 use App\Models\User;
 use App\Services\MealService;
 use App\Services\NotificationService;
-use App\Traits\FileUpload;
-use App\Traits\Generics;
-use App\Traits\ReturnTemplate;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-=======
-
-use App\Services\NotificationService;
 use Illuminate\Support\Facades\Request;
->>>>>>> 215f196050188cfc1b6faeb1f2744aea21a27d5e
 
 class MealsController extends Controller{
 
@@ -53,26 +43,39 @@ class MealsController extends Controller{
         ]);
     }
 
-    function vendorMeals(Request $request, $vendor_id = null){
-        if(!$user = User::where('unique_id', $vendor_id)->first() ?? $this->user()) return $this->returnErrorMessage('user_not_found');
+    function vendorMeals(MealService $mealService, $vendor_id = null){
+        $user = $this->user();
+        if($user->userRole->name === 'Vendor') {
+            $meals = $mealService
+                    ->byUser($user->unique_id)
+                    ->category()
+                    ->status()
+                    ->query();
+        }else{
+            if($vendor_id){
+                $meals = $mealService
+                        ->byUser($vendor_id)
+                        ->hasVendor()
+                        ->owner()->category()
+                        ->sortByRating()
+                        ->orders()
+                        ->query();
+            }
+        }
 
-        $meals = $user->meals();
-        $query = new MealService($request, $meals);
-        $meals = $query->category()->status()->query();
-
-        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('fetched_all', "Meals"), [
+        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('fetched_all', "Meal"), [
             'meals' => $meals->get()
         ]);
     }
 
-    function deleteMeal(Request $request, MealService $mealService, $meal_id){
+    function delete(Request $request, MealService $mealService, $meal_id){
         $mealService->find($meal_id)->delete();
         return $this->returnMessageTemplate(true, $this->returnSuccessMessage('deleted', "Meal"));
     }
 
-    function fetchAllMeals(MealService $mealService){
+    function fetchAllMeals(MealService $mealService, $vendor_id = null){
         $meals = $mealService
-                        ->hasVendor($this->pending)
+                        ->hasVendor()
                         ->owner()->category()
                         ->sortByRating()
                         ->orders()
@@ -85,13 +88,14 @@ class MealsController extends Controller{
 
     function vendorFetchSingleMeal(MealService $mealService, $meal_id){
         $meal = $mealService->find($meal_id)->owner()->reviews()->orders()->query();
+
         return $this->returnMessageTemplate(true, '', [
             'meal' => $meal->get()
         ]);
     }
 
-    function fetchSingleMeal(MealService $mealService, $meal_id){
-        $meal = $mealService->find($meal_id)->owner()->reviews()->query();
+    function single(MealService $mealService, $meal_id){
+        $meal = $mealService->find($meal_id)->owner()->orders()->reviews()->query();
         return $this->returnMessageTemplate(true, '', [
             'meal' => $meal->get()
         ]);

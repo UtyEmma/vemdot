@@ -19,7 +19,7 @@ class Meal extends Model{
     public $incrementing = false;
 
     protected $attributes = [
-        'availability' => true,
+        'availability' => 'yes',
         'rating' => 1,
         'discount' => 0,
         'tax' => 0

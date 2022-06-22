@@ -59,7 +59,8 @@ class User extends Authenticatable{
     ];
 
     protected $attributes = [
-        'kyc_status' => 'pending'
+        'kyc_status' => 'pending',
+        'availability' => 'yes'
     ];
 
     public function generateCode($auth){
@@ -75,24 +76,24 @@ class User extends Authenticatable{
         if($faildCode != null){
             $faildCode->status = 'failed';
             $faildCode->save();
-        }     
-        
-        UserCode::create([ 
+        }
+
+        UserCode::create([
             'unique_id' => $this->createUniqueId('user_codes'),
             'user_id' => $auth->unique_id,
             'code' => $code
         ]);
-       
+
         $message = "Your 2FA login code is ". $code;
-    
+
         try {
             $account_sid = env("TWILIO_SID");
             $auth_token = env("TWILIO_TOKEN");
             $twilio_number = env("TWILIO_FROM");
-    
+
             $client = new Client($account_sid, $auth_token);
             $client->messages->create($auth->phone, [
-                'from' => $twilio_number, 
+                'from' => $twilio_number,
                 'body' => $message
             ]);
 

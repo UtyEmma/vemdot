@@ -94,24 +94,29 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
                 Route::post('delete', [AddressController::class, 'delete']);
             });
         });
+    });
 
+    Route::prefix('meals')->group(function(){
+        Route::middleware('user.status:User')->group(function(){
+            Route::get('/', [MealsController::class, 'fetchAllMeals']);
+        });
 
+        Route::get('/vendor/{vendor_id?}', [MealsController::class, 'vendorMeals']);
+
+        Route::middleware('kyc.status:Vendor')->group(function(){
+            Route::post('/create', [MealsController::class, 'create']);
+            Route::prefix('{meal_id}')->group(function(){
+                Route::get('/', [MealsController::class, 'single']);
+                Route::post('/update', [MealsController::class, 'update']);
+                Route::get('/delete', [MealsController::class, 'delete']);
+            });
+        });
     });
 
     // Add a middleware for role here
     Route::middleware('user.status:Vendor')->group(function(){
         Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
 
-        Route::middleware('kyc.status:Vendor')->group(function(){
-            Route::prefix('meals')->group(function(){
-                Route::get('/', [MealsController::class, 'fetchAllMeals']);
-                Route::post('/create', [MealsController::class, 'create']);
-                Route::post('/update/{meal_id}', [MealsController::class, 'update']);
-                Route::get('/vendor/{vendor_id?}', [MealsController::class, 'vendorMeals']);
-            });
-
-
-        });
 
     });
 
