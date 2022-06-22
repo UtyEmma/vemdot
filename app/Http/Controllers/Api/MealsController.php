@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Meals\CreateMealRequest;
 use App\Models\Meal\Meal;
+<<<<<<< HEAD
 use App\Models\Meal\MealCategory;
 use App\Models\User;
 use App\Services\MealService;
@@ -14,6 +15,11 @@ use App\Traits\Generics;
 use App\Traits\ReturnTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+=======
+
+use App\Services\NotificationService;
+use Illuminate\Support\Facades\Request;
+>>>>>>> 215f196050188cfc1b6faeb1f2744aea21a27d5e
 
 class MealsController extends Controller{
 

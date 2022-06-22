@@ -43,6 +43,10 @@ class Kernel extends HttpKernel
         'api' => [
             'throttle:60,1',
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+<<<<<<< HEAD
+=======
+            'throttle:60,1',
+>>>>>>> 215f196050188cfc1b6faeb1f2744aea21a27d5e
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
@@ -66,6 +70,12 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'kyc.status' => CheckKycStatus::class,
+<<<<<<< HEAD
         'user.status' => CheckUserRole::class,
+=======
+        '2fa' => \App\Http\Middleware\Check2FA::class,
+        'abilities' => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
+        'ability' => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
+>>>>>>> 215f196050188cfc1b6faeb1f2744aea21a27d5e
     ];
 }

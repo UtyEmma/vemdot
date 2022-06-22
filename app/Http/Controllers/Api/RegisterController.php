@@ -10,19 +10,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules;
 use Illuminate\Auth\Events\Registered;
-use App\Models\Site\SiteSettings;
 use App\Models\Address\Address;
 use App\Models\Verification\Verification;
-use App\Traits\Generics;
-use App\Traits\ReturnTemplate;
-use Carbon\Carbon;
 
 class RegisterController extends Controller
 {
-    use Generics, ReturnTemplate;
     //
-    function __construct(SiteSettings $appSettings, Verification $verification, User $user){
-        $this->appSettings = $appSettings;
+    function __construct(Verification $verification, User $user){
         $this->verification = $verification;
         $this->user = $user;
     }
@@ -80,15 +74,15 @@ class RegisterController extends Controller
         $address->default = "yes";
         $address->save();
 
-        $appSettings = $this->appSettings->getSettings();
+        $appSettings = $this->getSiteSettings();
 
         if($appSettings->account_verification != 'no'){
             //send the user an email for activation of account and redirect the user to the page where they will enter code
-            $verificationCode = $this->verification->createActivationCode($user);
+            $verificationCode = $this->verification->createActivationCode($user, $appSettings);
             // dd($verificationCode);
             if($verificationCode['status'] == 'success'){
                 //send the activation code via email to the user
-                $this->verification->sendActivationMail($verificationCode['token'], $user);
+                $this->verification->sendActivationMail($verificationCode['token'], $user, $appSettings);
 
                 //return the account activation code and email
                 $payload = [
@@ -102,7 +96,7 @@ class RegisterController extends Controller
 
         if($appSettings->welcome_message != 'no'){
             //send welcome message to newly registerd user
-            $this->verification->sendWelcomeMail($user);
+            $this->verification->sendWelcomeMail($user, $appSettings);
         }
 
         $payload = ['user' => $user];

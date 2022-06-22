@@ -45,7 +45,12 @@ trait ReturnTemplate {
             'insufficiant_fund'=>'Insufficiant Fund',
             'not_equal_password'=>'The provided password does not match your current password.',
             'not_found' => "$item was not Found",
+<<<<<<< HEAD
             'not_owner' => "$item does not belong to $prepend"
+=======
+            'wrong_code' => "You entered a wrong code.",
+            'used_code' => "You entered a code that was previously used",
+>>>>>>> 215f196050188cfc1b6faeb1f2744aea21a27d5e
         ];
         return $messageArray[$keyword];
     }
@@ -63,6 +68,7 @@ trait ReturnTemplate {
             'successful_login'=>'Login was successful',
             'activation_token_sent'=>'Hi, an account activation mail have been sent to your email address. Please provide the code in the mail in the box below',
             'valid_token'=>'Valid Token',
+            '2fa_code_sent'=>'We sent you code on your mobile number.',
             'account_verified'=>'Your account have been successfully verified, please login to continue',
             'account_registered'=>'Your account was created successfully, please login to continue',
             'user_deleted'=>'Selected User(s) was deleted successfully',
