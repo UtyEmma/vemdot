@@ -28,12 +28,12 @@
 
     	</div>
     </div>
-    
+
 	<!-- initiate modal menu section-->
 	@include('include.modalmenu')
 
 	<!-- initiate scripts-->
-	@include('include.script')	
+	@include('include.script')
 
 	@include('sweetalert::alert')
 </body>

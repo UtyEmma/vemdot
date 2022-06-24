@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\CheckUserRole;
 use App\Http\Middleware\User\CheckKycStatus;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
@@ -40,6 +41,7 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
+            'throttle:60,1',
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             'throttle:60,1',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
@@ -65,6 +67,7 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'kyc.status' => CheckKycStatus::class,
+        'user.status' => CheckUserRole::class,
         '2fa' => \App\Http\Middleware\Check2FA::class,
         'abilities' => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
         'ability' => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,

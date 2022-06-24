@@ -20,7 +20,7 @@ trait ReturnTemplate {
     }
 
     //method that return error messages
-    public function returnErrorMessage($keyword, $append = '') {
+    public function returnErrorMessage($keyword, $append = '', $prepend = '') {
         $item = $append ?? 'Item';
         $messageArray = [
             'wrong_crendential'=>'Wrong login credentials, Please check you email and password',
@@ -50,7 +50,7 @@ trait ReturnTemplate {
         return $messageArray[$keyword];
     }
 
-    public function returnSuccessMessage($keyword, $append = '') {
+    public function returnSuccessMessage($keyword, $append = '', $prepend = '') {
         $item = $append ?? 'Item';
         $messageArray = [
             'successful_token_creation'=>'Code was successfully created',
@@ -78,7 +78,7 @@ trait ReturnTemplate {
             'fetched_single' => "$item was retrieved",
             'fetched_all' => $item."s were retrieved",
             'updated' => "$item updated successfully",
-            'deleted' => "$item was successfully deleted",
+            'deleted' => "$item was deleted successfully"
         ];
         return $messageArray[$keyword];
     }

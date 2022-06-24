@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Address\Address;
 use App\Models\Meal\Meal;
+use App\Models\Role\AccountRole;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -57,21 +59,23 @@ class User extends Authenticatable{
     ];
 
     protected $attributes = [
-        'kyc_status' => 'pending'
+        'kyc_status' => 'pending',
+        'availability' => 'yes'
     ];
 
     public function generateCode($auth){
         $code = $this->generateCodeFor2fa($auth);
 
         $message = "Your 2FA login code is ". $code['code'];
+
         try {
             $account_sid = env("TWILIO_SID");
             $auth_token = env("TWILIO_TOKEN");
             $twilio_number = env("TWILIO_FROM");
-    
+
             $client = new Client($account_sid, $auth_token);
             $client->messages->create($auth->phone, [
-                'from' => $twilio_number, 
+                'from' => $twilio_number,
                 'body' => $message
             ]);
 
@@ -128,5 +132,13 @@ class User extends Authenticatable{
 
     public function meals (){
         return $this->hasMany(Meal::class, 'user_id', 'unique_id');
+    }
+
+    public function addresses(){
+        return $this->hasMany(Address::class, 'user_id', 'unique_id');
+    }
+
+    public function userRole(){
+        return $this->belongsTo(AccountRole::class, 'role', 'unique_id');
     }
 }
