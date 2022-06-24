@@ -64,27 +64,9 @@ class User extends Authenticatable{
     ];
 
     public function generateCode($auth){
-        $code = rand(1000, 9999);
+        $code = $this->generateCodeFor2fa($auth);
 
-       // $auth = auth()->user();
-
-        $faildCode = UserCode::where([
-            ['user_id', $auth->unique_id],
-            ['status', 'un-used']
-        ])->first();
-
-        if($faildCode != null){
-            $faildCode->status = 'failed';
-            $faildCode->save();
-        }
-
-        UserCode::create([
-            'unique_id' => $this->createUniqueId('user_codes'),
-            'user_id' => $auth->unique_id,
-            'code' => $code
-        ]);
-
-        $message = "Your 2FA login code is ". $code;
+        $message = "Your 2FA login code is ". $code['code'];
 
         try {
             $account_sid = env("TWILIO_SID");
@@ -97,11 +79,33 @@ class User extends Authenticatable{
                 'body' => $message
             ]);
 
-            return ['status' => true, 'code' => $code];
+            return ['status' => true, 'code' => $code['code']];
         } catch (Exception $e) {
             info("Error: ". $e->getMessage());
             return ['status' => false, 'message' => $e->getMessage()];
         }
+    }
+
+    public function generateCodeFor2fa($user){
+        $code = rand(1000, 9999);
+ 
+         $faildCode = UserCode::where([
+             ['user_id', $user->unique_id],
+             ['status', 'un-used']
+         ])->first();
+ 
+         if($faildCode != null){
+             $faildCode->status = 'failed';
+             $faildCode->save();
+         }     
+         
+         UserCode::create([ 
+             'unique_id' => $this->createUniqueId('user_codes'),
+             'user_id' => $user->unique_id,
+             'code' => $code
+         ]);
+
+        return ['status' => true, 'code' => $code];
     }
 
 

@@ -67,10 +67,21 @@ class LoginController extends Controller
         $user->two_factor_verified_at = null;
         $user->save();
 
-        $data = $user->generateCode($user);
+        if($user->two_factor_access == 'text'){
+            $data = $user->generateCode($user);
+        }else{
+            $data = $user->generateCodeFor2fa($user);
+            $notification = $this->notification();
+            $notification->subject("2FA On ".$appSettings->site_name)
+            ->text('Your 2FA login code is ')
+            ->code($data['code'])
+            ->text('provide this code on your app to authenticate your login')
+            ->send($user, ['mail']);
+        }
 
         $payload = [
             '2fa_code' => $data['code'],
+            'user' => $user,
         ];
 
         if($data['status']){

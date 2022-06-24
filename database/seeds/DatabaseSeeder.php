@@ -72,6 +72,7 @@ class DatabaseSeeder extends Seeder{
             $plan = new SubscriptionPlan();
             $plan->unique_id  = $this->createUniqueId('subscription_plans', 'unique_id');
             $plan->name = $item;
+            $plan->status = 'active';
             $plan->description = $item;
             $plan->save();
         }

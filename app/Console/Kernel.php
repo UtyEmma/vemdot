@@ -15,6 +15,8 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         //
         Commands\UpdateBankList::class,
+        Commands\TrackDailySpecials::class,
+        Commands\SubscriptionChecker::class,
     ];
 
     /**
@@ -25,8 +27,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('updates:daily_special')->everyMinute();
         $schedule->command('updates:bank_list')->monthly();
+        $schedule->command('updates:subscriptions')->daily();
     }
 
     /**
