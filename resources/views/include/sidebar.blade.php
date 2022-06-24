@@ -2,7 +2,7 @@
     <div class="sidebar-header">
         <a class="header-brand" href="{{route('dashboard')}}">
             <div class="logo-img">
-               <img height="30" src="{{ asset('img/logo_white.png')}}" class="header-brand-img" title="RADMIN"> 
+               <img height="30" src="{{ asset('img/logo_white.png')}}" class="header-brand-img" title="RADMIN">
             </div>
         </a>
         <div class="sidebar-action"><i class="ik ik-arrow-left-circle"></i></div>
@@ -13,7 +13,7 @@
         $segment1 = request()->segment(1);
         $segment2 = request()->segment(2);
     @endphp
-    
+
     <div class="sidebar-content">
         <div class="nav-container">
             <nav id="main-menu-navigation" class="navigation-main">
@@ -38,28 +38,24 @@
                 <div class="nav-item {{ ($segment1 == 'site-settings') ? 'active' : '' }}">
                     <a href="{{url('site/settings')}}"><i class="ik ik-unlock"></i><span>{{ __('Site Settings')}}</span> </a>
                 </div>
-                <div class="nav-lavel">{{ __('Documentation')}} </div>
-                <div class="nav-item {{ ($segment1 == 'rest-api') ? 'active' : '' }}">
-                    <a href="{{url('rest-api')}}"><i class="ik ik-cloud"></i><span>{{ __('REST API')}}</span> <span class=" badge badge-success badge-right">{{ __('New')}}</span></a>
-                </div>
+
+
+                <div class="nav-lavel">{{ __('USERS')}} </div>
+
                 <div class="nav-item {{ ($segment1 == 'users' || $segment1 == 'roles'||$segment1 == 'permission' ||$segment1 == 'user') ? 'active open' : '' }} has-sub">
-                    <a href="#"><i class="ik ik-user"></i><span>{{ __('Adminstrator')}}</span></a>
+                    <a href="#"><i class="ik ik-user"></i><span>{{ __('Users')}}</span></a>
                     <div class="submenu-content">
-                        <!-- only those have manage_user permission will get access -->
-                        @can('manage_user')
-                        <a href="{{url('users')}}" class="menu-item {{ ($segment1 == 'users') ? 'active' : '' }}">{{ __('Users')}}</a>
-                        <a href="{{url('user/create')}}" class="menu-item {{ ($segment1 == 'user' && $segment2 == 'create') ? 'active' : '' }}">{{ __('Add User')}}</a>
-                         @endcan
-                         <!-- only those have manage_role permission will get access -->
-                        @can('manage_roles')
-                        <a href="{{url('roles')}}" class="menu-item {{ ($segment1 == 'roles') ? 'active' : '' }}">{{ __('Roles')}}</a>
-                        @endcan
-                        <!-- only those have manage_permission permission will get access -->
-                        @can('manage_permission')
-                        <a href="{{url('permission')}}" class="menu-item {{ ($segment1 == 'permission') ? 'active' : '' }}">{{ __('Permission')}}</a>
-                        @endcan
+                        <a class="menu-item {{ ($segment1 == 'users') ? 'active' : '' }}" href="{{route('users')}}">
+                            <span>{{ __('Users')}}</span>
+                            <span class=" badge badge-success badge-right">{{ __('New')}}</span>
+                        </a>
+                        <a class="menu-item {{ ($segment1 == 'users') ? 'active' : '' }}" href="{{route('users.kyc')}}">
+                            <span>{{ __('KYC Requests')}}</span>
+                            <span class=" badge badge-success badge-right">{{ __('New')}}</span>
+                        </a>
                     </div>
                 </div>
+
                 <div class="nav-item {{ ($segment1 == 'permission-example') ? 'active' : '' }}">
                     <a href="{{url('permission-example')}}"><i class="ik ik-unlock"></i><span>{{ __('Laravel Permission')}}</span> </a>
                 </div>
@@ -117,8 +113,8 @@
                         <a href="{{url('rating')}}" class="menu-item {{ ($segment1 == 'rating') ? 'active' : '' }}">{{ __('Rating')}}</a>
                     </div>
                 </div>
-                
-                
+
+
                 <div class="nav-item {{ ($segment1 == 'charts-chartist' || $segment1 == 'charts-flot'||$segment1 == 'charts-knob'||$segment1 == 'charts-amcharts') ? 'active open' : '' }} has-sub">
                     <a href="#"><i class="ik ik-pie-chart"></i><span>{{ __('Charts')}}</span> </a>
                     <div class="submenu-content">
@@ -143,7 +139,7 @@
                         <a href="{{url('forgot-password')}}" class="menu-item {{ ($segment1 == 'forgot-password') ? 'active' : '' }}">{{ __('Forgot Password')}}</a>
                     </div>
                 </div>
-                
+
                 <div class="nav-item {{ ($segment1 == 'profile' || $segment1 == 'invoice'||$segment1 == 'session-timeout') ? 'active open' : '' }} has-sub">
                     <a href="#"><i class="ik ik-file-text"></i><span>{{ __('Pages')}}</span></a>
                     <div class="submenu-content">
@@ -179,7 +175,7 @@
                 <div class="nav-item">
                     <a href="javascript:void(0)" class="disabled"><i class="ik ik-slash"></i><span>{{ __('Disabled Menu')}}</span></a>
                 </div>
-                
+
         </div>
     </div>
 </div>

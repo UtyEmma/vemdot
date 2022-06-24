@@ -12,6 +12,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\Meals\CategoryController;
 use App\Http\Controllers\Subscription\PlansController;
 use App\Http\Controllers\Settings\SiteSettingsController;
+use App\Http\Controllers\User\KycController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,7 +54,7 @@ Route::group(['middleware' => 'auth'], function(){
 	Route::post('/update/category/{id?}', [CategoryController::class,'updateCategory']);
 	Route::post('/delete/category', [CategoryController::class,'deleteCategory']);
 	Route::get('/edit/category/{id?}', [CategoryController::class,'viewSingleCategory']);
-	
+
 	// plan subscription handler
 	Route::get('/subscription-plan', [PlansController::class,'showCreatePlanPage']);
 	Route::get('/view/plans', [PlansController::class,'viewPlans']);
@@ -66,16 +67,28 @@ Route::group(['middleware' => 'auth'], function(){
 	Route::get('/site/settings', [SiteSettingsController::class,'viewSiteSettings']);
 	Route::post('/update/site/settings', [SiteSettingsController::class,'updateSiteSettings']);
 
+    Route::prefix('users')->group(function(){
+        Route::get('/', [UserController::class, 'index'])->name('users');
+        Route::get('/kyc', [UserController::class, 'fetchRequests'])->name('users.kyc');
+
+        Route::prefix('/{user_id}')->group(function(){
+            Route::get('/', [UserController::class, 'edit']);
+            Route::get('/kyc', [UserController::class, 'updateKycStatus'])->name('users.kyc.update');
+            Route::get('/delete', [UserController::class, 'delete']);
+            Route::post('/update', [UserController::class, 'update']);
+        });
+    });
+
 	//only those have manage_user permission will get access
-	Route::group(['middleware' => 'can:manage_user'], function(){
-		Route::get('/users', [UserController::class,'index']);
-		Route::get('/user/get-list', [UserController::class,'getUserList']);
-		Route::get('/user/create', [UserController::class,'create']);
-		Route::post('/user/create', [UserController::class,'store'])->name('create-user');
-		Route::get('/user/{id}', [UserController::class,'edit']);
-		Route::post('/user/update', [UserController::class,'update']);
-		Route::get('/user/delete/{id}', [UserController::class,'delete']);
-	});
+	// Route::group(['middleware' => 'auth'], function(){
+	// 	Route::get('/users', [UserController::class,'index']);
+	// 	Route::get('/user/get-list', [UserController::class,'getUserList']);
+	// 	Route::get('/user/create', [UserController::class,'create']);
+	// 	Route::post('/user/create', [UserController::class,'store'])->name('create-user');
+	// 	Route::get('/user/{id}', [UserController::class,'edit']);
+	// 	Route::post('/user/update', [UserController::class,'update']);
+	// 	Route::get('/user/delete/{id}', [UserController::class,'delete']);
+	// });
 
 	//only those have manage_role permission will get access
 	Route::group(['middleware' => 'can:manage_role|manage_user'], function(){

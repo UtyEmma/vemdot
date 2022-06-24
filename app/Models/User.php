@@ -13,6 +13,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
 use Twilio\Rest\Client;
 use App\Traits\Generics;
+use Exception;
 
 class User extends Authenticatable{
     use HasApiTokens, Notifiable, HasRoles, SoftDeletes, Generics;
