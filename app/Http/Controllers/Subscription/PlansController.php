@@ -59,7 +59,7 @@ class PlansController extends Controller
             }
         }else{
             $plan = new SubscriptionPlan();
-            $plan->unique_id = $this->createUniqueId('subscription_plans', 'unique_id');
+            $plan->unique_id = $this->createUniqueId('subscription_plans');
             $plan->name = $data['name'];
             $plans->amount = $data['amount'];
             $plans->duration = $data['duration'];

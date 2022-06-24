@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Request;
 class MealsController extends Controller{
 
     function create(CreateMealRequest $request){
-        $user = $this->user();
         $unique_id = $this->createUniqueId('meals');
 
         Meal::create($request->safe()->merge([

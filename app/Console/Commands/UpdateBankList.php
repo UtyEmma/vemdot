@@ -29,10 +29,9 @@ class UpdateBankList extends Command
      *
      * @return void
      */
-    public function __construct(BankList $bankList)
+    public function __construct()
     {
         parent::__construct();
-        $this->bankList = $bankList;
     }
 
     /**
@@ -47,26 +46,33 @@ class UpdateBankList extends Command
 
     public function updateBankList(){
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer '.env('FL_KEY')
-        ])->get('https://api.flutterwave.com/v3/banks/NG');
+            'Authorization' => 'Bearer '.env('PAYSTACK_SECRET_KEY')
+        ])->get('https://api.paystack.co/bank', [
+            'country' => 'nigeria',
+        ]);
 
         $decoded_response = json_decode($response, true);
 
-        if($decoded_response['status'] == 'success'){
+        if($decoded_response['status']){
             foreach($decoded_response['data'] as $response){
-                $bankList = $this->bankList->getSingleBankList([
-                    ['name', $response['name']],
-                    ['code', $response['code']],
-                ]);
+                $bankList = BankList::where('name', $response['name'])
+                ->where('code', $response['code'])
+                ->first();
                 
-                if($bankList === null){
-                    $bank = new BankList();
-                    $bank->unique_id = $this->createUniqueId('bank_lists', 'unique_id');
-                    $bank->code = $response['code'];
-                    $bank->name = $response['name'];
-                    $bank->save();
+                if($bankList == null){
+                    BankList::create([
+                        'unique_id' => $this->createUniqueId('bank_lists'),
+                        'name' => $response['name'],
+                        'slug' => $response['slug'],
+                        'code' => $response['code'],
+                        'longcode' => $response['longcode'],
+                        'country' => $response['country'],
+                        'currency' => $response['currency'],
+                        'type' => $response['type'],
+                    ]);
                 }else{
                     $bankList->name = $response['name'];
+                    $bankList->slug = $response['slug'];
                     $bankList->save();
                 }
             }
