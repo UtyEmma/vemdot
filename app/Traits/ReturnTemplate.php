@@ -5,6 +5,7 @@ use App\Models\Site\SiteSettings;
 
 trait ReturnTemplate {
 
+<<<<<<< HEAD
     public $paginate = 12;
     public $active = 'active';
     public $pending = 'pending';
@@ -12,6 +13,8 @@ trait ReturnTemplate {
     public $confirmed = 'confirmed'; // For KYC
     public $declined = 'declined';
 
+=======
+>>>>>>> 20b02b27edad3ca505684764d55dc81bdd407071
     //method that return the messages template
     public function returnMessageTemplate($status = true, $message = '', $payload = [], $other = []) {
         $appSettings = SiteSettings::first();
@@ -48,6 +51,11 @@ trait ReturnTemplate {
             'not_found' => "$item was not Found",
             'wrong_code' => "You entered a wrong code.",
             'used_code' => "You entered a code that was previously used",
+            'meal_availability' => "this meal is not available",
+            'paystack_token' => "The paystack token has expired. Please refresh the page and try again.",
+            'unable_to_pay' => "This payment is unavailable at moment, please make use of another.",
+            'payment_not_complete' => "An error occured!, payment was incomplete",
+            'subscription_exist' => "You have previously subscribed for this plan",
         ];
         return $messageArray[$keyword];
     }

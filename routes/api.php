@@ -12,10 +12,12 @@ use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\ResetPasswordContoller;
 use App\Http\Controllers\Api\UpdatePasswordContoller;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\TwoFAController;
+use App\Http\Controllers\Controller;
 
 use App\Http\Controllers\Meals\CategoryController;
 use App\Http\Controllers\Subscription\PlansController;
+use App\Http\Controllers\DailySpecial\DailySpecialController;
+use App\Http\Controllers\Subscription\SubscriptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +34,7 @@ use App\Http\Controllers\Subscription\PlansController;
 Route::post('login', [LoginController::class,'loginUser']);
 //2fa handler
 Route::post('user/2fa/verify', [LoginController::class, 'processUserlogin']);
+Route::get('/payment/callback', [Controller::class,'verifyPayment']);
 
 //create new accounts for users
 Route::post('register', [RegisterController::class,'register']);
@@ -73,15 +76,34 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
 	Route::post('/delete/plan', [PlansController::class,'deletePlan']);
 	Route::get('/edit/plan/{id?}', [PlansController::class,'editPlan']);
 
+	// daily specials
+	Route::post('/create/daily/special', [DailySpecialController::class,'createDailySpecial']);
+	Route::get('/fetch/daily/special', [DailySpecialController::class,'fetchDailySpecials']);
+	Route::get('/fetch/daily/special/by/vendor/{user_id?}', [DailySpecialController::class,'fetchDailySpecialsByVendor']);
+	Route::get('/fetch/single/daily/special/{id?}', [DailySpecialController::class,'fetchSingleDailySpecial']);
+	Route::delete('/delete/daily/special/{id?}', [DailySpecialController::class,'deleteDailySpecial']);
 
-    Route::get('user', [UserController::class, 'show'])->name('users.current');
-    Route::prefix('users')->group(function(){
-        Route::prefix('{role}')->group(function(){
-            Route::get('/', [UserController::class, 'list'])->name('users.list');
-            Route::get('/{id}', [UserController::class, 'single'])->name('users.single');
-        });
-        Route::post('update', [UserController::class, 'update'])->name('users.update');
-    });
+	// subscription handler 
+	Route::post('/create/vendor/subscription', [SubscriptionController::class,'createVendorSubscription']);
+
+  //only those have manage_user permission will get access
+  Route::group(['middleware' => 'can:manage_user'], function(){
+		Route::get('/users', [UserController::class,'list']);
+		Route::post('/user/create', [UserController::class,'store']);
+		Route::get('/user/{id}', [UserController::class,'profile']);
+		Route::get('/user/delete/{id}', [UserController::class,'delete']);
+		Route::post('/user/change-role/{id}', [UserController::class,'changeRole']);
+	});
+
+  Route::get('user', [UserController::class, 'show'])->name('users.current');
+  Route::prefix('users')->group(function(){
+      Route::prefix('{role}')->group(function(){
+          Route::get('/', [UserController::class, 'list'])->name('users.list');
+          Route::get('/{id}', [UserController::class, 'single'])->name('users.single');
+      });
+      Route::post('update', [UserController::class, 'update'])->name('users.update');
+      Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
+  });
 
     Route::middleware('user.status:User')->group(function(){
 

@@ -4,25 +4,36 @@ namespace App\Http\Controllers;
 
 use App\Models\Site\SiteSettings;
 use App\Models\User;
-use App\Models\UserCode;
 use App\Services\NotificationService;
 use App\Traits\FileUpload;
 use App\Traits\Generics;
 use App\Traits\ReturnTemplate;
+use App\Traits\PaymentHandler;
+use App\Traits\Options;
+use App\Traits\UpdateAfterPayments;
+use App\Traits\VerifyTwoFactor;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
+use Illuminate\Http\Request;
+
 
 class Controller extends BaseController{
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests, ReturnTemplate, Generics,  FileUpload;
+    use AuthorizesRequests, DispatchesJobs, ValidatesRequests, ReturnTemplate, Generics,  FileUpload, PaymentHandler, Options, UpdateAfterPayments, VerifyTwoFactor;
 
     protected $notification;
 
-    function __construct(NotificationService $notificationService){
+    function __construct(NotificationService $notificationService)
+    {
         $this->notification = $notificationService;
+    }
+
+    protected function notification()
+    {
+        $notification = new NotificationService();
+        return $notification;
     }
 
     protected function user (){
@@ -35,42 +46,29 @@ class Controller extends BaseController{
         return $settings->getSettings();
     }
 
-    protected function verifyTwofactor($data)
+    public function verifyPayment(Request $request)
     {
-        $user = User::where('unique_id', $data['user_id'])
-            ->first();
-       
-        $find = UserCode::where('user_id', $user->unique_id)
-            ->where('code', $data['code'])
-            ->first();
-           
-        if($find->status == 'used'){
-            return ['status' => false, 'message' => $this->returnErrorMessage('used_code')];
-        } 
-
-        //add thirty minutes to the time for the code that was created
-        $currentTime = Carbon::now()->toDateTimeString();
-        $expirationTime = Carbon::parse($find->created_at)->addMinutes(30)->toDateTimeString();
-        //compare the dates
-        if ($currentTime > $expirationTime) {
-            return ['status' => false, 'message' => $this->returnErrorMessage('expired_token')];
+        $searchQuery = $request->query();
+        $response = $this->handleGatewayCallback($searchQuery['reference']);
+        if($response['status'] == true){
+            $data = $response['data'];
+            //updatetransaction table
+            $transaction = $this->updateTransaction($data);
+            if($transaction['type'] == 'vendor_subscription'){
+                //update subscription status to comfirm
+                $this->updateSubscribeVendorModel($data);               
+            }elseif($transaction['type'] == 'fund_wallet'){
+                //fund user wallet
+                $this->updateUserMainWallet($data);
+            }else{
+                return $transaction;
+            }
+        }else{
+            return $this->returnMessageTemplate(false, $this->returnErrorMessage('payment_not_complete'));
         }
-        
-        if (!is_null($find)) {
-            $user->two_factor_verified_at = Carbon::now()->toDateTimeString();
-            $user->save();
-            
-            $find->status = 'used';
-            $find->save();
-            
-            $find->users;
-
-            return ['status' => true, 'payload' => $find];
-        }
-        return ['status' => false, 'message' => $this->returnErrorMessage('wrong_code')];
     }
 
-    protected function resend2faCode()
+    public function resend2faCode()
     {
         $data = $this->user()->generateCode();
 

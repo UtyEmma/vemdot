@@ -16,9 +16,12 @@ class CreateBankListsTable extends Migration
         Schema::create('bank_lists', function (Blueprint $table) {
             $table->id();
             $table->string('unique_id')->unique();
-
             $table->string('name')->nullable();
+            $table->string('slug')->nullable();
             $table->string('code')->nullable();
+            $table->string('longcode')->nullable();
+            $table->string('country')->nullable();
+            $table->string('currency')->nullable();
             $table->string('status')->default('active');
             $table->string('logo')->default('default.png');
 
