@@ -34,5 +34,18 @@ trait PaymentHandler {
         return json_decode($response, true);
     }
 
+    public function verifyUserAccount($data)
+    {
+        $response = Http::withHeaders([
+            "Authorization" => "Bearer $this->key",
+            "Content-Type" => "application/json",
+        ])->get('https://api.paystack.co/bank/resolve', [
+            'account_number' => $data['account_number'],
+            'bank_code' => $data['bank_code'],
+        ]);
+
+        return json_decode($response, true); 
+    }
+
     
 }

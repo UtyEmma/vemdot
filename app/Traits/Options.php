@@ -13,6 +13,7 @@ trait Options {
     public $inprogress = 'inprogress';
     public $verified = 'verified';
     public $suspended = 'suspended';
+    public $settled = 'settled';
     public $expired = 'expired';
     public $processing = 'processing';
     public $failed = 'failed';
