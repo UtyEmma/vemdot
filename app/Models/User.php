@@ -89,18 +89,18 @@ class User extends Authenticatable{
 
     public function generateCodeFor2fa($user){
         $code = rand(1000, 9999);
- 
+
          $faildCode = UserCode::where([
              ['user_id', $user->unique_id],
              ['status', 'un-used']
          ])->first();
- 
+
          if($faildCode != null){
              $faildCode->status = 'failed';
              $faildCode->save();
-         }     
-         
-         UserCode::create([ 
+         }
+
+         UserCode::create([
              'unique_id' => $this->createUniqueId('user_codes'),
              'user_id' => $user->unique_id,
              'code' => $code
@@ -142,4 +142,5 @@ class User extends Authenticatable{
     public function userRole(){
         return $this->belongsTo(AccountRole::class, 'role', 'unique_id');
     }
+
 }

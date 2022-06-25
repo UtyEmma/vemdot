@@ -14,7 +14,10 @@ class CreateCardsTable extends Migration {
         Schema::create('cards', function (Blueprint $table) {
             $table->id();
             $table->string('unique_id')->unique();
-            $table->string('');
+            $table->string('user_id');
+            $table->string('auth_code');
+            $table->string('signature');
+            $table->json('data');
             $table->timestamps();
         });
     }

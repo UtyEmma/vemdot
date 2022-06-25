@@ -50,22 +50,22 @@
                             <th class="nosort">{{ __('Avatar')}}</th>
                             <th>{{ __('Name')}}</th>
                             <th>{{ __('Email')}}</th>
-                            <th class="nosort">{{ __('&nbsp;')}}</th>
+                            <th>{{ __('Role')}}</th>
+                            <th class="nosort">{{ __('Action')}}</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {{$count = 0}}
                         @forelse ($users as $user)
                             <tr>
-                                <td>{{ __('001')}}</td>
-                                <td><img src="{{$user->avatar ?? '../img/users/1.jpg'}}" class="table-user-thumb" alt=""></td>
+                                <td>{{ __(++$count)}}</td>
+                                <td><img src="{{$user->avatar ?? asset('img/users/1.jpg')}}" class="table-user-thumb" alt=""></td>
                                 <td>{{ __($user->name)}}</td>
                                 <td>{{ __($user->email)}}</td>
                                 <td>{{ __($user->userRole->name)}}</td>
                                 <td>
-                                    <div class="table-actions">
-                                        <a href="{{route('users.kyc.update', ['status' => 'confirmed'])}}" class="btn btn-success">Confirm</a>
-                                        <a href="{{route('users.kyc.update', ['status' => 'declined'])}}" class="btn btn-danger">Decline</a>
-                                    </div>
+                                    <a href="{{route('users.kyc.update', ['status' => 'confirmed', 'user_id' => $user->unique_id])}}" class="btn btn-success">Confirm</a>
+                                    <a href="{{route('users.kyc.update', ['status' => 'declined', 'user_id' => $user->unique_id])}}" class="btn btn-danger">Decline</a>
                                 </td>
                             </tr>
                         @empty

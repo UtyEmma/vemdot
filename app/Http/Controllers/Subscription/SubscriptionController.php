@@ -24,6 +24,7 @@ class SubscriptionController extends Controller
             'meal_id'  => 'required',
             'payment_type'  => 'required',
         ]);
+
         if($validator->fails()) {
             return $this->returnMessageTemplate(false, $validator->messages());
         }
@@ -36,8 +37,9 @@ class SubscriptionController extends Controller
         }
 
         $meal = Meal::where('unique_id', $data['meal_id'])
-        ->where('availability', $this->yes)
-        ->first();
+                        ->where('availability', $this->yes)
+                        ->first();
+
         if($meal == null){
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('not_found', "Meal"));
         }
@@ -50,8 +52,10 @@ class SubscriptionController extends Controller
             if($this->user()->main_balance == 0 || $this->user()->main_balance < $plan->amount){
                 return $this->returnMessageTemplate(false, $this->returnErrorMessage('insufficiant_fund'));
             }
+
             //create subscription record
             $sub = $this->createSubscription($reference, $plan, $meal, 'wallet');
+
             if($sub){
                 //create transaction record
                 $this->createTransaction($plan, $reference, $orderID, $description, 'wallet', null);
@@ -59,7 +63,9 @@ class SubscriptionController extends Controller
                 $user = $this->user();
                 $user->main_balance = ($user->main_balance - $plan->amount);
                 $user->save();
+
                 return $this->returnMessageTemplate(true, $this->returnSuccessMessage('updated', 'Your Subscription Status'));
+
             }else{
                 return $this->returnMessageTemplate(false, $this->returnErrorMessage('subscription_exist'));
             }
@@ -72,6 +78,7 @@ class SubscriptionController extends Controller
                 "orderID" => $orderID,
                 "description" => $description,
             ];
+
             //throw request for payment initialization
             $payment = $this->redirectToGateway($data);
             if($payment['status'] == true){
@@ -108,10 +115,11 @@ class SubscriptionController extends Controller
 
     public function createSubscription($reference, $plan, $meal, $channel = null){
         $subscription = Subscription::where('user_id', $this->user()->unique_id)
-        ->where('plan_id', $plan->unique_id)
-        ->where('meal_id', $meal->unique_id)
-        ->where('status', $this->inprogress)
-        ->first();
+                                    ->where('plan_id', $plan->unique_id)
+                                    ->where('meal_id', $meal->unique_id)
+                                    ->where('status', $this->inprogress)
+                                    ->first();
+
         if($subscription == null){
             Subscription::create([
                 'unique_id' => $reference,
@@ -121,6 +129,7 @@ class SubscriptionController extends Controller
                 'status' => ($channel == null) ? $this->pending : $this->inprogress,
                 'start_date' => ($channel == null) ? null : Carbon::now()->toDateTimeString(),
             ]);
+
             return true;
         }else{
             return false;

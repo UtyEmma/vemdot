@@ -36,56 +36,6 @@ class UserController extends Controller{
         ]);
     }
 
-
-
-    public function create(){
-        try
-        {
-            $roles = Role::pluck('name','id');
-            return view('create-user', compact('roles'));
-
-        }catch (\Exception $e) {
-            $bug = $e->getMessage();
-            return redirect()->back()->with('error', $bug);
-
-        }
-    }
-
-    public function store(Request $request){
-        // create user
-        $validator = Validator::make($request->all(), [
-            'name'     => 'required | string ',
-            'email'    => 'required | email | unique:users',
-            'password' => 'required | confirmed',
-            'role'     => 'required'
-        ]);
-
-        if($validator->fails()) {
-            return redirect()->back()->withInput()->with('error', $validator->messages()->first());
-        }
-
-        try {
-            // store user information
-            $user = User::create([
-                        'name'     => $request->name,
-                        'email'    => $request->email,
-                        'password' => Hash::make($request->password),
-                    ]);
-
-            // assign new role to the user
-            $user->syncRoles($request->role);
-
-            if($user){
-                return redirect('users')->with('success', 'New user created!');
-            }else{
-                return redirect('users')->with('error', 'Failed to create new user! Try again.');
-            }
-        }catch (\Exception $e) {
-            $bug = $e->getMessage();
-            return redirect()->back()->with('error', $bug);
-        }
-    }
-
     function fetchRequests (Request $request){
         $requests = User::where('kyc_status', $this->pending)
                         ->whereRelation('userRole', 'name', 'Vendor')->get();
@@ -102,11 +52,13 @@ class UserController extends Controller{
         $user->save();
 
         if ($request->status === $this->declined) {
-            $notificationService->text('Congratulations, your '.env('APP_NAME').' account has been approved!')
+            $notificationService->subject("Your Account Request has been approved")
+                                ->text('Congratulations, your '.env('APP_NAME').' account has been approved!')
                                 ->text("You can now proceed to your application and enjoy the amazing benefits offered on the ".env('APP_NAME')." platform.")
                                 ->send($user, ['mail']);
         }else{
-            $notificationService->text('Sorry, we could not approve your account verification request at this time because "'.$request->reason.'"')
+            $notificationService->subject("Your Account Request has been declined")
+                                ->text('Sorry, we could not approve your account verification request at this time because "'.$request->reason.'"')
                                 ->text("Please update your information provided on your application and try again!")
                                 ->text("You can reach out to our support center via ".env('SUPPORT_EMAIL'))
                                 ->send($user, ['mail']);

@@ -17,6 +17,7 @@ trait Options {
     public $processing = 'processing';
     public $failed = 'failed';
     public $delivered = 'delivered';
+    public $declined = 'declined';
     public $cancelled = 'cancelled';
     public $yes = 'yes';
     public $no = 'no';
