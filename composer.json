@@ -23,7 +23,6 @@
         "realrashid/sweet-alert": "^5.1",
         "spatie/laravel-permission": "^3.11",
         "twilio/sdk": "^6.37",
-        "unicodeveloper/laravel-paystack": "^1.0",
         "yajra/laravel-datatables-oracle": "~9.0"
     },
     "require-dev": {

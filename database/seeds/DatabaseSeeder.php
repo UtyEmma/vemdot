@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder{
      */
     public function run(){
         $user = new User();
-        $user->unique_id  = $this->createUniqueId('users', 'unique_id');
+        $user->unique_id  = $this->createUniqueId('users');
         $user->name = "Super Admin";
         $user->email = "support@".env('APP_DOMAIN');
         $user->role = "super_admin";
@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder{
         $user->save();
 
         $address = new Address();
-        $address->unique_id  = $this->createUniqueId('addresses', 'unique_id');
+        $address->unique_id  = $this->createUniqueId('addresses');
         $address->user_id = $user->unique_id;
         $address->city = "oshodi";
         $address->state = "Los Angels";
@@ -41,9 +41,9 @@ class DatabaseSeeder extends Seeder{
         $address->save();
 
         $bank = new BankDetail();
-        $bank->unique_id  = $this->createUniqueId('bank_details', 'unique_id');
+        $bank->unique_id  = $this->createUniqueId('bank_details');
         $bank->user_id = $user->unique_id;
-        $bank->bank_id = "c3mcjwew321";
+        $bank->bank_id = "044";
         $bank->account_name = "Test Account";
         $bank->account_no = "0923097121";
         $bank->save();
@@ -52,7 +52,7 @@ class DatabaseSeeder extends Seeder{
 
         foreach ($countries as $item){
             $country = new CountryList();
-            $country->unique_id  = $this->createUniqueId('country_lists', 'unique_id');
+            $country->unique_id  = $this->createUniqueId('country_lists');
             $country->name = $item;
             $country->save();
         }
@@ -60,7 +60,7 @@ class DatabaseSeeder extends Seeder{
         $categories = ["Pastries", "Soup", "Vegetables", "Native Dish", "Fast Food"];
         foreach ($categories as $item){
             $category = new MealCategory();
-            $category->unique_id  = $this->createUniqueId('meal_categories', 'unique_id');
+            $category->unique_id  = $this->createUniqueId('meal_categories');
             $category->name = $item;
             $category->status = 'active';
             $category->description = $item;
@@ -70,7 +70,7 @@ class DatabaseSeeder extends Seeder{
         $plans = ["Basic", "Flat", "Advance", "Premium", "Contract"];
         foreach ($plans as $item){
             $plan = new SubscriptionPlan();
-            $plan->unique_id  = $this->createUniqueId('subscription_plans', 'unique_id');
+            $plan->unique_id  = $this->createUniqueId('subscription_plans');
             $plan->name = $item;
             $plan->status = 'active';
             $plan->description = $item;
@@ -90,7 +90,7 @@ class DatabaseSeeder extends Seeder{
 
         foreach ($roles as $item){
             $role = new AccountRole();
-            $role->unique_id  = $this->createUniqueId('account_roles', 'unique_id');
+            $role->unique_id  = $this->createUniqueId('account_roles');
             $role->name = $item;
             $role->save();
         }
