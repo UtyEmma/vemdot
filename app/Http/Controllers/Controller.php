@@ -52,20 +52,39 @@ class Controller extends BaseController{
         $response = $this->handleGatewayCallback($searchQuery['reference']);
         if($response['status'] == true){
             $data = $response['data'];
+            $amount = $data['amount'] / 100;
             //updatetransaction table
             $transaction = $this->updateTransaction($data);
-            if($transaction['type'] == 'vendor_subscription'){
-                //update subscription status to comfirm
-                $this->updateSubscribeVendorModel($data);               
-            }elseif($transaction['type'] == 'fund_wallet'){
-                //fund user wallet
-                $this->updateUserMainWallet($data);
-            }else{
+            if($transaction != null){
+                if($transaction->type == 'vendor_subscription'){
+                    //update subscription status to comfirm
+                    $subscribeResponse = $this->updateSubscribeVendorModel($data);      
+                    if($subscribeResponse){
+                        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('updated', 'Your Subscription Status'));
+                    }
+                    return $this->returnMessageTemplate(false, $this->returnErrorMessage('unknown_error'));
+                }elseif($transaction->type == 'fund_wallet'){
+                    //fund user wallet
+                    $walletResponse = $this->updateUserMainWallet($data);
+                    if($walletResponse){
+                        //send notification to user
+                        $notification = $this->notification();
+                        $notification->subject("Your Main Was Sucessfully Funded")
+                            ->text('Your Main Wallet was sucessfully funded with '.$amount.' NGN')
+                            ->text('You can now use your main wallet to make payments')
+                            ->text('Thank you for using our services')
+                            ->text('Kindly contact us if you have any questions')
+                            ->send($transaction->owner, ['mail', 'database']);
+                        //return success message to user    
+                        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('updated', 'Your Main Balance'));
+                    }
+                    return $this->returnMessageTemplate(false, $this->returnErrorMessage('unknown_error'));
+                }
                 return $transaction;
             }
-        }else{
-            return $this->returnMessageTemplate(false, $this->returnErrorMessage('payment_not_complete'));
+            return $this->returnMessageTemplate(false, $this->returnErrorMessage('unknown_error'));
         }
+        return $this->returnMessageTemplate(false, $this->returnErrorMessage('payment_not_complete'));
     }
 
     public function resend2faCode()

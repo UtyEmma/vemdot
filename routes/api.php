@@ -18,6 +18,8 @@ use App\Http\Controllers\Meals\CategoryController;
 use App\Http\Controllers\Subscription\PlansController;
 use App\Http\Controllers\DailySpecial\DailySpecialController;
 use App\Http\Controllers\Subscription\SubscriptionController;
+use App\Http\Controllers\Wallet\WalletController;
+use App\Http\Controllers\Banks\BankController;
 
 /*
 |--------------------------------------------------------------------------
@@ -85,6 +87,14 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
 
 	// subscription handler
 	Route::post('/create/vendor/subscription', [SubscriptionController::class,'createVendorSubscription']);
+
+    // fund users wallet
+    Route::post('/fund/user/wallet', [WalletController::class,'fundUserWallet']);
+
+    //bank account handler
+    Route::get('/fetch/all/banks', [BankController::class,'fetchAllBanks']);
+    Route::get('/fetch/single/bank/{code?}', [BankController::class,'fetchSingleBank']);
+    Route::post('/verify/account/number', [BankController::class,'verifyUserAccountNumber']);
 
   //only those have manage_user permission will get access
   Route::group(['middleware' => 'can:manage_user'], function(){

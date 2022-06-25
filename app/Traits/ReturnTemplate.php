@@ -53,7 +53,7 @@ trait ReturnTemplate {
             'unable_to_pay' => "This payment is unavailable at moment, please make use of another.",
             'payment_not_complete' => "An error occured!, payment was incomplete",
             'subscription_exist' => "You have previously subscribed for this plan",
-            'not_owner' => "$item does not belong to ".$prepend ?? 'this user'
+            'wrong_accct_number' => "Provided accout number does not match the Bank",
         ];
         return $messageArray[$keyword];
     }

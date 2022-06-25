@@ -5,6 +5,7 @@ namespace App\Models\Transaction;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\User;
 
 class Transaction extends Model
 {
@@ -15,4 +16,8 @@ class Transaction extends Model
     protected $keyType = 'string';
     protected $primaryKey = 'unique_id';
     public $incrementing = false;
+
+    function owner(){
+        return $this->belongsTo(User::class, 'user_id', 'unique_id');
+    }
 }
