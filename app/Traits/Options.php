@@ -8,7 +8,7 @@ trait Options {
     public $dailySpecial = 24;
     public $active = 'active';
     public $pending = 'pending';
-    public $comfirmed = 'comfirmed';
+    public $confirmed = 'confirmed';
     public $success = 'success';
     public $inprogress = 'inprogress';
     public $verified = 'verified';

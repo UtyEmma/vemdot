@@ -10,8 +10,7 @@ trait PaymentHandler {
 
     public $key = 'sk_test_e348e0dda59d216ce25dc0744bcada10935a3d42';
 
-    public function redirectToGateway($data)
-    {
+    public function redirectToGateway($data) {
         try{
             $response = Http::withHeaders([
                 "Authorization" => "Bearer $this->key",
@@ -21,11 +20,10 @@ trait PaymentHandler {
             return json_decode($response, true);
         }catch(Exception $e) {
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('paystack_token'));
-        }        
+        }
     }
 
-    public function handleGatewayCallback($ref) 
-    {
+    public function handleGatewayCallback($ref) {
         $response = Http::withHeaders([
             "Authorization" => "Bearer $this->key",
             "Content-Type" => "application/json",
@@ -34,8 +32,7 @@ trait PaymentHandler {
         return json_decode($response, true);
     }
 
-    public function verifyUserAccount($data)
-    {
+    public function verifyUserAccount($data) {
         $response = Http::withHeaders([
             "Authorization" => "Bearer $this->key",
             "Content-Type" => "application/json",
@@ -44,8 +41,17 @@ trait PaymentHandler {
             'bank_code' => $data['bank_code'],
         ]);
 
-        return json_decode($response, true); 
+        return json_decode($response, true);
     }
 
-    
+    function payWithExistingCard($data){
+
+        $response = Http::withHeaders([
+            "Authorization" => "Bearer $this->key",
+            "Content-Type" => "application/json",
+        ])->post('https://api.paystack.co/transaction/charge_authorization', $data);
+
+        return json_decode($response, true);
+    }
+
 }

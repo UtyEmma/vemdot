@@ -7,7 +7,8 @@ use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\AccountActivationController;
 use App\Http\Controllers\Api\AddressController;
-use App\Http\Controllers\Api\MealsController;
+use App\Http\Controllers\Cards\CardController;
+use App\Http\Controllers\Api\Meals\MealsController;
 use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\ResetPasswordContoller;
 use App\Http\Controllers\Api\UpdatePasswordContoller;
@@ -95,6 +96,13 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
     Route::get('/fetch/all/banks', [BankController::class,'fetchAllBanks']);
     Route::get('/fetch/single/bank/{code?}', [BankController::class,'fetchSingleBank']);
     Route::post('/verify/account/number', [BankController::class,'verifyUserAccountNumber']);
+
+    Route::prefix('cards')->group(function(){
+        Route::get('/', [CardController::class, 'list']);
+        Route::prefix('{id}')->group(function(){
+            Route::get('/delete', [CardController::class, 'delete']);
+        });
+    });
 
   //only those have manage_user permission will get access
   Route::group(['middleware' => 'can:manage_user'], function(){

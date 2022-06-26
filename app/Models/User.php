@@ -143,4 +143,9 @@ class User extends Authenticatable{
         return $this->belongsTo(AccountRole::class, 'role', 'unique_id');
     }
 
+    public function cards(){
+        return $this->hasMany(Card::class, 'user_id', 'unique_id');
+    }
+
+
 }

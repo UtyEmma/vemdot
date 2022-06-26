@@ -24,12 +24,14 @@ class SubscriptionController extends Controller
             'meal_id'  => 'required',
             'payment_type'  => 'required',
         ]);
+
         if($validator->fails())
             return $this->returnMessageTemplate(false, $validator->messages());
 
         $plan = SubscriptionPlan::where('unique_id', $data['plan_id'])
-        ->where('status', '!=', $this->pending)
-        ->first();
+                                ->where('status', '!=', $this->pending)
+                                ->first();
+
         if($plan == null)
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('not_found', "Subscription Plan"));
 
@@ -44,8 +46,9 @@ class SubscriptionController extends Controller
         $description = $plan->name.' Subscription by '.$this->user()->name.' for '.$meal->name;
 
         if($data['payment_type'] == 'wallet'){
+
             if($this->user()->main_balance == 0 || $this->user()->main_balance < $plan->amount)
-                return $this->returnMessageTemplate(false, $this->returnErrorMessage('insufficiant_fund'));
+                    return $this->returnMessageTemplate(false, $this->returnErrorMessage('insufficiant_fund'));
 
             //create subscription record
             $sub = $this->createSubscription($reference, $plan, $meal, 'wallet');
@@ -60,7 +63,9 @@ class SubscriptionController extends Controller
 
                 return $this->returnMessageTemplate(true, $this->returnSuccessMessage('updated', 'Your Subscription Status'));
             }
+
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('subscription_exist'));
+
         }else{
             $data = [
                 "amount" => $plan->amount * 100,
@@ -73,6 +78,7 @@ class SubscriptionController extends Controller
 
             //throw request for payment initialization
             $payment = $this->redirectToGateway($data);
+
             if($payment['status'] == true){
                 //create subscription record
                 $sub = $this->createSubscription($reference, $plan, $meal);
@@ -86,6 +92,7 @@ class SubscriptionController extends Controller
                 }
                 return $this->returnMessageTemplate(false, $this->returnErrorMessage('subscription_exist'));
             }
+
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('unable_to_pay'));
         }
     }
