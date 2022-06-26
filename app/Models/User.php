@@ -13,6 +13,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
 use Twilio\Rest\Client;
 use App\Traits\Generics;
+use Exception;
 
 class User extends Authenticatable{
     use HasApiTokens, Notifiable, HasRoles, SoftDeletes, Generics;
@@ -88,18 +89,18 @@ class User extends Authenticatable{
 
     public function generateCodeFor2fa($user){
         $code = rand(1000, 9999);
- 
+
          $faildCode = UserCode::where([
              ['user_id', $user->unique_id],
              ['status', 'un-used']
          ])->first();
- 
+
          if($faildCode != null){
              $faildCode->status = 'failed';
              $faildCode->save();
-         }     
-         
-         UserCode::create([ 
+         }
+
+         UserCode::create([
              'unique_id' => $this->createUniqueId('user_codes'),
              'user_id' => $user->unique_id,
              'code' => $code
@@ -141,4 +142,10 @@ class User extends Authenticatable{
     public function userRole(){
         return $this->belongsTo(AccountRole::class, 'role', 'unique_id');
     }
+
+    public function cards(){
+        return $this->hasMany(Card::class, 'user_id', 'unique_id');
+    }
+
+
 }

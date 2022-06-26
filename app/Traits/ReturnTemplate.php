@@ -5,6 +5,13 @@ use App\Models\Site\SiteSettings;
 
 trait ReturnTemplate {
 
+    public $paginate = 12;
+    // public $active = 'active';
+    // public $pending = 'pending';
+    // public $suspended = 'suspended';
+    // public $confirmed = 'confirmed'; // For KYC
+    // public $declined = 'declined';
+
     //method that return the messages template
     public function returnMessageTemplate($status = true, $message = '', $payload = [], $other = []) {
         $appSettings = SiteSettings::first();

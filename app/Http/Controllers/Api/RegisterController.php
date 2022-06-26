@@ -35,6 +35,7 @@ class RegisterController extends Controller
             'phone' => 'required',
             'role' => 'required',
             'email' => 'required|email|unique:users|max:50',
+            'gender' => 'required|string',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 

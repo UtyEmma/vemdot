@@ -2,17 +2,14 @@
 
 namespace App\Http\Requests\Api\Address;
 
+use App\Traits\ReturnTemplate;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class CreateAddressRequest extends FormRequest
-{
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
+class CreateAddressRequest extends FormRequest{
+    use ReturnTemplate;
+
     public function authorize(){
         return true;
     }

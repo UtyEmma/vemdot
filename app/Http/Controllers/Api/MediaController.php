@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Traits\Generics;
 use App\Traits\ReturnTemplate;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 
@@ -12,14 +13,16 @@ class MediaController extends Controller{
     use Generics, ReturnTemplate;
 
     function upload(Request $request){
-        return Response::json([
-            'file' => $request->file('media')
-        ]);
+        $files = $request->allFiles();
+        $urls = [];
+        foreach ($files['media'] as $key => $file) {
+            $urls[] = Cloudinary::uploadFile($file->getRealPath(),
+                            ['folder' => 'vemdot/'.$request->folder,]
+                        )->getSecurePath();
+        }
 
-        $file = $this->uploadFileHandler($request, 'file', $request->folder);
-
         return Response::json([
-            'file' => $file
+            'urls' => $urls
         ]);
     }
 

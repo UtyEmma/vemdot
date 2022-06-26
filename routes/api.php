@@ -7,7 +7,8 @@ use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\AccountActivationController;
 use App\Http\Controllers\Api\AddressController;
-use App\Http\Controllers\Api\MealsController;
+use App\Http\Controllers\Cards\CardController;
+use App\Http\Controllers\Api\Meals\MealsController;
 use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\ResetPasswordContoller;
 use App\Http\Controllers\Api\UpdatePasswordContoller;
@@ -85,7 +86,7 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
 	Route::get('/fetch/single/daily/special/{id?}', [DailySpecialController::class,'fetchSingleDailySpecial']);
 	Route::delete('/delete/daily/special/{id?}', [DailySpecialController::class,'deleteDailySpecial']);
 
-	// subscription handler 
+	// subscription handler
 	Route::post('/create/vendor/subscription', [SubscriptionController::class,'createVendorSubscription']);
 
     // fund users wallet
@@ -95,6 +96,13 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
     Route::get('/fetch/all/banks', [BankController::class,'fetchAllBanks']);
     Route::get('/fetch/single/bank/{code?}', [BankController::class,'fetchSingleBank']);
     Route::post('/verify/account/number', [BankController::class,'verifyUserAccountNumber']);
+
+    Route::prefix('cards')->group(function(){
+        Route::get('/', [CardController::class, 'list']);
+        Route::prefix('{id}')->group(function(){
+            Route::get('/delete', [CardController::class, 'delete']);
+        });
+    });
 
   //only those have manage_user permission will get access
   Route::group(['middleware' => 'can:manage_user'], function(){
@@ -106,24 +114,27 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
 	});
 
   Route::get('user', [UserController::class, 'show'])->name('users.current');
-  Route::prefix('users')->group(function(){
-      Route::prefix('{role}')->group(function(){
-          Route::get('/', [UserController::class, 'list'])->name('users.list');
-          Route::get('/{id}', [UserController::class, 'single'])->name('users.single');
-      });
-      Route::post('update', [UserController::class, 'update'])->name('users.update');
-      Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
-  });
+
+    Route::prefix('users')->group(function(){
+        Route::prefix('{role}')->group(function(){
+            Route::get('/', [UserController::class, 'list'])->name('users.list');
+            Route::get('/{id}', [UserController::class, 'single'])->name('users.single');
+        });
+
+        Route::post('update', [UserController::class, 'update'])->name('users.update');
+        Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
+    });
 
     Route::middleware('user.status:User')->group(function(){
-
         Route::prefix('addresses')->group(function(){
-            Route::post('/', [AddressController::class, 'list']);
+            Route::get('/', [AddressController::class, 'list']);
             Route::post('create', [AddressController::class, 'create']);
 
-            Route::prefix('{id}')->group(function(){
+            Route::prefix('{address}')->group(function(){
+                Route::get('/', [AddressController::class, 'single']);
                 Route::post('update', [AddressController::class, 'update']);
-                Route::post('delete', [AddressController::class, 'delete']);
+                Route::get('default', [AddressController::class, 'setDefault']);
+                Route::get('delete', [AddressController::class, 'delete']);
             });
         });
     });

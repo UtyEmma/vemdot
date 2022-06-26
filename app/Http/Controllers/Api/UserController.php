@@ -38,9 +38,7 @@ class UserController extends Controller{
     }
 
     public function list($role){
-        $query = User::query();
-
-
+        $query = User::whereRelation('userRole', 'name', $role);
 
         if($role === 'Vendor'){
             $query->with(['meals']);
@@ -50,13 +48,11 @@ class UserController extends Controller{
             $query->with(['addresses']);
         }
 
-
         if($role === 'Logistic'){
             $query->with(['bikes']);
         }
 
-        $query->with('wallet');
-        $query->notifications;
+        // $query->notifications;
 
         return $this->returnMessageTemplate(true, "", [
             'users' => $query->get()

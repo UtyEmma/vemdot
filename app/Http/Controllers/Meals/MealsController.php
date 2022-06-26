@@ -20,7 +20,7 @@ class MealsController extends Controller{
     function create(CreateMealRequest $request){
         $user = $this->user();
 
-        if(!MealCategory::find($request->category)) return abort(400, "The Selected Meal Category Does not Exist");
+        if(!MealCategory::find($request->category)) return $this->returnMessageTemplate(false, "The Selected Meal Category Does not Exist");
 
         $unique_id = $this->createUniqueId('meals');
 

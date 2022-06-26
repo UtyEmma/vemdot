@@ -10,7 +10,10 @@ class Address extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $fillable = ['unique_id', 'user_id', 'name', 'city', 'state', 'location', 'default'];
+
     protected $primaryKey = 'unique_id';
     public $incrementing = false;
     protected $keyType = 'string';
+
 }
