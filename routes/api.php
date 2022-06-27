@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\AccountActivationController;
 use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Cards\CardController;
-use App\Http\Controllers\Api\Meals\MealsController;
+use App\Http\Controllers\Meals\MealsController;
 use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\ResetPasswordContoller;
 use App\Http\Controllers\Api\UpdatePasswordContoller;
@@ -145,6 +145,7 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
         });
 
         Route::get('/vendor/{vendor_id?}', [MealsController::class, 'vendorMeals']);
+        Route::get('/by/ads', [MealsController::class, 'fetchMealsByAds']);
 
         Route::middleware('kyc.status:Vendor')->group(function(){
             Route::post('/create', [MealsController::class, 'create']);

@@ -1,14 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Meals;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Meals\CreateMealRequest;
 use App\Models\Meal\Meal;
 use App\Models\Meal\MealCategory;
-use App\Models\User;
 use App\Services\MealService;
-use App\Services\NotificationService;
 use Illuminate\Support\Facades\Request;
 
 class MealsController extends Controller{
@@ -75,11 +73,11 @@ class MealsController extends Controller{
 
     function fetchAllMeals(MealService $mealService, $vendor_id = null){
         $meals = $mealService
-                        ->hasVendor()
-                        ->owner()->category()
-                        ->sortByRating()
-                        ->orders()
-                        ->query();
+            ->hasVendor()
+            ->owner()->category()
+            ->sortByRating()
+            ->orders()
+            ->query();
 
         return $this->returnMessageTemplate(true, '', [
             'meals' => $meals->get()
@@ -103,5 +101,14 @@ class MealsController extends Controller{
 
     function updateAvailabilityStatus(){
 
+    }
+
+    function fetchMealsByAds(){
+        $meals = Meal::where('promoted', $this->yes)->paginate($this->paginate);
+        foreach($meals as $meal){
+            $meal->categories;
+            $meal->vendor;
+        }
+        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('fetched_all', 'Meal'), $meals);
     }
 }

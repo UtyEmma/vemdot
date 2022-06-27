@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\Subscription\Subscription;
 use App\Models\Plan\SubscriptionPlan;
+use App\Models\Meal\Meal;
 use App\Traits\Options;
 use Carbon\Carbon;
 
@@ -53,8 +54,12 @@ class SubscriptionChecker extends Command
             ->first();     
             if($plan != null){
                 if($subscription->start_date->diffInDays(now()) >= $plan->duration){
-                    $each_subscription->status = $this->expired;
-                    $each_subscription->save();
+                    $each_subscription->update([
+                        'status' => $this->expired,
+                    ]);
+                    foreach($subscription->meal_id as $eachMeal){
+                        Meal::where('unique_id', $eachMeal)->update(['promoted' => $this->no]);
+                    }
                 }
             }       
         }
