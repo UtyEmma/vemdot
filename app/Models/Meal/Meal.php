@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Meal extends Model{
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['unique_id', 'user_id', 'category', 'name', 'thumbnail', 'description', 'price', 'images', 'video', 'price', 'discount', 'tax', 'rating', 'availability'];
+    protected $fillable = ['unique_id', 'user_id', 'category', 'name', 'thumbnail', 'description', 'price', 'images', 'video', 'price', 'discount', 'tax', 'rating', 'availability', 'promoted'];
 
     protected $keyType = 'string';
     protected $primaryKey = 'unique_id';
@@ -22,14 +22,15 @@ class Meal extends Model{
         'availability' => 'yes',
         'rating' => 1,
         'discount' => 0,
-        'tax' => 0
+        'tax' => 0,
+        'promoted' => 'no',
     ];
 
     function vendor(){
         return $this->belongsTo(User::class, 'user_id', 'unique_id');
     }
 
-    function category(){
+    function categories(){
         return $this->belongsTo(MealCategory::class, 'category', 'unique_id');
     }
 

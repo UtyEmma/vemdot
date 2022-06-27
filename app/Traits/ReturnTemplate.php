@@ -54,6 +54,8 @@ trait ReturnTemplate {
             'payment_not_complete' => "An error occured!, payment was incomplete",
             'subscription_exist' => "You have previously subscribed for this plan",
             'wrong_accct_number' => "Provided accout number does not match the Bank",
+            'meal_exceed_plan' => "Number of meals exceeds the plan's items",
+            'meal_not_available' => "$item is currently not available",
         ];
         return $messageArray[$keyword];
     }
