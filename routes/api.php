@@ -21,7 +21,8 @@ use App\Http\Controllers\DailySpecial\DailySpecialController;
 use App\Http\Controllers\Subscription\SubscriptionController;
 use App\Http\Controllers\Wallet\WalletController;
 use App\Http\Controllers\Banks\BankController;
-use App\Http\Controllers\Logistic\BikeController;
+use App\Http\Controllers\Logistic\LogisticController;
+use App\Http\Controllers\Logistic\RiderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,7 +38,7 @@ use App\Http\Controllers\Logistic\BikeController;
 // log users in
 Route::post('login', [LoginController::class,'loginUser']);
 //log rider in
-Route::post('login/rider', [BikeController::class, 'loginRider']);
+Route::post('login/rider', [RiderController::class, 'loginRider']);
 //2fa handler
 Route::post('user/2fa/verify', [LoginController::class, 'processUserlogin']);
 Route::get('/payment/callback', [Controller::class,'verifyPayment']);
@@ -163,15 +164,15 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
     
     // logistic handler
     Route::middleware('user.status:Logistic')->group(function(){
-        Route::post('create/rider', [BikeController::class, 'createRiderRequest']);
-        Route::get('fetch/all/riders/{logistic?}', [BikeController::class, 'fetchAllRiders']);
-        Route::get('fetch/rider/{uniqueId?}', [BikeController::class, 'fetchSingleRider']);
-        Route::post('update/riders/{uniqueId?}', [BikeController::class, 'updateRiderDetails']);
+        Route::post('create/rider', [LogisticController::class, 'createRiderRequest']);
+        Route::get('fetch/all/riders/{logistic?}', [LogisticController::class, 'fetchAllRiders']);
+        Route::get('fetch/rider/{uniqueId?}', [LogisticController::class, 'fetchSingleRider']);
+        Route::post('update/riders/{uniqueId?}', [LogisticController::class, 'updateRiderDetails']);
     });
 
-});
+    // Rider handler
+    Route::middleware('user.status:Rider')->group(function(){
+        Route::get('logout/rider/{unique?}', [RiderController::class, 'logOutRider']);
+    });
 
-// Rider handler
-Route::group(['middleware' => 'auth:sanctum', 'ability:riders'], function(){
-    Route::get('logout/rider/{unique?}', [BikeController::class, 'logOutRider']);
 });
