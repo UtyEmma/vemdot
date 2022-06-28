@@ -21,6 +21,7 @@ use App\Http\Controllers\DailySpecial\DailySpecialController;
 use App\Http\Controllers\Subscription\SubscriptionController;
 use App\Http\Controllers\Wallet\WalletController;
 use App\Http\Controllers\Banks\BankController;
+use App\Http\Controllers\Logistic\BikeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,8 @@ use App\Http\Controllers\Banks\BankController;
 
 // log users in
 Route::post('login', [LoginController::class,'loginUser']);
+//log rider in
+Route::post('login/rider', [BikeController::class, 'loginRider']);
 //2fa handler
 Route::post('user/2fa/verify', [LoginController::class, 'processUserlogin']);
 Route::get('/payment/callback', [Controller::class,'verifyPayment']);
@@ -104,8 +107,8 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
         });
     });
 
-  //only those have manage_user permission will get access
-  Route::group(['middleware' => 'can:manage_user'], function(){
+    //only those have manage_user permission will get access
+    Route::group(['middleware' => 'can:manage_user'], function(){
 		Route::get('/users', [UserController::class,'list']);
 		Route::post('/user/create', [UserController::class,'store']);
 		Route::get('/user/{id}', [UserController::class,'profile']);
@@ -113,14 +116,13 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
 		Route::post('/user/change-role/{id}', [UserController::class,'changeRole']);
 	});
 
-  Route::get('user', [UserController::class, 'show'])->name('users.current');
+    Route::get('user', [UserController::class, 'show'])->name('users.current');
 
     Route::prefix('users')->group(function(){
         Route::prefix('{role}')->group(function(){
             Route::get('/', [UserController::class, 'list'])->name('users.list');
             Route::get('/{id}', [UserController::class, 'single'])->name('users.single');
         });
-
         Route::post('update', [UserController::class, 'update'])->name('users.update');
         Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
     });
@@ -129,7 +131,6 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
         Route::prefix('addresses')->group(function(){
             Route::get('/', [AddressController::class, 'list']);
             Route::post('create', [AddressController::class, 'create']);
-
             Route::prefix('{address}')->group(function(){
                 Route::get('/', [AddressController::class, 'single']);
                 Route::post('update', [AddressController::class, 'update']);
@@ -143,10 +144,8 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
         Route::middleware('user.status:User')->group(function(){
             Route::get('/', [MealsController::class, 'fetchAllMeals']);
         });
-
         Route::get('/vendor/{vendor_id?}', [MealsController::class, 'vendorMeals']);
         Route::get('/by/ads', [MealsController::class, 'fetchMealsByAds']);
-
         Route::middleware('kyc.status:Vendor')->group(function(){
             Route::post('/create', [MealsController::class, 'create']);
             Route::prefix('{meal_id}')->group(function(){
@@ -160,11 +159,19 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
     // Add a middleware for role here
     Route::middleware('user.status:Vendor')->group(function(){
         Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
-
-
+    });
+    
+    // logistic handler
+    Route::middleware('user.status:Logistic')->group(function(){
+        Route::post('create/rider', [BikeController::class, 'createRiderRequest']);
+        Route::get('fetch/all/riders/{logistic?}', [BikeController::class, 'fetchAllRiders']);
+        Route::get('fetch/rider/{uniqueId?}', [BikeController::class, 'fetchSingleRider']);
+        Route::post('update/riders/{uniqueId?}', [BikeController::class, 'updateRiderDetails']);
     });
 
+});
 
-
-
+// Rider handler
+Route::group(['middleware' => 'auth:sanctum', 'ability:riders'], function(){
+    Route::get('logout/rider/{unique?}', [BikeController::class, 'logOutRider']);
 });

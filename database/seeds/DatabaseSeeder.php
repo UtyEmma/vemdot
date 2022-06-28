@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder{
         $user->email = "support@".env('APP_DOMAIN');
         $user->role = "super_admin";
         $user->phone = "0392372831";
-        $user->gender = "Male";
+        $user->gender = "male";
         $user->referral_id = $this->createUniqueId('users', 'referral_id');
         $user->password = Hash::make(1234567890);
         $user->save();

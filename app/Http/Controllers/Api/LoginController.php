@@ -25,13 +25,11 @@ class LoginController extends Controller
             'email' => 'required|email',
             'password' => 'required',
         ]);
-        if($validator->fails()){
+        if($validator->fails())
             return $this->returnMessageTemplate(false, $validator->messages());
-        }
 
-        if (!Auth::attempt($request->only('email', 'password'))){
+        if (!Auth::attempt($request->only('email', 'password')))
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('wrong_crendential'));
-        }
 
         $user = User::where('email', $request['email'])->firstOrFail();
         
