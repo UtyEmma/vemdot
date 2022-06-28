@@ -56,6 +56,8 @@ trait ReturnTemplate {
             'wrong_accct_number' => "Provided accout number does not match the Bank",
             'meal_exceed_plan' => "Number of meals exceeds the plan's items",
             'meal_not_available' => "$item is currently not available",
+            'not_authorized' => "You are not authorized to carry out this action",
+            'pending_approval' => "Your account is pending approval",
         ];
         return $messageArray[$keyword];
     }

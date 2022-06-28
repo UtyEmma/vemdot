@@ -21,8 +21,6 @@ class CheckUserRole{
         $user = $request->user();
         $accountRole = AccountRole::find($user->role);
 
-
-
         if($accountRole->name === $role) return $next($request);
 
         abort(401, "You are not authorized to make this request");
