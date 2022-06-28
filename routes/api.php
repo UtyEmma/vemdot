@@ -38,7 +38,7 @@ use App\Http\Controllers\Logistic\RiderController;
 // log users in
 Route::post('login', [LoginController::class,'loginUser']);
 //log rider in
-Route::post('login/rider', [BikeController::class, 'loginRider']);
+Route::post('login/rider', [RiderController::class, 'loginRider']);
 //2fa handler
 Route::post('user/2fa/verify', [LoginController::class, 'processUserlogin']);
 Route::get('/payment/callback', [Controller::class,'verifyPayment']);
@@ -170,9 +170,9 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
         Route::post('update/riders/{uniqueId?}', [LogisticController::class, 'updateRiderDetails']);
     });
 
-});
+    // Rider handler
+    Route::middleware('user.status:Rider')->group(function(){
+        Route::get('logout/rider/{unique?}', [RiderController::class, 'logOutRider']);
+    });
 
-// Rider handler
-Route::group(['middleware' => 'auth:sanctum', 'ability:riders'], function(){
-    Route::get('logout/rider/{unique?}', [RiderController::class, 'logOutRider']);
 });
