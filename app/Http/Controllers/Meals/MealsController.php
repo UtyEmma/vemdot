@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Meals;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Meals\CreateMealRequest;
@@ -96,6 +96,8 @@ class MealsController extends Controller{
 
     function single(MealService $mealService, $meal_id){
         $meal = $mealService->find($meal_id)->owner()->orders()->reviews()->query();
+        if(!$meal->exists()) return $this->returnMessageTemplate(false, "Meal Not found");
+
         return $this->returnMessageTemplate(true, '', [
             'meal' => $meal->get()
         ]);

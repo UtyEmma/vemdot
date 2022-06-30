@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\AccountActivationController;
 use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Cards\CardController;
-use App\Http\Controllers\Api\Meals\MealsController;
+use App\Http\Controllers\Meals\MealsController;
 use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\ResetPasswordContoller;
 use App\Http\Controllers\Api\UpdatePasswordContoller;
@@ -21,6 +21,9 @@ use App\Http\Controllers\DailySpecial\DailySpecialController;
 use App\Http\Controllers\Subscription\SubscriptionController;
 use App\Http\Controllers\Wallet\WalletController;
 use App\Http\Controllers\Banks\BankController;
+use App\Http\Controllers\Meals\FavouriteController;
+use App\Http\Controllers\Orders\OrderController;
+use App\Http\Controllers\User\VendorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -104,14 +107,8 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
         });
     });
 
-  //only those have manage_user permission will get access
-  Route::group(['middleware' => 'can:manage_user'], function(){
-		Route::get('/users', [UserController::class,'list']);
-		Route::post('/user/create', [UserController::class,'store']);
-		Route::get('/user/{id}', [UserController::class,'profile']);
-		Route::get('/user/delete/{id}', [UserController::class,'delete']);
-		Route::post('/user/change-role/{id}', [UserController::class,'changeRole']);
-	});
+    Route::get('/all-users', [UserController::class, 'allUsers']);
+    Route::get('/orders/{user_id?}', [OrderController::class, 'list']);
 
   Route::get('user', [UserController::class, 'show'])->name('users.current');
 
@@ -137,11 +134,24 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
                 Route::get('delete', [AddressController::class, 'delete']);
             });
         });
+
+        Route::prefix('vendors')->group(function(){
+            Route::get('/list-companies/{vendor_id}', [VendorController::class, 'listCompanies']);
+        });
+
+        Route::prefix('orders')->group(function(){
+            Route::post('/create', [OrderController::class, 'create']);
+        });
     });
 
     Route::prefix('meals')->group(function(){
+        Route::get('/', [MealsController::class, 'fetchAllMeals']);
+
         Route::middleware('user.status:User')->group(function(){
-            Route::get('/', [MealsController::class, 'fetchAllMeals']);
+            Route::prefix('favourites')->group(function(){
+                Route::get('/', [FavouriteController::class, 'list']);
+                Route::get('/{meal_id}', [FavouriteController::class, 'toggle']);
+            });
         });
 
         Route::get('/vendor/{vendor_id?}', [MealsController::class, 'vendorMeals']);
@@ -149,19 +159,25 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
         Route::middleware('kyc.status:Vendor')->group(function(){
             Route::post('/create', [MealsController::class, 'create']);
             Route::prefix('{meal_id}')->group(function(){
-                Route::get('/', [MealsController::class, 'single']);
                 Route::post('/update', [MealsController::class, 'update']);
                 Route::get('/delete', [MealsController::class, 'delete']);
             });
+        });
+
+        Route::prefix('{meal_id}')->group(function(){
+            Route::get('/', [MealsController::class, 'single']);
         });
     });
 
     // Add a middleware for role here
     Route::middleware('user.status:Vendor')->group(function(){
         Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
-
-
+        Route::get('/add-company/{company_id}', [VendorController::class, 'addCompany']);
+        Route::prefix('vendors')->group(function(){
+            Route::get('/list-companies', [VendorController::class, 'listCompanies']);
+        });
     });
+
 
 
 

@@ -22,5 +22,5 @@ trait Options {
     public $cancelled = 'cancelled';
     public $yes = 'yes';
     public $no = 'no';
-
+    public $paid = 'paid';
 }

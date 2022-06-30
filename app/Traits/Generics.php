@@ -92,4 +92,8 @@ trait Generics{
     function returnObject(array $array){
         return json_decode(json_encode($array));
     }
+
+    function percentageDiff($value, $percent){
+        return $value - $value * $percent / 100;
+    }
 }

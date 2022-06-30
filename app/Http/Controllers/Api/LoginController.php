@@ -34,7 +34,7 @@ class LoginController extends Controller
         }
 
         $user = User::where('email', $request['email'])->firstOrFail();
-        
+
         $appSettings = $this->getSiteSettings();
 
         if($appSettings->account_verification != 'no'){
@@ -53,6 +53,7 @@ class LoginController extends Controller
                         'user' => $user,
                         'token' => $verificationCode['token']
                     ];
+
                     return $this->returnMessageTemplate(true, $this->returnSuccessMessage('activation_token_sent'), $payload);
                 }
             }
@@ -105,7 +106,7 @@ class LoginController extends Controller
         $process = $this->verifyTwofactor($data);
 
         if($process['status']){
-            
+
             if($this->getSiteSettings()->login_alert != 'no'){
                 $currentDate = Carbon::now();
                 $dateFormat = $currentDate->format('l jS \\of F Y h:i:s A');

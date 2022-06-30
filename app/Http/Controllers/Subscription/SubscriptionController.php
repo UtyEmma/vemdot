@@ -82,6 +82,7 @@ class SubscriptionController extends Controller
             if($payment['status'] == true){
                 //create subscription record
                 $sub = $this->createSubscription($reference, $plan, $meal);
+
                 if($sub){
                     //create transaction record
                     $this->createTransaction($plan, $reference, $orderID, $description, null,  $payment['data']);
@@ -90,6 +91,7 @@ class SubscriptionController extends Controller
                     }
                     return Redirect::to($payment['data']['authorization_url']); //live / deployment
                 }
+
                 return $this->returnMessageTemplate(false, $this->returnErrorMessage('subscription_exist'));
             }
 
