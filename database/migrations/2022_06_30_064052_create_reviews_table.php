@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBikesTable extends Migration
+class CreateReviewsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,18 +12,15 @@ class CreateBikesTable extends Migration
      * @return void
      */
     public function up()
-    { 
-        Schema::create('bikes', function (Blueprint $table) {
-            $table->id();
+    {
+        Schema::create('reviews', function (Blueprint $table) {
+            $table->id();  
             $table->string('unique_id')->unique();
             $table->string('user_id');
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('avatar');
-            $table->string('bike_no');
-            $table->string('bike_image');
-            $table->string('password');
-            $table->string('availability');
+            $table->string('type');  //meal / restaurant / logistic / rider
+            $table->string('data_id');
+            $table->string('rate');
+            $table->string('comment')->nullable();
             $table->string('status');
 
             $table->softDeletes();  //add this line
@@ -38,6 +35,6 @@ class CreateBikesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('bikes');
+        Schema::dropIfExists('reviews');
     }
 }

@@ -27,7 +27,7 @@ class MealsController extends Controller{
             'user_id' => $user->unique_id
         ])->all());
 
-        return $this->returnMessageTemplate(true, "Your Meal was created Successfully!", [
+        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('created', 'Meal'), [
             'meal' => $meal
         ]);
     }
@@ -45,19 +45,19 @@ class MealsController extends Controller{
         $user = $this->user();
         if($user->userRole->name === 'Vendor') {
             $meals = $mealService
-                    ->byUser($user->unique_id)
-                    ->category()
-                    ->status()
-                    ->query();
+                ->byUser($user->unique_id)
+                ->category()
+                ->status()
+                ->query();
         }else{
             if($vendor_id){
                 $meals = $mealService
-                        ->byUser($vendor_id)
-                        ->hasVendor()
-                        ->owner()->category()
-                        ->sortByRating()
-                        ->orders()
-                        ->query();
+                    ->byUser($vendor_id)
+                    ->hasVendor()
+                    ->owner()->category()
+                    ->sortByRating()
+                    ->orders()
+                    ->query();
             }
         }
 
@@ -78,10 +78,7 @@ class MealsController extends Controller{
             ->sortByRating()
             ->orders()
             ->query();
-
-        return $this->returnMessageTemplate(true, '', [
-            'meals' => $meals->get()
-        ]);
+        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('fetched_all', 'Meals'), ['meals' => $meals->get()]);
     }
 
     function vendorFetchSingleMeal(MealService $mealService, $meal_id){

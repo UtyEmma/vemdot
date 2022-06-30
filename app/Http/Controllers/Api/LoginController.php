@@ -123,10 +123,4 @@ class LoginController extends Controller
             return $this->returnMessageTemplate(false, $process['message']);
         }
     }
-
-    // method for user logoutUser and delete token
-    public function logoutUser(){
-        auth()->user()->tokens()->delete();
-        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('successful_logout'));
-    }
 }

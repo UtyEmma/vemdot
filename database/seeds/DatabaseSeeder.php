@@ -86,7 +86,7 @@ class DatabaseSeeder extends Seeder{
         $settings->site_domain = env('APP_URL');
         $settings->save();
 
-        $roles = ["Super Admin", "Admin", "Vendor", "Logistic", "User"];
+        $roles = ["Super Admin", "Admin", "Vendor", "Logistic", "Rider", "User"];
 
         foreach ($roles as $item){
             $role = new AccountRole();

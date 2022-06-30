@@ -23,6 +23,7 @@ use App\Http\Controllers\Wallet\WalletController;
 use App\Http\Controllers\Banks\BankController;
 use App\Http\Controllers\Logistic\LogisticController;
 use App\Http\Controllers\Logistic\RiderController;
+use App\Http\Controllers\Review\ReviewController;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,7 +61,7 @@ Route::post('reset-password', [ResetPasswordContoller::class, 'resetPassword']);
 Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function(){
     //log user out
     Route::post('upload', [MediaController::class, 'upload']);
-	Route::get('logout', [LoginController::class,'logoutUser']);
+	Route::get('logout', [Controller::class,'logoutUser']);
 	//update user password
 	Route::post('update-password', [UpdatePasswordContoller::class, 'updateUserPassword']);
 
@@ -168,11 +169,19 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
         Route::get('fetch/all/riders/{logistic?}', [LogisticController::class, 'fetchAllRiders']);
         Route::get('fetch/rider/{uniqueId?}', [LogisticController::class, 'fetchSingleRider']);
         Route::post('update/riders/{uniqueId?}', [LogisticController::class, 'updateRiderDetails']);
+        Route::delete('delete/rider/{uniqueId?}', [LogisticController::class, 'deleteRiders']);
+        Route::post('riders/avaliabilty/update', [LogisticController::class, 'updateRiderAvaliablity']);
     });
 
     // Rider handler
     Route::middleware('user.status:Rider')->group(function(){
-        Route::get('logout/rider/{unique?}', [RiderController::class, 'logOutRider']);
+        Route::post('update/riders', [LogisticController::class, 'updateRiderDetails']);
+    });
+    
+    // Review handler
+    Route::prefix('review')->group(function(){
+        Route::post('create', [ReviewController::class, 'createReview']);
+        Route::get('fetch/{type?}', [ReviewController::class, 'fetchAllReview']);
     });
 
 });

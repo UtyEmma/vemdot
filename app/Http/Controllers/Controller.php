@@ -104,4 +104,11 @@ class Controller extends BaseController{
             return $this->returnMessageTemplate(false, $data['message']);
         }
     }
+
+    // method for user logoutUser and delete token
+    protected function logoutUser()
+    {
+        auth()->user()->tokens()->delete();
+        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('successful_logout'));
+    }
 }
