@@ -60,7 +60,14 @@ class User extends Authenticatable{
 
     protected $attributes = [
         'kyc_status' => 'pending',
-        'availability' => 'yes'
+        'availability' => 'yes',
+        'status' => 'pending',
+        'two_factor' => 'no',
+        'two_factor_access' => 'text',
+        'avatar' => 'default.png',
+        'main_balance' => 0,
+        'ref_balance' => 0,
+        'first_time_login' => 'yes',
     ];
 
     public function generateCode($auth){
@@ -144,6 +151,10 @@ class User extends Authenticatable{
 
     public function cards(){
         return $this->hasMany(Card::class, 'user_id', 'unique_id');
+    }
+
+    function logistic(){
+        return $this->belongsTo(User::class, 'business_name', 'unique_id');
     }
 
 
