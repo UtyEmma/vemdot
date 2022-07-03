@@ -4,39 +4,15 @@
 
 
 <div class="container-fluid">
-    <div class="page-header">
-        <div class="row align-items-end">
-            <div class="col-lg-8">
-                <div class="page-header-title">
-                    <i class="ik ik-file-text bg-blue"></i>
-                    <div class="d-inline">
-                        <h5>{{ __('Profile')}}</h5>
-                        <span>{{ __('lorem ipsum dolor sit amet, consectetur adipisicing elit')}}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <nav class="breadcrumb-container" aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item">
-                            <a href="{{route('dashboard')}}"><i class="ik ik-home"></i></a>
-                        </li>
-                        <li class="breadcrumb-item">
-                            <a href="#">{{ __('Pages')}}</a>
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">{{ __('Profile')}}</li>
-                    </ol>
-                </nav>
-            </div>
-        </div>
-    </div>
-
+    {{-- page header section --}}
+    <x-pageHeader header="Profile" />
+    
     <div class="row">
         <div class="col-lg-4 col-md-5">
             <div class="card">
                 <div class="card-body">
                     <div class="text-center">
-                        <img src="{{asset($user->avatar ?? '../img/user.jpg')}}" style="object-fit: cover;" class="rounded-circle" width="150" />
+                        <img src="{{asset($user->avatar ?? asset('default.png'))}}" style="object-fit: cover;" class="rounded-circle" width="150" />
                         <h4 class="card-title mt-10">{{ __($user->name)}}</h4>
                         <p class="card-subtitle">{{ __($user->userRole->name)}}</p>
                         <div class="row text-center justify-content-md-center">

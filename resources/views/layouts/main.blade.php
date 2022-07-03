@@ -29,6 +29,10 @@
     	</div>
     </div>
 
+	<x-modal call="logoutUser" header="Logout Notification" message="Do you really wish to logout from {{env('APP_NAME')}} ?">
+		<a href="{{ url('logout') }}" class="btn btn-primary">{{ __('Continue')}}</a>
+	</x-modal>
+
 	<!-- initiate modal menu section-->
 	@include('include.modalmenu')
 
