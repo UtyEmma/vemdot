@@ -3,29 +3,8 @@
 @section('content')
 
     <div class="container-fluid">
-        <div class="page-header">
-            <div class="row align-items-end">
-                <div class="col-lg-8">
-                    <div class="page-header-title">
-                        <i class="ik ik-edit bg-blue"></i>
-                        <div class="d-inline">
-                            <h5>{{ __('Site Settings')}}</h5>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <nav class="breadcrumb-container" aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item">
-                                <a href="{{route('dashboard')}}"><i class="ik ik-home"></i></a>
-                            </li>
-                            <li class="breadcrumb-item"><a href="#">{{ __('Site Settings')}}</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">{{ __('Site Settings')}}</li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-        </div>
+        {{-- page header section --}}
+        <x-pageHeader header="Site Settings" />
 
         <div class="row">
             <div class="col-lg-12 col-md-12">

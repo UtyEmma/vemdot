@@ -12,7 +12,13 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\Meals\CategoryController;
 use App\Http\Controllers\Subscription\PlansController;
 use App\Http\Controllers\Settings\SiteSettingsController;
-use App\Http\Controllers\User\KycController;
+use App\Http\Controllers\Vendor\VendorController;
+use App\Http\Controllers\Logistic\LogisticController;
+use App\Http\Controllers\Logistic\RiderController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Transaction\AdsTransaction;
+use App\Http\Controllers\Transaction\WalletFundTransaction;
+use App\Http\Controllers\Advert\AdvertController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,9 +73,60 @@ Route::group(['middleware' => 'auth'], function(){
 	Route::get('/site/settings', [SiteSettingsController::class,'viewSiteSettings']);
 	Route::post('/update/site/settings', [SiteSettingsController::class,'updateSiteSettings']);
 
+	//general user/vendor/logistic/rider management
+	Route::post('delete/user', [VendorController::class, 'deleteUser']);
+	Route::post('activate/user/status', [VendorController::class, 'activateUserStatus']);
+	//vendor management
+	Route::prefix('vendor')->group(function(){
+        Route::get('interface/{start?}/{end?}', [VendorController::class, 'vendorsInterface']);
+        Route::post('interface/by/date', [VendorController::class, 'getVendorsByDate']);
+    });
+	//logistic management
+	Route::prefix('logistic')->group(function(){
+        Route::get('interface/{start?}/{end?}', [LogisticController::class, 'logisticInterface']);
+        Route::post('interface/by/date', [LogisticController::class, 'getLogisticByDate']);
+    });
+	//riders management
+	Route::prefix('riders')->group(function(){
+        Route::get('interface/{logistic?}/{start?}/{end?}', [RiderController::class, 'ridersInterface']);
+        Route::post('interface/by/date', [RiderController::class, 'getRidersByDate']);
+    });
+	//admin management
+	Route::prefix('admin')->group(function(){
+        Route::get('create/interface', [AdminController::class, 'createAdminInterface']);
+        Route::post('create', [AdminController::class, 'createAdminRequest']);
+		Route::get('view/interface/{start?}/{end?}', [AdminController::class, 'fetchAdminInterface']);
+        Route::post('interface/by/date', [AdminController::class, 'getAdminByDate']);
+    });
+
+	//transaction management
+	Route::prefix('transaction')->group(function(){
+		//ads section
+        Route::get('ads/interface/{start?}/{end?}', [AdsTransaction::class, 'adsTransactionInterface']);
+        Route::post('delete', [AdsTransaction::class, 'deletetransaction']);
+		Route::post('interface/by/date', [AdsTransaction::class, 'getTransactionByDate']);
+		Route::post('interface/by/type', [AdsTransaction::class, 'getTransactionByType']);
+		//fund wallet section
+		Route::get('fundwallet/interface/{start?}/{end?}', [WalletFundTransaction::class, 'fundWalletTransactionInterface']);
+		Route::post('fundwallet/by/date', [WalletFundTransaction::class, 'getTransactionByDate']);
+		Route::post('fundwallet/by/type', [WalletFundTransaction::class, 'getTransactionByType']);
+    });
+	
+	//transaction management
+	Route::prefix('advert')->group(function(){
+		//advert section
+        Route::get('create/interface', [AdvertController::class, 'createAdvertInterface']);
+        Route::post('create', [AdvertController::class, 'addNewAdvert']);
+        Route::get('fetch', [AdvertController::class, 'fetchAdvertInterface']);
+        Route::post('update/status', [AdvertController::class, 'updateAdvertStatus']);
+        Route::post('delete', [AdvertController::class, 'deleteAdvert']);
+    });
+
     Route::prefix('users')->group(function(){
-        Route::get('/', [UserController::class, 'index'])->name('users');
+        Route::get('view/{start?}/{end?}', [UserController::class, 'index'])->name('users');
+		Route::post('interface/by/date', [UserController::class, 'getUserByDate']);
         Route::get('/kyc', [UserController::class, 'fetchRequests'])->name('users.kyc');
+		Route::post('update', [UserController::class, 'updateUser']);
 
         Route::prefix('/{user_id}')->group(function(){
             Route::get('/', [UserController::class, 'edit']);
@@ -78,17 +135,6 @@ Route::group(['middleware' => 'auth'], function(){
             Route::post('/update', [UserController::class, 'update']);
         });
     });
-
-	//only those have manage_user permission will get access
-	// Route::group(['middleware' => 'auth'], function(){
-	// 	Route::get('/users', [UserController::class,'index']);
-	// 	Route::get('/user/get-list', [UserController::class,'getUserList']);
-	// 	Route::get('/user/create', [UserController::class,'create']);
-	// 	Route::post('/user/create', [UserController::class,'store'])->name('create-user');
-	// 	Route::get('/user/{id}', [UserController::class,'edit']);
-	// 	Route::post('/user/update', [UserController::class,'update']);
-	// 	Route::get('/user/delete/{id}', [UserController::class,'delete']);
-	// });
 
 	//only those have manage_role permission will get access
 	Route::group(['middleware' => 'can:manage_role|manage_user'], function(){

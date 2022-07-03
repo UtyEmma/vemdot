@@ -6,7 +6,7 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 trait FileUpload {
 
-    public function uploadImageHandler($request, $file, $folder, $image = 'default.png',  $width = 2000, $height = 1163){
+    public function uploadImageHandler($request, $file, $folder, $image = 'default.png',  $width = 1200, $height = 720){
         $image_hold = $image;
         if ($request->hasFile($file)) {
             $image_hold = Cloudinary::upload($request->file($file)->getRealPath(),

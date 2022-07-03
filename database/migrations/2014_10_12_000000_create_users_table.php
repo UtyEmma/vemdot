@@ -31,7 +31,7 @@ class CreateUsersTable extends Migration
             $table->string('two_factor_access');
             $table->string('password');
 
-            $table->string('avatar');
+            $table->string('avatar')->nullable();
             $table->string('referral_id');
             $table->string('referred_id')->nullable();
 

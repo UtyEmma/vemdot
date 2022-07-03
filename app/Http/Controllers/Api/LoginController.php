@@ -57,7 +57,7 @@ class LoginController extends Controller
         }
 
         //check if the user is blocked
-        if($user->status == 'blocked'){
+        if($user->status == $this->pending){
             $this->logoutUser();
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('account_blocked'));
         }

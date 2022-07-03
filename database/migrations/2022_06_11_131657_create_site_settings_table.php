@@ -21,7 +21,7 @@ class CreateSiteSettingsTable extends Migration
             $table->string('site_phone')->nullable();
             $table->string('site_address')->nullable();
             $table->string('site_domain')->nullable();
-            $table->string('site_logo')->default('default.png');
+            $table->string('site_logo')->nullable();
             $table->string('referral_bonus')->default(5);
             $table->string('account_verification')->default('no');
             $table->string('token_length')->default(4);

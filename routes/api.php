@@ -24,6 +24,7 @@ use App\Http\Controllers\Banks\BankController;
 use App\Http\Controllers\Logistic\LogisticController;
 use App\Http\Controllers\Logistic\RiderController;
 use App\Http\Controllers\Review\ReviewController;
+use App\Http\Controllers\Advert\AdvertController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,6 +58,9 @@ Route::post('resend-reset-code', [ResetPasswordContoller::class, 'resendResetCod
 Route::post('verify-reset-code', [ResetPasswordContoller::class, 'verifySentResetCode']);
 Route::post('reset-password', [ResetPasswordContoller::class, 'resetPassword']);
 
+//advers handler
+Route::get('/fetch/adverts', [AdvertController::class,'fetchAdvertsForUsers']);
+Route::get('/fetch/single/advert/{id?}', [AdvertController::class,'fetchSingleAdvert']);
 
 Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function(){
     //log user out
@@ -126,7 +130,7 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
             Route::get('/{id}', [UserController::class, 'single'])->name('users.single');
         });
         Route::post('update', [UserController::class, 'update'])->name('users.update');
-        Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
+        //Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
     });
 
     Route::middleware('user.status:User')->group(function(){

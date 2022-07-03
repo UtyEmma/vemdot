@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Address\Address;
 use App\Models\Meal\Meal;
 use App\Models\Role\AccountRole;
+use App\Models\Country\CountryList;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -64,7 +65,6 @@ class User extends Authenticatable{
         'status' => 'pending',
         'two_factor' => 'no',
         'two_factor_access' => 'text',
-        'avatar' => 'default.png',
         'main_balance' => 0,
         'ref_balance' => 0,
         'first_time_login' => 'yes',
@@ -115,7 +115,6 @@ class User extends Authenticatable{
         return ['status' => true, 'code' => $code];
     }
 
-
     public function getAllUsers($condition, $id = 'id', $desc = "desc"){
         return User::where($condition)->orderBy($id, $desc)->get();
     }
@@ -147,6 +146,10 @@ class User extends Authenticatable{
 
     public function userRole(){
         return $this->belongsTo(AccountRole::class, 'role', 'unique_id');
+    }  
+    
+    public function countries(){
+        return $this->belongsTo(CountryList::class, 'country', 'unique_id');
     }
 
     public function cards(){
@@ -155,6 +158,10 @@ class User extends Authenticatable{
 
     function logistic(){
         return $this->belongsTo(User::class, 'business_name', 'unique_id');
+    }
+
+    function currency(){
+        return 'NGN';
     }
 
 
