@@ -122,7 +122,6 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
         });
     });
 
-<<<<<<< HEAD
     Route::get('/all-users', [UserController::class, 'allUsers']);
 
     Route::prefix('orders')->group(function(){
@@ -132,16 +131,6 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
             Route::post('/update', [OrderController::class, 'update']);
         });
     });
-=======
-    //only those have manage_user permission will get access
-    Route::group(['middleware' => 'can:manage_user'], function(){
-		Route::get('/users', [UserController::class,'list']);
-		Route::post('/user/create', [UserController::class,'store']);
-		Route::get('/user/{id}', [UserController::class,'profile']);
-		Route::get('/user/delete/{id}', [UserController::class,'delete']);
-		Route::post('/user/change-role/{id}', [UserController::class,'changeRole']);
-	});
->>>>>>> 988d4e4133b7987e0a5b00d6097b23f657dc55f2
 
     Route::get('user', [UserController::class, 'show'])->name('users.current');
 
@@ -202,12 +191,10 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
     // Add a middleware for role here
     Route::middleware('user.status:Vendor')->group(function(){
         Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
-<<<<<<< HEAD
         Route::get('/add-company/{company_id}', [VendorController::class, 'addCompany']);
         Route::prefix('vendors')->group(function(){
             Route::get('/list-companies', [VendorController::class, 'listCompanies']);
         });
-=======
     });
 
     // logistic handler
@@ -218,7 +205,6 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
         Route::post('update/riders/{uniqueId?}', [LogisticController::class, 'updateRiderDetails']);
         Route::delete('delete/rider/{uniqueId?}', [LogisticController::class, 'deleteRiders']);
         Route::post('riders/avaliabilty/update', [LogisticController::class, 'updateRiderAvaliablity']);
->>>>>>> 988d4e4133b7987e0a5b00d6097b23f657dc55f2
     });
 
     // Rider handler
