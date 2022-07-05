@@ -20,7 +20,81 @@
                 <div class="nav-item {{ ($segment1 == 'dashboard') ? 'active' : '' }}">
                     <a href="{{route('dashboard')}}"><i class="ik ik-bar-chart-2"></i><span>{{ __('Dashboard')}}</span></a>
                 </div>
-                <div class="nav-lavel">{{ __('Using')}} </div>
+                {{-- users section --}}
+                <div class="nav-item {{ ($segment1 == 'users' || $segment1 == 'roles'||$segment1 == 'permission' ||$segment1 == 'user') ? 'active open' : '' }} has-sub">
+                    <a href="#"><i class="ik ik-user"></i><span>{{ __('Users')}}</span></a>
+                    <div class="submenu-content">
+                        <a class="menu-item {{ ($segment1 == 'users') ? 'active' : '' }}" href="{{url('users/view')}}">
+                            <span>{{ __('View Users')}}</span>
+                            <span class=" badge badge-success badge-right">{{ __('New')}}</span>
+                        </a>
+                    </div>
+                </div>
+                {{-- vendor section --}}
+                <div class="nav-item {{ ($segment1 == 'vendors' || $segment1 == 'roles'||$segment1 == 'permission' ||$segment1 == 'vendor') ? 'active open' : '' }} has-sub">
+                    <a href="#"><i class="ik ik-users"></i><span>{{ __('Vendors')}}</span></a>
+                    <div class="submenu-content">
+                        <a class="menu-item {{ ($segment1 == 'vendors') ? 'active' : '' }}" href="{{url('vendor/interface')}}">
+                            <span>{{ __('View vendor')}}</span>
+                        </a>
+                    </div>
+                </div>
+                {{-- logistic section --}}
+                <div class="nav-item {{ ($segment1 == 'logistic' || $segment1 == 'roles'||$segment1 == 'permission' ||$segment1 == 'logistic') ? 'active open' : '' }} has-sub">
+                    <a href="#"><i class="ik ik-users"></i><span>{{ __('Logistic')}}</span></a>
+                    <div class="submenu-content">
+                        <a class="menu-item {{ ($segment1 == 'logistic') ? 'active' : '' }}" href="{{url('logistic/interface')}}">
+                            <span>{{ __('View Logistic')}}</span>
+                        </a>
+                    </div>
+                </div>
+                {{-- admins section --}}
+                <div class="nav-item {{ ($segment1 == 'admins' || $segment1 == 'roles'||$segment1 == 'permission' ||$segment1 == 'admins') ? 'active open' : '' }} has-sub">
+                    <a href="#"><i class="ik ik-user"></i><span>{{ __('Admins')}}</span></a>
+                    <div class="submenu-content">
+                        <a class="menu-item {{ ($segment1 == 'admins') ? 'active' : '' }}" href="{{url('admin/create/interface')}}">
+                            <span>{{ __('Create Admin')}}</span>
+                        </a>
+                        <a class="menu-item {{ ($segment1 == 'admins') ? 'active' : '' }}" href="{{url('admin/view/interface')}}">
+                            <span>{{ __('View Admins')}}</span>
+                        </a>
+                    </div>
+                </div>
+                {{-- KYC request section --}}
+                <div class="nav-item {{ ($segment1 == 'kyc' || $segment1 == 'roles'||$segment1 == 'permission' ||$segment1 == 'kyc') ? 'active open' : '' }} has-sub">
+                    <a href="#"><i class="ik ik-layers"></i><span>{{ __('KYC')}}</span></a>
+                    <div class="submenu-content">
+                        <a class="menu-item {{ ($segment1 == 'kyc') ? 'active' : '' }}" href="{{route('users.kyc')}}">
+                            <span>{{ __('KYC Requests')}}</span>
+                            <span class=" badge badge-success badge-right">{{ __('New')}}</span>
+                        </a>
+                    </div>
+                </div>
+                {{-- transactions section --}}
+                <div class="nav-item {{ ($segment1 == 'transaction' || $segment1 == 'roles'||$segment1 == 'permission' ||$segment1 == 'transaction') ? 'active open' : '' }} has-sub">
+                    <a href="#"><i class="ik ik-credit-card"></i><span>{{ __('Transactions')}}</span></a>
+                    <div class="submenu-content">
+                        <a class="menu-item {{ ($segment1 == 'transaction') ? 'active' : '' }}" href="{{url('transaction/ads/interface')}}">
+                            <span>{{ __('Transactions On Ad`s')}}</span>
+                        </a>
+                        <a class="menu-item {{ ($segment1 == 'transaction') ? 'active' : '' }}" href="{{url('transaction/fundwallet/interface')}}">
+                            <span>{{ __('Transactions on WalletFund')}}</span>
+                        </a>
+                    </div>
+                </div>
+                {{-- withdrawal section --}}
+                <div class="nav-item {{ ($segment1 == 'withdrawal' || $segment1 == 'roles'||$segment1 == 'permission' ||$segment1 == 'withdrawal') ? 'active open' : '' }} has-sub">
+                    <a href="#"><i class="ik ik-dollar-sign"></i><span>{{ __('Withdrawal')}}</span></a>
+                    <div class="submenu-content">
+                        <a class="menu-item {{ ($segment1 == 'withdrawal') ? 'active' : '' }}" href="{{url('withdrawal/interface')}}">
+                            <span>{{ __('Withdrawal Request')}}</span>
+                        </a>
+                        <a class="menu-item {{ ($segment1 == 'withdrawal') ? 'active' : '' }}" href="{{url('withdrawal/histroy/interface')}}">
+                            <span>{{ __('Withdrawal History')}}</span>
+                        </a>
+                    </div>
+                </div>
+                {{-- meal category section --}}
                 <div class="nav-item {{ ($segment1 == 'form-components'||$segment1 == 'form-addon') ? 'active open' : '' }} has-sub">
                     <a href="#"><i class="ik ik-edit"></i><span>{{ __('Meal Category')}}</span></a>
                     <div class="submenu-content">
@@ -28,6 +102,7 @@
                         <a href="{{url('view/categories')}}" class="menu-item {{ ($segment1 == 'form-addon') ? 'active' : '' }}">{{ __('View Categories')}}</a>
                     </div>
                 </div>
+                {{-- subscription plan section --}}
                 <div class="nav-item {{ ($segment1 == 'add-plan'||$segment1 == 'view-plan') ? 'active open' : '' }} has-sub">
                     <a href="#"><i class="ik ik-cloud"></i><span>{{ __('Subscription Plan')}}</span></a>
                     <div class="submenu-content">
@@ -35,27 +110,28 @@
                         <a href="{{url('view/plans')}}" class="menu-item {{ ($segment1 == 'view-plan') ? 'active' : '' }}">{{ __('View Plan')}}</a>
                     </div>
                 </div>
-                <div class="nav-item {{ ($segment1 == 'site-settings') ? 'active' : '' }}">
-                    <a href="{{url('site/settings')}}"><i class="ik ik-unlock"></i><span>{{ __('Site Settings')}}</span> </a>
-                </div>
-
-
-                <div class="nav-lavel">{{ __('USERS')}} </div>
-
-                <div class="nav-item {{ ($segment1 == 'users' || $segment1 == 'roles'||$segment1 == 'permission' ||$segment1 == 'user') ? 'active open' : '' }} has-sub">
-                    <a href="#"><i class="ik ik-user"></i><span>{{ __('Users')}}</span></a>
+                {{-- advert section --}}
+                <div class="nav-item {{ ($segment1 == 'advert' || $segment1 == 'roles'||$segment1 == 'permission' ||$segment1 == 'advert') ? 'active open' : '' }} has-sub">
+                    <a href="#"><i class="ik ik-file-text"></i><span>{{ __('Adverts')}}</span></a>
                     <div class="submenu-content">
-                        <a class="menu-item {{ ($segment1 == 'users') ? 'active' : '' }}" href="{{route('users')}}">
-                            <span>{{ __('Users')}}</span>
-                            <span class=" badge badge-success badge-right">{{ __('New')}}</span>
+                        <a class="menu-item {{ ($segment1 == 'advert') ? 'active' : '' }}" href="{{url('advert/create/interface')}}">
+                            <span>{{ __('Create Advert')}}</span>
                         </a>
-                        <a class="menu-item {{ ($segment1 == 'users') ? 'active' : '' }}" href="{{route('users.kyc')}}">
-                            <span>{{ __('KYC Requests')}}</span>
-                            <span class=" badge badge-success badge-right">{{ __('New')}}</span>
+                        <a class="menu-item {{ ($segment1 == 'advert') ? 'active' : '' }}" href="{{url('advert/fetch')}}">
+                            <span>{{ __('View Adverts')}}</span>
                         </a>
                     </div>
                 </div>
+                {{-- site section --}}
+                <div class="nav-item {{ ($segment1 == 'site-settings') ? 'active' : '' }}">
+                    <a href="{{url('site/settings')}}"><i class="ik ik-unlock"></i><span>{{ __('Site Settings')}}</span> </a>
+                </div>
+                {{-- logout section --}}
+                <div class="nav-item {{ ($segment1 == 'logout') ? 'active' : '' }}">
+                    <a href="#" data-toggle="modal" data-target="#logoutUser"><i class="ik ik-power"></i><span>{{ __('Logout')}}</span> </a>
+                </div>
 
+                <div class="nav-lavel">{{ __('Not Using')}} </div>
                 <div class="nav-item {{ ($segment1 == 'permission-example') ? 'active' : '' }}">
                     <a href="{{url('permission-example')}}"><i class="ik ik-unlock"></i><span>{{ __('Laravel Permission')}}</span> </a>
                 </div>

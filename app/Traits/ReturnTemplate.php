@@ -43,7 +43,7 @@ trait ReturnTemplate {
             'no_data_returned'=>'No Data was returned',
             'no_user'=>'This user is not registerd with us, please select a valid user',
             'unknown_error'=>'An error occurred, please try again',
-            'insufficiant_fund'=>'Insufficiant Fund',
+            'insufficiant_fund'=>'Insufficiant Balance',
             'not_equal_password'=>'The provided password does not match your current password.',
             'not_found' => "$item was not Found",
             'wrong_code' => "You entered a wrong code.",
@@ -55,6 +55,12 @@ trait ReturnTemplate {
             'subscription_exist' => "You have previously subscribed for this plan",
             'wrong_accct_number' => "Provided accout number does not match the Bank",
             'kyc_error' => "Your Account has not been verified",
+            'meal_exceed_plan' => "Number of meals exceeds the plan's items",
+            'meal_not_available' => "$item is currently not available",
+            'not_authorized' => "You are not authorized to carry out this action",
+            'pending_approval' => "Your account is pending approval",
+            'exceed_rate' => "Rate must be between 0 and 5",
+            'no_bank_details' => "Set up a verified your bank account details to to proceed",
         ];
         return $messageArray[$keyword];
     }
@@ -87,7 +93,8 @@ trait ReturnTemplate {
             'fetched_single' => "$item was retrieved",
             'fetched_all' => $item."s were retrieved",
             'updated' => "$item updated successfully",
-            'deleted' => "$item was deleted successfully"
+            'deleted' => "$item was deleted successfully",
+            'payout' => "Payout was successfully",
         ];
         return $messageArray[$keyword];
     }

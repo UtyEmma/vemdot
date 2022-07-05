@@ -24,6 +24,11 @@ use App\Http\Controllers\Banks\BankController;
 use App\Http\Controllers\Meals\FavouriteController;
 use App\Http\Controllers\Orders\OrderController;
 use App\Http\Controllers\User\VendorController;
+use App\Http\Controllers\Logistic\LogisticController;
+use App\Http\Controllers\Logistic\RiderController;
+use App\Http\Controllers\Review\ReviewController;
+use App\Http\Controllers\Advert\AdvertController;
+use App\Http\Controllers\Withdrawal\WithdrawalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +43,8 @@ use App\Http\Controllers\User\VendorController;
 
 // log users in
 Route::post('login', [LoginController::class,'loginUser']);
+//log rider in
+Route::post('login/rider', [RiderController::class, 'loginRider']);
 //2fa handler
 Route::post('user/2fa/verify', [LoginController::class, 'processUserlogin']);
 Route::get('/payment/callback', [Controller::class,'verifyPayment']);
@@ -55,11 +62,14 @@ Route::post('resend-reset-code', [ResetPasswordContoller::class, 'resendResetCod
 Route::post('verify-reset-code', [ResetPasswordContoller::class, 'verifySentResetCode']);
 Route::post('reset-password', [ResetPasswordContoller::class, 'resetPassword']);
 
+//advers handler
+Route::get('/fetch/adverts', [AdvertController::class,'fetchAdvertsForUsers']);
+Route::get('/fetch/single/advert/{id?}', [AdvertController::class,'fetchSingleAdvert']);
 
 Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function(){
     //log user out
     Route::post('upload', [MediaController::class, 'upload']);
-	Route::get('logout', [LoginController::class,'logoutUser']);
+	Route::get('logout', [Controller::class,'logoutUser']);
 	//update user password
 	Route::post('update-password', [UpdatePasswordContoller::class, 'updateUserPassword']);
 
@@ -100,6 +110,11 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
     Route::get('/fetch/single/bank/{code?}', [BankController::class,'fetchSingleBank']);
     Route::post('/verify/account/number', [BankController::class,'verifyUserAccountNumber']);
 
+    //withdrawal handler section
+    Route::get('/fetch/bank/details', [WithdrawalController::class,'fetchUserBankDetails']);
+    Route::get('/fetch/single/bank/detail/{id?}', [WithdrawalController::class,'fetchSingleBankDetails']);
+    Route::post('/initiate/withdrawal', [WithdrawalController::class,'initiateWithdrawal']);
+
     Route::prefix('cards')->group(function(){
         Route::get('/', [CardController::class, 'list']);
         Route::prefix('{id}')->group(function(){
@@ -107,6 +122,7 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
         });
     });
 
+<<<<<<< HEAD
     Route::get('/all-users', [UserController::class, 'allUsers']);
 
     Route::prefix('orders')->group(function(){
@@ -116,24 +132,32 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
             Route::post('/update', [OrderController::class, 'update']);
         });
     });
+=======
+    //only those have manage_user permission will get access
+    Route::group(['middleware' => 'can:manage_user'], function(){
+		Route::get('/users', [UserController::class,'list']);
+		Route::post('/user/create', [UserController::class,'store']);
+		Route::get('/user/{id}', [UserController::class,'profile']);
+		Route::get('/user/delete/{id}', [UserController::class,'delete']);
+		Route::post('/user/change-role/{id}', [UserController::class,'changeRole']);
+	});
+>>>>>>> 988d4e4133b7987e0a5b00d6097b23f657dc55f2
 
-  Route::get('user', [UserController::class, 'show'])->name('users.current');
+    Route::get('user', [UserController::class, 'show'])->name('users.current');
 
     Route::prefix('users')->group(function(){
         Route::prefix('{role}')->group(function(){
             Route::get('/', [UserController::class, 'list'])->name('users.list');
             Route::get('/{id}', [UserController::class, 'single'])->name('users.single');
         });
-
         Route::post('update', [UserController::class, 'update'])->name('users.update');
-        Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
+        //Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
     });
 
     Route::middleware('user.status:User')->group(function(){
         Route::prefix('addresses')->group(function(){
             Route::get('/', [AddressController::class, 'list']);
             Route::post('create', [AddressController::class, 'create']);
-
             Route::prefix('{address}')->group(function(){
                 Route::get('/', [AddressController::class, 'single']);
                 Route::post('update', [AddressController::class, 'update']);
@@ -160,9 +184,8 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
                 Route::get('/{meal_id}', [FavouriteController::class, 'toggle']);
             });
         });
-
         Route::get('/vendor/{vendor_id?}', [MealsController::class, 'vendorMeals']);
-
+        Route::get('/by/ads', [MealsController::class, 'fetchMealsByAds']);
         Route::middleware('kyc.status:Vendor')->group(function(){
             Route::post('/create', [MealsController::class, 'create']);
             Route::prefix('{meal_id}')->group(function(){
@@ -179,14 +202,35 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
     // Add a middleware for role here
     Route::middleware('user.status:Vendor')->group(function(){
         Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
+<<<<<<< HEAD
         Route::get('/add-company/{company_id}', [VendorController::class, 'addCompany']);
         Route::prefix('vendors')->group(function(){
             Route::get('/list-companies', [VendorController::class, 'listCompanies']);
         });
+=======
     });
 
+    // logistic handler
+    Route::middleware('user.status:Logistic')->group(function(){
+        Route::post('create/rider', [LogisticController::class, 'createRiderRequest']);
+        Route::get('fetch/all/riders/{logistic?}', [LogisticController::class, 'fetchAllRiders']);
+        Route::get('fetch/rider/{uniqueId?}', [LogisticController::class, 'fetchSingleRider']);
+        Route::post('update/riders/{uniqueId?}', [LogisticController::class, 'updateRiderDetails']);
+        Route::delete('delete/rider/{uniqueId?}', [LogisticController::class, 'deleteRiders']);
+        Route::post('riders/avaliabilty/update', [LogisticController::class, 'updateRiderAvaliablity']);
+>>>>>>> 988d4e4133b7987e0a5b00d6097b23f657dc55f2
+    });
 
+    // Rider handler
+    Route::middleware('user.status:Rider')->group(function(){
+        Route::post('update/riders', [LogisticController::class, 'updateRiderDetails']);
+    });
 
+    // Review handler
+    Route::prefix('review')->group(function(){
+        Route::post('create', [ReviewController::class, 'createReview']);
+        Route::get('fetch/{type?}', [ReviewController::class, 'fetchAllReview']);
+    });
 
 
 });

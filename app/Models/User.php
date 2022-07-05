@@ -7,6 +7,7 @@ use App\Models\Meal\Meal;
 use App\Models\Role\AccountRole;
 use App\Models\Vendors\VendorLogistic;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Country\CountryList;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -62,7 +63,13 @@ class User extends Authenticatable{
 
     protected $attributes = [
         'kyc_status' => 'pending',
-        'availability' => 'yes'
+        'availability' => 'yes',
+        'status' => 'pending',
+        'two_factor' => 'no',
+        'two_factor_access' => 'text',
+        'main_balance' => 0,
+        'ref_balance' => 0,
+        'first_time_login' => 'yes',
     ];
 
     public function generateCode($auth){
@@ -110,7 +117,6 @@ class User extends Authenticatable{
         return ['status' => true, 'code' => $code];
     }
 
-
     public function getAllUsers($condition, $id = 'id', $desc = "desc"){
         return User::where($condition)->orderBy($id, $desc)->get();
     }
@@ -148,6 +154,10 @@ class User extends Authenticatable{
         return $this->belongsTo(AccountRole::class, 'role', 'unique_id');
     }
 
+    public function countries(){
+        return $this->belongsTo(CountryList::class, 'country', 'unique_id');
+    }
+
     public function cards(){
         return $this->hasMany(Card::class, 'user_id', 'unique_id');
     }
@@ -172,5 +182,13 @@ class User extends Authenticatable{
     function isUser(){
         return $this->where('unique_id', $this->unique_id)->with('userRole')->whereRelation('userRole', 'name', 'User')->exists();
     }
+    function logistic(){
+        return $this->belongsTo(User::class, 'business_name', 'unique_id');
+    }
+
+    function currency(){
+        return 'NGN';
+    }
+
 
 }

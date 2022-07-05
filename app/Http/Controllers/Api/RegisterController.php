@@ -54,7 +54,7 @@ class RegisterController extends Controller
         }
 
         $user = User::create([
-            'unique_id' =>  $this->createUniqueId('users', 'unique_id'),
+            'unique_id' =>  $this->createUniqueId('users'),
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'],

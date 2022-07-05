@@ -25,13 +25,11 @@ class LoginController extends Controller
             'email' => 'required|email',
             'password' => 'required',
         ]);
-        if($validator->fails()){
+        if($validator->fails())
             return $this->returnMessageTemplate(false, $validator->messages());
-        }
 
-        if (!Auth::attempt($request->only('email', 'password'))){
+        if (!Auth::attempt($request->only('email', 'password')))
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('wrong_crendential'));
-        }
 
         $user = User::where('email', $request['email'])->firstOrFail();
 
@@ -60,7 +58,7 @@ class LoginController extends Controller
         }
 
         //check if the user is blocked
-        if($user->status == 'blocked'){
+        if($user->status == $this->pending){
             $this->logoutUser();
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('account_blocked'));
         }
@@ -125,11 +123,5 @@ class LoginController extends Controller
         }else{
             return $this->returnMessageTemplate(false, $process['message']);
         }
-    }
-
-    // method for user logoutUser and delete token
-    public function logoutUser(){
-        auth()->user()->tokens()->delete();
-        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('successful_logout'));
     }
 }

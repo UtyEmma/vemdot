@@ -23,7 +23,7 @@ class CreateBankListsTable extends Migration
             $table->string('country')->nullable();
             $table->string('currency')->nullable();
             $table->string('status')->default('active');
-            $table->string('logo')->default('default.png');
+            $table->string('logo')->nullable();
 
             $table->softDeletes();  //add this line
             $table->timestamps();

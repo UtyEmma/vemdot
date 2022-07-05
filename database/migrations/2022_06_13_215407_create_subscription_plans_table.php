@@ -23,7 +23,7 @@ class CreateSubscriptionPlansTable extends Migration
             $table->string('duration')->default(30);
             $table->string('items')->default(5);
             $table->text('description')->nullable();
-            $table->string('thumbnail')->default('default.png');
+            $table->string('thumbnail')->nullable();
             
             $table->softDeletes();  //add this line
             $table->timestamps();

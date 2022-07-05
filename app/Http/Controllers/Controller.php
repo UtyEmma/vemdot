@@ -38,7 +38,7 @@ class Controller extends BaseController{
         return $notification;
     }
 
-    protected function user (){
+    protected function user(){
         $user = Auth::user();
         return $user ? User::findOrFail($user->unique_id) : null;
     }
@@ -109,5 +109,12 @@ class Controller extends BaseController{
         }else{
             return $this->returnMessageTemplate(false, $data['message']);
         }
+    }
+
+    // method for user logoutUser and delete token
+    protected function logoutUser()
+    {
+        auth()->user()->tokens()->delete();
+        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('successful_logout'));
     }
 }

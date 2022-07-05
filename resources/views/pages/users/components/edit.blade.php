@@ -2,41 +2,41 @@
     <div class="row">
         <div class="col-md-3 col-6"> <strong>{{ __('Full Name')}}</strong>
             <br>
-            <p class="text-muted">Johnathan Deo</p>
+            <p class="text-muted">{{$user->name}}</p>
         </div>
         <div class="col-md-3 col-6"> <strong>{{ __('Mobile')}}</strong>
             <br>
-            <p class="text-muted">(123) 456 7890</p>
+            <p class="text-muted">{{$user->phone}}</p>
         </div>
         <div class="col-md-3 col-6"> <strong>{{ __('Email')}}</strong>
             <br>
-            <p class="text-muted">johnathan@admin.com</p>
+            <p class="text-muted">{{$user->email}}</p>
         </div>
-        <div class="col-md-3 col-6"> <strong>{{ __('Location')}}</strong>
+        <div class="col-md-3 col-6"> <strong>{{ __('Country')}}</strong>
             <br>
-            <p class="text-muted">London</p>
+            <p class="text-muted">{{$user->countries->name}}</p>
         </div>
     </div>
     <hr>
-    <p class="mt-30">{{ __('Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt.Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim.')}}</p>
-    <p>{{ __('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries')}} </p>
-    <p>{{ __('It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.')}}</p>
-    <h4 class="mt-30">{{ __('Skill Set')}}</h4>
-    <hr>
-    <h6 class="mt-30">{{ __('Wordpress')}} <span class="pull-right">80%</span></h6>
-    <div class="progress progress-sm">
-        <div class="progress-bar bg-success" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width:80%;"> <span class="sr-only">50% Complete</span> </div>
-    </div>
-    <h6 class="mt-30">{{ __('HTML 5')}} <span class="pull-right">90%</span></h6>
-    <div class="progress  progress-sm">
-        <div class="progress-bar bg-info" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100" style="width:90%;"> <span class="sr-only">50% Complete</span> </div>
-    </div>
-    <h6 class="mt-30">{{ __('jQuery')}} <span class="pull-right">50%</span></h6>
-    <div class="progress  progress-sm">
-        <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width:50%;"> <span class="sr-only">50% Complete</span> </div>
-    </div>
-    <h6 class="mt-30">{{ __('Photoshop')}} <span class="pull-right">70%</span></h6>
-    <div class="progress  progress-sm">
-        <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width:70%;"> <span class="sr-only">50% Complete</span> </div>
-    </div>
+    <p class="mt-30">{{$user->city}}, {{$user->state}}, {{$user->address}}, {{$user->countries->name}} </p>
+    @if(in_array($user->userRole->name, ['Vendor', 'Logistic', 'Rider', 'Super Admin']))
+        <h4 class="mt-30">{{ __('Skill Set')}}</h4>
+        <hr>
+        <h6 class="mt-30">{{ __('Business Name')}}</h6>
+        <div class="">
+           <h4>{{$user->business_name ?? 'None Provided'}}</h4>
+        </div>
+        <h6 class="mt-30">{{ __('Open Hours')}}</h6>
+        <div class="">
+           <h4>{{$user->avg_time ?? 'None Provided'}}</h4>
+        </div>
+        <h6 class="mt-30">{{ __('Business Address')}}</h6>
+        <div class="">
+           <h4>{{$user->address ?? 'None Provided'}}</h4>
+        </div>
+        <h6 class="mt-30">{{ __('Availability Status')}}</h6>
+        <div class="">
+           <h4>{{$user->availability}}</h4>
+        </div>
+    @endif
 </div>

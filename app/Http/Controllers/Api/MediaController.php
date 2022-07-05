@@ -20,7 +20,7 @@ class MediaController extends Controller{
         foreach ($files['files'] as $key => $file) {
             // dd($file);
             $urls[] = Cloudinary::uploadFile($file->getRealPath(),
-                            ['folder' => 'vemdot/'.$request->folder,]
+                        ['folder' => 'vemdot/'.$request->folder,]
                         )->getSecurePath();
         }
 

@@ -20,7 +20,7 @@ class CreateMealCategoriesTable extends Migration
             $table->string('name');
             $table->string('status')->default('pending');
             $table->text('description')->nullable();
-            $table->string('thumbnail')->default('default.png');
+            $table->string('thumbnail')->nullable();
             
             $table->softDeletes();  //add this line
             $table->timestamps();

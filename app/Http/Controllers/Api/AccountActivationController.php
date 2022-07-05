@@ -89,6 +89,7 @@ class AccountActivationController extends Controller
         $user->update([
             'email_verified_at' => Carbon::now()->toDateTimeString(),
             'two_factor' => 'yes',
+            'status' => $this->confirmed,
         ]);
 
         if($appSettings->welcome_message != 'no'){

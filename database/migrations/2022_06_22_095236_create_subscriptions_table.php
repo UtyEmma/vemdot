@@ -18,7 +18,7 @@ class CreateSubscriptionsTable extends Migration
             $table->string('unique_id')->unique();
             $table->string('plan_id');
             $table->string('user_id');
-            $table->string('meal_id');
+            $table->json('meal_id');
             $table->string('status')->default('pending');
             $table->timestamp('start_date')->nullable();
 

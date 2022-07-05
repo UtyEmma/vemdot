@@ -6,9 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Meals\CreateMealRequest;
 use App\Models\Meal\Meal;
 use App\Models\Meal\MealCategory;
-use App\Models\User;
 use App\Services\MealService;
-use App\Services\NotificationService;
 use Illuminate\Support\Facades\Request;
 
 class MealsController extends Controller{
@@ -29,7 +27,7 @@ class MealsController extends Controller{
             'user_id' => $user->unique_id
         ])->all());
 
-        return $this->returnMessageTemplate(true, "Your Meal was created Successfully!", [
+        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('created', 'Meal'), [
             'meal' => $meal
         ]);
     }
@@ -105,5 +103,14 @@ class MealsController extends Controller{
 
     function updateAvailabilityStatus(){
 
+    }
+
+    function fetchMealsByAds(){
+        $meals = Meal::where('promoted', $this->yes)->paginate($this->paginate);
+        foreach($meals as $meal){
+            $meal->categories;
+            $meal->vendor;
+        }
+        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('fetched_all', 'Meal'), $meals);
     }
 }

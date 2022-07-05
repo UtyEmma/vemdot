@@ -28,6 +28,7 @@ class CreateMealsTable extends Migration
             $table->string('tax');
             $table->string('rating');
             $table->string('availability');
+            $table->string('promoted');
             $table->softDeletes();
             $table->timestamps();
         });

@@ -5,12 +5,13 @@ namespace App\Http\Middleware\User;
 use App\Models\Role\AccountRole;
 use App\Traits\Generics;
 use App\Traits\ReturnTemplate;
+use App\Traits\Options;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 
 class CheckKycStatus{
-    use ReturnTemplate, Generics;
+    use ReturnTemplate, Options, Generics;
     /**
      * Handle an incoming request.
      *

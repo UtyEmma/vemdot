@@ -20,4 +20,8 @@ class Subscription extends Model
     function owner(){
         return $this->belongsTo(User::class, 'user_id', 'unique_id');
     }
+
+    protected $casts = [
+        'meal_id' => 'array'
+    ];
 }

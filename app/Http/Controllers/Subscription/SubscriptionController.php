@@ -29,30 +29,32 @@ class SubscriptionController extends Controller
             return $this->returnMessageTemplate(false, $validator->messages());
 
         $plan = SubscriptionPlan::where('unique_id', $data['plan_id'])
-                                ->where('status', '!=', $this->pending)
-                                ->first();
-
+            ->where('status', '!=', $this->pending)
+            ->first();
         if($plan == null)
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('not_found', "Subscription Plan"));
-
-        $meal = Meal::where('unique_id', $data['meal_id'])
-                        ->where('availability', $this->yes)
-                        ->first();
-        if($meal == null)
-            return $this->returnMessageTemplate(false, $this->returnErrorMessage('not_found', "Meal"));
-
+        // if the number of meals is greater than the number of items for the plan, return error
+        $explodeMeal = explode(',', $data['meal_id']);
+        if(count($explodeMeal) > $plan->items){
+            return $this->returnMessageTemplate(false, $this->returnErrorMessage('meal_exceed_plan'));
+        }
+        // if the availibility is not yes, return error
+        foreach($explodeMeal as $eachMeal){
+            $meal = Meal::where('unique_id', $eachMeal)->first();
+            if($meal != null){
+                if($meal->availability != 'yes')
+                    return $this->returnMessageTemplate(false, $this->returnErrorMessage('meal_not_available', $meal->name));
+            }
+        }
         $reference = $this->createUniqueId('transactions');
         $orderID = $this->createRandomNumber(5);
-        $description = $plan->name.' Subscription by '.$this->user()->name.' for '.$meal->name;
+        $description = $plan->name.' Subscription by '.$this->user()->name;
 
         if($data['payment_type'] == 'wallet'){
-
             if($this->user()->main_balance == 0 || $this->user()->main_balance < $plan->amount)
-                    return $this->returnMessageTemplate(false, $this->returnErrorMessage('insufficiant_fund'));
-
+                return $this->returnMessageTemplate(false, $this->returnErrorMessage('insufficiant_fund'));
             //create subscription record
-            $sub = $this->createSubscription($reference, $plan, $meal, 'wallet');
-
+            $sub = $this->createSubscription($reference, $plan, $explodeMeal, 'wallet');
             if($sub){
                 //create transaction record
                 $this->createTransaction($plan, $reference, $orderID, $description, 'wallet', null);
@@ -60,12 +62,9 @@ class SubscriptionController extends Controller
                 $user = $this->user();
                 $user->main_balance = ($user->main_balance - $plan->amount);
                 $user->save();
-
                 return $this->returnMessageTemplate(true, $this->returnSuccessMessage('updated', 'Your Subscription Status'));
             }
-
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('subscription_exist'));
-
         }else{
             $data = [
                 "amount" => $plan->amount * 100,
@@ -81,8 +80,7 @@ class SubscriptionController extends Controller
 
             if($payment['status'] == true){
                 //create subscription record
-                $sub = $this->createSubscription($reference, $plan, $meal);
-
+                $sub = $this->createSubscription($reference, $plan, $explodeMeal);
                 if($sub){
                     //create transaction record
                     $this->createTransaction($plan, $reference, $orderID, $description, null,  $payment['data']);
@@ -110,30 +108,36 @@ class SubscriptionController extends Controller
             'orderID' => $orderID,
             'description' => $description,
             'channel' => $channel,
-            'status' => ($channel == 'wallet') ? $this->comfirmed : $this->pending,
+            'status' => ($channel == 'wallet') ? $this->confirmed : $this->pending,
         ]);
     }
 
-    public function createSubscription($reference, $plan, $meal, $channel = null){
+    public function createSubscription($reference, $plan, $explodeMeal, $channel = null){
         $subscription = Subscription::where('user_id', $this->user()->unique_id)
-                                    ->where('plan_id', $plan->unique_id)
-                                    ->where('meal_id', $meal->unique_id)
-                                    ->where('status', $this->inprogress)
-                                    ->first();
-
+            ->where('plan_id', $plan->unique_id)
+            ->where('status', $this->inprogress)
+            ->first();
         if($subscription == null){
             Subscription::create([
                 'unique_id' => $reference,
                 'user_id' => $this->user()->unique_id,
                 'plan_id' => $plan->unique_id,
-                'meal_id' => $meal->unique_id,
+                'meal_id' => $explodeMeal,
                 'status' => ($channel == null) ? $this->pending : $this->inprogress,
                 'start_date' => ($channel == null) ? null : Carbon::now()->toDateTimeString(),
             ]);
-
-            return true;
+            return $this->updateMealPromotion($explodeMeal, $channel);
         }
         return false;
+    }
+
+    protected function updateMealPromotion($meal, $channel){
+        if($channel == 'wallet'){
+            foreach($meal as $eachMeal){
+                Meal::where('unique_id', $eachMeal)->update(['promoted' => $this->yes]);
+            }
+        }
+        return true;
     }
 }
 
