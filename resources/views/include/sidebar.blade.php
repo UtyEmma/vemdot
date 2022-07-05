@@ -70,8 +70,8 @@
                         </a>
                     </div>
                 </div>
-                 {{-- transactions section --}}
-                 <div class="nav-item {{ ($segment1 == 'transaction' || $segment1 == 'roles'||$segment1 == 'permission' ||$segment1 == 'transaction') ? 'active open' : '' }} has-sub">
+                {{-- transactions section --}}
+                <div class="nav-item {{ ($segment1 == 'transaction' || $segment1 == 'roles'||$segment1 == 'permission' ||$segment1 == 'transaction') ? 'active open' : '' }} has-sub">
                     <a href="#"><i class="ik ik-credit-card"></i><span>{{ __('Transactions')}}</span></a>
                     <div class="submenu-content">
                         <a class="menu-item {{ ($segment1 == 'transaction') ? 'active' : '' }}" href="{{url('transaction/ads/interface')}}">
@@ -79,6 +79,18 @@
                         </a>
                         <a class="menu-item {{ ($segment1 == 'transaction') ? 'active' : '' }}" href="{{url('transaction/fundwallet/interface')}}">
                             <span>{{ __('Transactions on WalletFund')}}</span>
+                        </a>
+                    </div>
+                </div>
+                {{-- withdrawal section --}}
+                <div class="nav-item {{ ($segment1 == 'withdrawal' || $segment1 == 'roles'||$segment1 == 'permission' ||$segment1 == 'withdrawal') ? 'active open' : '' }} has-sub">
+                    <a href="#"><i class="ik ik-dollar-sign"></i><span>{{ __('Withdrawal')}}</span></a>
+                    <div class="submenu-content">
+                        <a class="menu-item {{ ($segment1 == 'withdrawal') ? 'active' : '' }}" href="{{url('withdrawal/interface')}}">
+                            <span>{{ __('Withdrawal Request')}}</span>
+                        </a>
+                        <a class="menu-item {{ ($segment1 == 'withdrawal') ? 'active' : '' }}" href="{{url('withdrawal/histroy/interface')}}">
+                            <span>{{ __('Withdrawal History')}}</span>
                         </a>
                     </div>
                 </div>

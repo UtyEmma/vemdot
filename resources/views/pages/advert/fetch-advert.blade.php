@@ -46,6 +46,7 @@
                                 </div>
                             </td>
                         </tr>
+                        {{-- modal section --}}
                         <x-modal call="enableAdvert{{$advert->unique_id}}" header="Enable Advert" message="Do you really want to enable this advert ?">
                             <form action="{{url('advert/update/status')}}" method="POST">@csrf
                                 <input type="hidden" name="unique_id" value="{{$advert->unique_id}}">
@@ -66,29 +67,17 @@
                                 <button type="submit" class="btn btn-primary">{{ __('Continue')}}</button>
                             </form>
                         </x-modal>
-                        {{-- modal section --}}
-                        <div class="modal fade edit-layout-modal" id="editLayoutItem{{$advert->unique_id}}" tabindex="-1" role="dialog" aria-labelledby="editLayoutItem{{$advert->unique_id}}Label" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="editLayoutItem{{$advert->unique_id}}Label">{{ __($advert->caption ?? $advert->description)}}</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <img src="{{$advert->banner ?? asset('default.png')}}" class="img-fluid" alt="{{env('APP_NAME')}}">
-                                            </div>
-                                        </div>
-                                        <p>{{ __($advert->description)}}</p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('Close')}}</button>
-                                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteAdvert{{$advert->unique_id}}">{{ __('Delete')}}</button>
-                                    </div>
+                        <x-side-modal call="editLayoutItem{{$advert->unique_id}}" header="{{$advert->caption ?? $advert->description}}">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <img src="{{$advert->banner ?? asset('default.png')}}" class="img-fluid" alt="{{env('APP_NAME')}}">
                                 </div>
                             </div>
-                        </div>
+                            <p>{{ __($advert->description)}}</p>
+                            <x-slot name="other">
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteAdvert{{$advert->unique_id}}">{{ __('Delete')}}</button>
+                            </x-slot>
+                        </x-side-modal>
                     @empty
                         <tr><td colspan="12" class="text-center">No Data Available</td></tr>
                     @endforelse

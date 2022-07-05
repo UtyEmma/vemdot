@@ -25,6 +25,7 @@ use App\Http\Controllers\Logistic\LogisticController;
 use App\Http\Controllers\Logistic\RiderController;
 use App\Http\Controllers\Review\ReviewController;
 use App\Http\Controllers\Advert\AdvertController;
+use App\Http\Controllers\Withdrawal\WithdrawalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -105,6 +106,11 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
     Route::get('/fetch/all/banks', [BankController::class,'fetchAllBanks']);
     Route::get('/fetch/single/bank/{code?}', [BankController::class,'fetchSingleBank']);
     Route::post('/verify/account/number', [BankController::class,'verifyUserAccountNumber']);
+
+    //withdrawal handler section
+    Route::get('/fetch/bank/details', [WithdrawalController::class,'fetchUserBankDetails']);
+    Route::get('/fetch/single/bank/detail/{id?}', [WithdrawalController::class,'fetchSingleBankDetails']);
+    Route::post('/initiate/withdrawal', [WithdrawalController::class,'initiateWithdrawal']);
 
     Route::prefix('cards')->group(function(){
         Route::get('/', [CardController::class, 'list']);

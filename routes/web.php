@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Transaction\AdsTransaction;
 use App\Http\Controllers\Transaction\WalletFundTransaction;
 use App\Http\Controllers\Advert\AdvertController;
+use App\Http\Controllers\Withdrawal\WithdrawalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -110,6 +111,24 @@ Route::group(['middleware' => 'auth'], function(){
 		Route::get('fundwallet/interface/{start?}/{end?}', [WalletFundTransaction::class, 'fundWalletTransactionInterface']);
 		Route::post('fundwallet/by/date', [WalletFundTransaction::class, 'getTransactionByDate']);
 		Route::post('fundwallet/by/type', [WalletFundTransaction::class, 'getTransactionByType']);
+    });	
+	
+	//transaction management
+	Route::prefix('withdrawal')->group(function(){
+		//ads section
+        Route::get('interface/{start?}/{end?}', [WithdrawalController::class, 'withdrawalRequestInterface']);
+        Route::post('payout', [WithdrawalController::class, 'withdrawalPayout']);
+        Route::get('otp/interface/{code?}/{id?}', [WithdrawalController::class, 'processOTPInterface']);
+        Route::post('process-otp', [WithdrawalController::class, 'processOTP']);
+        Route::post('delete', [WithdrawalController::class, 'deleteWithdrawal']);
+        Route::post('decline', [WithdrawalController::class, 'declineWithdrawal']);
+		Route::post('interface/by/date', [WithdrawalController::class, 'getWithdrawalalRequestByDate']);
+		Route::post('interface/by/type', [WithdrawalController::class, 'getWithdrawalalRequestByType']);
+		Route::prefix('histroy')->group(function(){
+			Route::get('interface/{start?}/{end?}', [WithdrawalController::class, 'withdrawalInterface']);
+			Route::post('interface/by/date', [WithdrawalController::class, 'getWithdrawalalByDate']);
+			Route::post('interface/by/type', [WithdrawalController::class, 'getWithdrawalalByType']);
+		});
     });
 	
 	//transaction management
