@@ -36,7 +36,7 @@ class Controller extends BaseController{
         return $notification;
     }
 
-    protected function user (){
+    protected function user(){
         $user = Auth::user();
         return $user ? User::findOrFail($user->unique_id) : null;
     }

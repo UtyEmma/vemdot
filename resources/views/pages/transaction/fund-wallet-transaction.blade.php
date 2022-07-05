@@ -27,7 +27,7 @@
                     <th class="text-center">{{ __('Reference')}}</th>
                     <th class="text-center">{{ __('Business Name')}}</th>
                     <th class="text-center">{{ __('Email')}}</th>
-                    <th class="text-center">{{ __('Type')}}</th>
+                    <th class="text-center">{{ __('Account Type')}}</th>
                     <th class="text-center">{{ __('Amount')}}</th>
                     <th class="text-center">{{ __('Payment Method')}}</th>
                     <th class="text-center">{{ __('Status')}}</th>

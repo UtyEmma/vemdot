@@ -19,7 +19,7 @@ trait PaymentHandler {
 
             return json_decode($response, true);
         }catch(Exception $e) {
-            return $this->returnMessageTemplate(false, $this->returnErrorMessage('paystack_token'));
+            return false;
         }
     }
 
@@ -50,6 +50,33 @@ trait PaymentHandler {
             "Authorization" => "Bearer $this->key",
             "Content-Type" => "application/json",
         ])->post('https://api.paystack.co/transaction/charge_authorization', $data);
+
+        return json_decode($response, true);
+    }
+
+    function transferRecipient($data){
+        $response = Http::withHeaders([
+            "Authorization" => "Bearer $this->key",
+            "Content-Type" => "application/json",
+        ])->post('https://api.paystack.co/transferrecipient', $data);
+
+        return json_decode($response, true);
+    }
+    
+    function initiateTransfer($data){
+        $response = Http::withHeaders([
+            "Authorization" => "Bearer $this->key",
+            "Content-Type" => "application/json",
+        ])->post('https://api.paystack.co/transfer', $data);
+
+        return json_decode($response, true);
+    }
+    
+    function finalizeTransfer($data){
+        $response = Http::withHeaders([
+            "Authorization" => "Bearer $this->key",
+            "Content-Type" => "application/json",
+        ])->post('https://api.paystack.co/transfer/finalize_transfer', $data);
 
         return json_decode($response, true);
     }

@@ -28,6 +28,7 @@ class CreateSiteSettingsTable extends Migration
             $table->string('login_alert')->default('no');
             $table->string('welcome_message')->default('no');
             $table->string('send_basic_emails')->default('no');
+            $table->string('automatic_withdraw')->default('no');
 
             $table->softDeletes();  //add this line
             $table->timestamps();
