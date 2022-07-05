@@ -23,6 +23,7 @@ class KycController extends Controller{
         $user = User::find($user_id);
         // ['confirmed', 'pending', 'declined']
         $user->kyc_status = $request->status;
+        $user->status = $this->active;
         $user->save();
 
         if ($request->status === $this->declined) {

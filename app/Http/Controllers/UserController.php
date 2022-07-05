@@ -68,14 +68,6 @@ class UserController extends Controller{
         return redirect()->back()->with('message', "User KYC Request has been $request->status");
     }
     public function update(UpdateUserRequest $request){
-
-        // check validation for password match
-        // if(isset($request->password)){
-        //     $validator = Validator::make($request->all(), [
-        //         'password' => 'required | confirmed'
-        //     ]);
-        // }
-
         $user = User::find($request->id);
 
         $update = $user->update($request->safe()->all());
@@ -87,9 +79,6 @@ class UserController extends Controller{
             //         'password' => Hash::make($request->password)
             //     ]);
             // }
-
-            // sync user role
-            // $user->syncRoles($request->role);
 
             return redirect()->back()->with('success', 'User information updated succesfully!');
         }catch (\Exception $e) {

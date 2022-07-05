@@ -51,16 +51,16 @@ class MealsController extends Controller{
                     ->category()
                     ->status()
                     ->query();
-        }else{
-            if($vendor_id){
+        }else if($vendor_id){
                 $meals = $mealService
                         ->byUser($vendor_id)
                         ->hasVendor()
                         ->owner()->category()
                         ->sortByRating()
-                        ->orders()
+                        // ->orders(true)
                         ->query();
-            }
+        }else{
+            return $this->returnMessageTemplate(false, 'Invalid Request. You are not logged in as a Vendor');
         }
 
         return $this->returnMessageTemplate(true, $this->returnSuccessMessage('fetched_all', "Meal"), [
@@ -78,7 +78,7 @@ class MealsController extends Controller{
                         ->hasVendor()
                         ->owner()->category()
                         ->sortByRating()
-                        ->orders()
+                        // ->orders('withCount')
                         ->query();
 
         return $this->returnMessageTemplate(true, '', [

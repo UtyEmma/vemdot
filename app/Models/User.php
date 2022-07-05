@@ -132,6 +132,10 @@ class User extends Authenticatable{
         return $roles;
     }
 
+    static function admin(){
+        return static::where('role', 'super_admin')->first();
+    }
+
     public function meals (){
         return $this->hasMany(Meal::class, 'user_id', 'unique_id');
     }
@@ -148,9 +152,14 @@ class User extends Authenticatable{
         return $this->hasMany(Card::class, 'user_id', 'unique_id');
     }
 
+    public function orders(){
+        return $this->hasMany(Order::class, 'user_id', 'unique_id');
+    }
+
     public function logisticCompany(){
         return $this->hasMany(VendorLogistic::class, 'vendor_id', 'unique_id');
     }
+
 
     public function isLogistic(){
         return $this->where('unique_id', $this->unique_id)->whereRelation('userRole', 'name', 'Logistic')->exists();

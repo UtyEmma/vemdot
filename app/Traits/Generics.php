@@ -94,6 +94,6 @@ trait Generics{
     }
 
     function percentageDiff($value, $percent){
-        return $value - $value * $percent / 100;
+        return $value - ($value * ($percent / 100));
     }
 }

@@ -29,6 +29,6 @@ class CheckKycStatus{
             return $next($request);
         }
 
-        return abort(401, "You are not authorized to carry out this action");
+        return $this->returnMessageTemplate(false, $this->returnErrorMessage('kyc_error'));
     }
 }

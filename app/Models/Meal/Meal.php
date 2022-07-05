@@ -34,9 +34,9 @@ class Meal extends Model{
         return $this->belongsTo(MealCategory::class, 'category', 'unique_id');
     }
 
-    function orders(){
-        return $this->belongsTo(Order::class, 'order_id', 'unique_id');
-    }
+    // function orders(){
+    //     return $this->hasMany(Order::class, 'order_id', 'unique_id');
+    // }
 
     function favourites(){
         return $this->hasMany(Favourite::class, 'meal_id', 'unique_id');

@@ -108,7 +108,14 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
     });
 
     Route::get('/all-users', [UserController::class, 'allUsers']);
-    Route::get('/orders/{user_id?}', [OrderController::class, 'list']);
+
+    Route::prefix('orders')->group(function(){
+        Route::get('/list/{user_id?}', [OrderController::class, 'list']);
+
+        Route::prefix('{order_id}')->group(function(){
+            Route::post('/update', [OrderController::class, 'update']);
+        });
+    });
 
   Route::get('user', [UserController::class, 'show'])->name('users.current');
 

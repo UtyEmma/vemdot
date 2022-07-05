@@ -50,7 +50,7 @@ class LoginController extends Controller
 
                     //return the account activation code and email
                     $payload = [
-                        'user' => $user,
+                        'user' => $user->with('userRole')->first(),
                         'token' => $verificationCode['token']
                     ];
 
@@ -82,7 +82,7 @@ class LoginController extends Controller
 
         $payload = [
             '2fa_code' => $data['code'],
-            'user' => $user,
+            'user' => $user->with('userRole')->find($user->unique_id),
         ];
 
         if($data['status']){

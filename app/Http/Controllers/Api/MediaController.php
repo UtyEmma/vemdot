@@ -14,15 +14,18 @@ class MediaController extends Controller{
 
     function upload(Request $request){
         $files = $request->allFiles();
+
+        // return ;
         $urls = [];
-        foreach ($files['media'] as $key => $file) {
+        foreach ($files['files'] as $key => $file) {
+            // dd($file);
             $urls[] = Cloudinary::uploadFile($file->getRealPath(),
                             ['folder' => 'vemdot/'.$request->folder,]
                         )->getSecurePath();
         }
 
         return Response::json([
-            'urls' => $urls
+            'files' => $urls
         ]);
     }
 

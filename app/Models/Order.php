@@ -26,4 +26,24 @@ class Order extends Model {
         'meals' => 'array'
     ];
 
+    public function orderStatus(){
+        return $this->hasMany(OrderStatus::class, 'order_id', 'unique_id');
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id', 'unique_id');
+    }
+
+    public function vendor(){
+        return $this->belongsTo(User::class, 'vendor_id', 'unique_id');
+    }
+
+    public function courier(){
+        return $this->belongsTo(User::class, 'courier_id', 'unique_id');
+    }
+
+    public function bike(){
+        return $this->belongsTo(User::class, 'bike_id', 'unique_id' );
+    }
+
 }

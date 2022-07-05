@@ -54,6 +54,7 @@ trait ReturnTemplate {
             'payment_not_complete' => "An error occured!, payment was incomplete",
             'subscription_exist' => "You have previously subscribed for this plan",
             'wrong_accct_number' => "Provided accout number does not match the Bank",
+            'kyc_error' => "Your Account has not been verified",
         ];
         return $messageArray[$keyword];
     }
