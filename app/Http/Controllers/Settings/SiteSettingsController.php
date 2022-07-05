@@ -40,6 +40,12 @@ class SiteSettingsController extends Controller
             'referral_bonus'  => 'required',
             'token_length'  => 'required',
             'site_address'  => 'required',
+            'cancellation_limit' => 'required|numeric',
+            'cancellation_fee' => 'required|numeric',
+            'delivery_fee' => 'required|numeric',
+            'vendor_service_charge' => 'required|numeric',
+            'logistics_service_charge' => 'required|numeric',
+            'charge_cancellations' => 'required',
         ]);
         if($validator->fails()) {
             if($request->wantsJson()){
@@ -56,6 +62,12 @@ class SiteSettingsController extends Controller
         $appSettings->site_phone = $data['site_phone'];
         $appSettings->site_domain = $data['site_domain'];
         $appSettings->referral_bonus = $data['referral_bonus'];
+        $appSettings->cancellation_limit = $data['cancellation_limit'];
+        $appSettings->cancellation_fee = $data['cancellation_fee'];
+        $appSettings->delivery_fee = $data['delivery_fee'];
+        $appSettings->vendor_service_charge = $data['vendor_service_charge'];
+        $appSettings->logistics_service_charge = $data['logistics_service_charge'];
+        $appSettings->charge_cancellations = $data['charge_cancellations'];
         $appSettings->token_length = $data['token_length'];
         $appSettings->site_address = $data['site_address'];
         $appSettings->account_verification = strtolower($data['account_verification']);

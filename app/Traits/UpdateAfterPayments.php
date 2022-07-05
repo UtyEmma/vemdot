@@ -33,6 +33,7 @@ trait UpdateAfterPayments {
         $user = User::find($transaction['user_id']);
         $authorization = $payment_info['authorization'];
         $card = $user->cards()->where('signature', $authorization['signature'])->first();
+
         if(!$card){
             $card = Card::create([
                 'unique_id' => $this->createUniqueId('cards'),

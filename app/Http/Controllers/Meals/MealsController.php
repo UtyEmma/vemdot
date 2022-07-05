@@ -45,20 +45,20 @@ class MealsController extends Controller{
         $user = $this->user();
         if($user->userRole->name === 'Vendor') {
             $meals = $mealService
-                ->byUser($user->unique_id)
-                ->category()
-                ->status()
-                ->query();
-        }else{
-            if($vendor_id){
-                $meals = $mealService
-                    ->byUser($vendor_id)
-                    ->hasVendor()
-                    ->owner()->category()
-                    ->sortByRating()
-                    ->orders()
+                    ->byUser($user->unique_id)
+                    ->category()
+                    ->status()
                     ->query();
-            }
+        }else if($vendor_id){
+                $meals = $mealService
+                        ->byUser($vendor_id)
+                        ->hasVendor()
+                        ->owner()->category()
+                        ->sortByRating()
+                        // ->orders(true)
+                        ->query();
+        }else{
+            return $this->returnMessageTemplate(false, 'Invalid Request. You are not logged in as a Vendor');
         }
 
         return $this->returnMessageTemplate(true, $this->returnSuccessMessage('fetched_all', "Meal"), [
@@ -73,12 +73,15 @@ class MealsController extends Controller{
 
     function fetchAllMeals(MealService $mealService, $vendor_id = null){
         $meals = $mealService
-            ->hasVendor()
-            ->owner()->category()
-            ->sortByRating()
-            ->orders()
-            ->query();
-        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('fetched_all', 'Meals'), ['meals' => $meals->get()]);
+                        ->hasVendor()
+                        ->owner()->category()
+                        ->sortByRating()
+                        // ->orders('withCount')
+                        ->query();
+
+        return $this->returnMessageTemplate(true, '', [
+            'meals' => $meals->get()
+        ]);
     }
 
     function vendorFetchSingleMeal(MealService $mealService, $meal_id){
@@ -91,6 +94,8 @@ class MealsController extends Controller{
 
     function single(MealService $mealService, $meal_id){
         $meal = $mealService->find($meal_id)->owner()->orders()->reviews()->query();
+        if(!$meal->exists()) return $this->returnMessageTemplate(false, "Meal Not found");
+
         return $this->returnMessageTemplate(true, '', [
             'meal' => $meal->get()
         ]);

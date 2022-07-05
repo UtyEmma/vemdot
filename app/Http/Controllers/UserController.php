@@ -53,7 +53,7 @@ class UserController extends Controller{
     public function edit($user_id){
         if(!$user = User::where('unique_id', $user_id)->with('userRole')->first())
             return redirect()->back('error', $this->returnErrorMessage('not_found', "User"));
-        $country = CountryList::all();    
+        $country = CountryList::all();
         return view('pages.users.profile', [
             'user' => $user,
             'country' => $country,
@@ -128,6 +128,12 @@ class UserController extends Controller{
         $update = $user->update($request->safe()->all());
 
         try{
+            // update password if user input a new password
+            // if(isset($request->password)){
+            //     $update = $user->update([
+            //         'password' => Hash::make($request->password)
+            //     ]);
+            // }
 
             return redirect()->back()->with('success', 'User information updated succesfully!');
         }catch (\Exception $e) {

@@ -6,11 +6,11 @@ use App\Models\Site\SiteSettings;
 trait ReturnTemplate {
 
     public $paginate = 12;
-    // public $active = 'active';
-    // public $pending = 'pending';
-    // public $suspended = 'suspended';
-    // public $confirmed = 'confirmed'; // For KYC
-    // public $declined = 'declined';
+    public $active = 'active';
+    public $pending = 'pending';
+    public $suspended = 'suspended';
+    public $confirmed = 'confirmed'; // For KYC
+    public $declined = 'declined';
 
     //method that return the messages template
     public function returnMessageTemplate($status = true, $message = '', $payload = [], $other = []) {
@@ -54,6 +54,7 @@ trait ReturnTemplate {
             'payment_not_complete' => "An error occured!, payment was incomplete",
             'subscription_exist' => "You have previously subscribed for this plan",
             'wrong_accct_number' => "Provided accout number does not match the Bank",
+            'kyc_error' => "Your Account has not been verified",
             'meal_exceed_plan' => "Number of meals exceeds the plan's items",
             'meal_not_available' => "$item is currently not available",
             'not_authorized' => "You are not authorized to carry out this action",

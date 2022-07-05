@@ -22,5 +22,16 @@ trait Options {
     public $cancelled = 'cancelled';
     public $yes = 'yes';
     public $no = 'no';
+    public $paid = 'paid';
 
+    public $orderProgression = ['paid', 'cancelled', 'declined', 'processing', 'terminated', 'done', 'enroute', 'pickedup', 'failed', 'delivered'];
+
+    public $orderUserActions = [
+        'User' => ['cancelled'],
+        'Vendor' => ['declined', 'processing', 'done', 'delivered', 'terminated'],
+        'Logistic' => ['enroute', 'failed', 'delivered'],
+        'Rider' => ['enroute', 'delivered'],
+    ];
 }
+
+

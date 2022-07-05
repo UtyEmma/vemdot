@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Models\Address\Address;
 use App\Models\Meal\Meal;
 use App\Models\Role\AccountRole;
+use App\Models\Vendors\VendorLogistic;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Country\CountryList;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -136,6 +138,10 @@ class User extends Authenticatable{
         return $roles;
     }
 
+    static function admin(){
+        return static::where('role', 'super_admin')->first();
+    }
+
     public function meals (){
         return $this->hasMany(Meal::class, 'user_id', 'unique_id');
     }
@@ -146,8 +152,8 @@ class User extends Authenticatable{
 
     public function userRole(){
         return $this->belongsTo(AccountRole::class, 'role', 'unique_id');
-    }  
-    
+    }
+
     public function countries(){
         return $this->belongsTo(CountryList::class, 'country', 'unique_id');
     }
@@ -156,6 +162,26 @@ class User extends Authenticatable{
         return $this->hasMany(Card::class, 'user_id', 'unique_id');
     }
 
+    public function orders(){
+        return $this->hasMany(Order::class, 'user_id', 'unique_id');
+    }
+
+    public function logisticCompany(){
+        return $this->hasMany(VendorLogistic::class, 'vendor_id', 'unique_id');
+    }
+
+
+    public function isLogistic(){
+        return $this->where('unique_id', $this->unique_id)->whereRelation('userRole', 'name', 'Logistic')->exists();
+    }
+
+    function isVendor(){
+        return $this->where('unique_id', $this->unique_id)->whereRelation('userRole', 'name', 'Vendor')->exists();
+    }
+
+    function isUser(){
+        return $this->where('unique_id', $this->unique_id)->with('userRole')->whereRelation('userRole', 'name', 'User')->exists();
+    }
     function logistic(){
         return $this->belongsTo(User::class, 'business_name', 'unique_id');
     }

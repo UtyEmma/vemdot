@@ -33,7 +33,7 @@ class SubscriptionController extends Controller
             ->first();
         if($plan == null)
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('not_found', "Subscription Plan"));
-        // if the number of meals is greater than the number of items for the plan, return error    
+        // if the number of meals is greater than the number of items for the plan, return error
         $explodeMeal = explode(',', $data['meal_id']);
         if(count($explodeMeal) > $plan->items){
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('meal_exceed_plan'));
@@ -89,6 +89,7 @@ class SubscriptionController extends Controller
                     }
                     return Redirect::to($payment['data']['authorization_url']); //live / deployment
                 }
+
                 return $this->returnMessageTemplate(false, $this->returnErrorMessage('subscription_exist'));
             }
 

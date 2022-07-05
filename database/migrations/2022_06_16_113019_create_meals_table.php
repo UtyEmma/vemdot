@@ -20,7 +20,7 @@ class CreateMealsTable extends Migration
             $table->string('category');
             $table->string('name');
             $table->string('thumbnail');
-            $table->string('description');
+            $table->longText('description');
             $table->string('price');
             $table->longText('images');
             $table->string('video');

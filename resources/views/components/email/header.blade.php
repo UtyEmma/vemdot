@@ -25,7 +25,6 @@
 
     <!-- CSS Reset : BEGIN -->
 
-
     <style>
         /* What it does: Remove spaces around the email design added by some email clients. */
         /* Beware: It can remove the padding / margin and add a background color to the compose a reply window. */

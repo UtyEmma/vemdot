@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use App\Models\Site\SiteSettings;
 use App\Models\User;
 use App\Services\NotificationService;
+use App\Services\OrderService;
 use App\Traits\FileUpload;
 use App\Traits\Generics;
 use App\Traits\ReturnTemplate;
@@ -85,6 +87,10 @@ class Controller extends BaseController{
                         return $this->returnMessageTemplate(true, $this->returnSuccessMessage('updated', 'Your Main Balance'));
                     }
                     return $this->returnMessageTemplate(false, $this->returnErrorMessage('unknown_error'));
+                }elseif ($transaction->type == 'order') {
+                    $orderService = new OrderService();
+                    $order = Order::find($transaction->orderID);
+                    return $orderService->completeOrder($order, $transaction, User::find($transaction->user_id));
                 }
 
                 return $transaction;
