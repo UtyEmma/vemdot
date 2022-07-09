@@ -30,7 +30,7 @@ class MealService {
         return $this;
     }
 
-    function hasVendor($status = 'active'){
+    function hasVendor($status = 'confirmed'){
         $this->query = $this->query->whereRelation('vendor', 'status', $status);
         return $this;
     }
@@ -41,7 +41,7 @@ class MealService {
     }
 
     function category(){
-        $this->query = $this->query->with('category');
+        $this->query = $this->query->with('categories');
         return $this;
     }
 
@@ -74,7 +74,7 @@ class MealService {
 
     function search($keyword = 'search'){
         $this->query = $this->query->when(request()->has($keyword), function($query, $keyword){
-            $query->where('name', '%like%', $keyword);
+            $query->where('name', 'LIKE', "%$keyword%");
         });
         return $this;
     }

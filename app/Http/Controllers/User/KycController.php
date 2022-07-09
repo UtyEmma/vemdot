@@ -23,14 +23,14 @@ class KycController extends Controller{
         $user = User::find($user_id);
         // ['confirmed', 'pending', 'declined']
         $user->kyc_status = $request->status;
-        $user->status = $this->active;
+        $user->status = $this->confirmed;
         $user->save();
 
-        if ($request->status === $this->declined) {
+        if ($request->status === $this->confirmed) {
             $notificationService->text('Congratulations, your '.env('APP_NAME').' account has been approved!')
                                 ->text("You can now proceed to your application and enjoy the amazing benefits offered on the ".env('APP_NAME')." platform.")
                                 ->send($user, ['mail']);
-        }else{
+        }else if($request->status === $this->declined){
             $notificationService->text('Sorry, we could not approve your account verification request at this time because "'.$request->reason.'"')
                                 ->text("Please update your information provided on your application and try again!")
                                 ->text("You can reach out to our support center via ".env('SUPPORT_EMAIL'))

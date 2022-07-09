@@ -18,13 +18,16 @@ class MealsController extends Controller{
     function create(CreateMealRequest $request){
         $user = $this->user();
 
+        // return response($request->safe()->all());
+
         if(!MealCategory::find($request->category)) return $this->returnMessageTemplate(false, "The Selected Meal Category Does not Exist");
 
         $unique_id = $this->createUniqueId('meals');
 
         $meal = Meal::create($request->safe()->merge([
             'unique_id' => $unique_id,
-            'user_id' => $user->unique_id
+            'user_id' => $user->unique_id,
+            'images' => $request->images
         ])->all());
 
         return $this->returnMessageTemplate(true, $this->returnSuccessMessage('created', 'Meal'), [
@@ -76,6 +79,7 @@ class MealsController extends Controller{
                         ->hasVendor()
                         ->owner()->category()
                         ->sortByRating()
+                        ->search()
                         // ->orders('withCount')
                         ->query();
 

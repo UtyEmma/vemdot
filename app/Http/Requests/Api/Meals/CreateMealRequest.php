@@ -31,11 +31,13 @@ class CreateMealRequest extends FormRequest{
             'thumbnail' => 'required|url',
             'description' => 'required|string',
             'price' => 'required|numeric',
-            'images*' => 'required|url',
-            'video' => 'required|url',
-            'discount' => 'nullable|numeric',
-            'tax' => 'nullable|numeric',
-            'category' => 'required|string'
+            'images*' => 'required|url|array',
+            'video' => 'nullable|url',
+            'discount' => 'nullable|numeric|max:100|min:0',
+            'tax' => 'nullable|numeric|max:100|min:0',
+            'category' => 'required|string',
+            'availability' => 'required|string|in:yes,no',
+            'avg_time' => 'required|numeric'
         ];
     }
 }

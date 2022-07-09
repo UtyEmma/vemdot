@@ -31,6 +31,12 @@ use Illuminate\Support\Facades\DB;
      * permitted_daily_cancellations, order_charges, can_cancel_order, PRICE_PER_KM
      *
      * cancelled | declined | confirmed | inprogress | terminated | enroute | pickup | delivered
+     *
+     *
+     * ///
+     *
+     * Order Reference
+     * Email Address
 */
 
 class OrderController extends Controller {
@@ -38,16 +44,26 @@ class OrderController extends Controller {
     function create(CreateOrderRequest $request, OrderService $orderService){
         $user = $this->user();
 
-        if(!User::find($request->courier_id)->isLogistic()) return $this->returnMessageTemplate(false, "The Selected Courier is not registered");
-        if(!User::find($request->vendor_id)->isVendor()) return $this->returnMessageTemplate(false, "The Selected Vendor is not registered");
+        $rider = User::with('logistic')->find($request->rider_id);
+        if(!$rider->isRider()) return $this->returnMessageTemplate(false, "The Selected User is not registered as a Rider");
+        if(!User::find($request->vendor_id)->isVendor()) return $this->returnMessageTemplate(false, "The Selected User is not registered as a Vendor");
 
-        $meals = $orderService->confirmMeals($request->meals); // Confirm the meals and prices
+        try {
+            $meals = $orderService->confirmMeals($request->meals); // Confirm the meals and prices
+        } catch (\Throwable $th) {
+            return $this->returnMessageTemplate(false, $th->getMessage());
+        }
+
         $address = $request->address_id ? Address::find($request->address_id)->location : $request->receiver_location; // Handle Address
 
         $settings = SiteSettings::first();
 
         // Calculate Delivery fee per
-        $delivery_fee = $request->delivery_distance ? $settings->delivery_fee * $request->delivery_distance : $request->delivery_fee;
+        $delivery_fee = $settings->delivery_fee * $request->delivery_distance;
+        $avg_delivery_time = $request->delivery_distance * $settings->delivery_fee;
+        $delivery_time = $meals->sum('time') + $avg_delivery_time;
+
+        $reference = $this->createRandomNumber(6);
 
         $order = Order::create($request->safe()->merge([
             'user_id' => $user->unique_id,
@@ -57,11 +73,15 @@ class OrderController extends Controller {
             'receiver_name' => $request->receiver_name ?? $user->name,
             'receiver_phone' => $request->receiver_phone ?? $user->phone,
             'receiver_location' => $address,
+            'receiver_email' => $request->receiver_email ?? $user->email,
             'amount' => $meals->sum('price'), //Calculate the price by sum
-            'delivery_fee' => $delivery_fee
+            'delivery_fee' => $delivery_fee,
+            'avg_time' => $delivery_time,
+            'reference' => $reference,
         ])->except('address_id')); // Create the order
 
         $transaction = $orderService->createOrderTransaction($order, $request); // Create Transaction for this Order
+
         return $orderService->initiatePayment($request, $transaction, $user, $order);
     }
 
@@ -84,7 +104,7 @@ class OrderController extends Controller {
 
         if($notUpdateable)
             return $this->returnMessageTemplate(false,
-                        "Order Update failed because because it is set to ".ucfirst($order->status), ['order' => $order]);
+                    "Order Update failed because because it is set to ".ucfirst($order->status), ['order' => $order]);
 
         $vendorCanUpdateDelivered = (($user->userRole->name === 'Vendor') && ($status === 'delivered') && ($order->delivery_method !== 'pickup'));
 
@@ -98,11 +118,15 @@ class OrderController extends Controller {
         return $this->returnMessageTemplate(true, "Order Status has been updated successfully", $order);
     }
 
-    function list(Request $request, $user_id = null){
+    function list($user_id = null){
         $user = User::find($user_id) ?? $this->user();
         $query = Order::query();
 
         $query->when($user->isLogistic(), function($query) use($user){
+            $query->where('courier_id', $user->unique_id);
+        });
+
+        $query->when($user->isRider(), function($query) use($user){
             $query->where('courier_id', $user->unique_id);
         });
 

@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Traits\Generics;
 use App\Traits\Options;
 use App\Traits\PaymentHandler;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
@@ -23,15 +24,21 @@ class OrderService {
     function confirmMeals($items){
         $items = collect($items);
         $meals = $items->map(function($meal){
-            $meal = json_decode($meal);
-            $model = Meal::find($meal->meal_id)->with('vendor')->first();
-            $price = $model->discount ? $this->percentageDiff($model->price, $model->discount) : $model->price;
-            $item['meal_id'] = $model->unique_id;
-            $item['vendor_id'] = $model->vendor->unique_id;
-            $item['price'] = $price * $meal->qty;
-            $item['unit_price'] = $price;
-            $item['qty'] = $meal->qty;
-            return $item;
+            if($model = Meal::find($meal['meal_id'])){
+                $model = $model->with('vendor')->first();
+                $price = $model->discount ? $this->percentageDiff($model->price, $model->discount) : $model->price;
+                $tax = ($model->price * ($model->tax / 100));
+
+                $item['meal_id'] = $model->unique_id;
+                $item['vendor_id'] = $model->vendor->unique_id;
+                $item['price'] = ($price + $tax) * $meal['qty'];
+                $item['unit_price'] = ($price + $tax);
+                $item['qty'] = $meal['qty'];
+                $item['time'] = $model->avg_time;
+                return $item;
+            }
+
+            throw new Exception('Invalid Meal Selected', 400);
         });
 
         return collect($meals);
@@ -115,11 +122,11 @@ class OrderService {
         $admin->main_balance += $order->amount;
         $admin->save();
 
-        $vendor = $order->vendor();
+        $vendor = $order->vendor;
         $vendor->pending_balance += $this->percentageDiff($order->amount, $settings->vendor_service_charge);
         $vendor->save();
 
-        $logistics = $order->courier();
+        $logistics = $order->courier;
         $logistics->pending_balance += $this->percentageDiff($order->delivery_fee, $settings->logistics_service_charge);
 
         return $this->returnMessageTemplate(true, "You Order has been Created", ['order' => $order]);
@@ -214,9 +221,32 @@ class OrderService {
         $orderStatusPos = array_search($order->status, $progression);
         $isNextStatus = $orderStatusPos + 1 === $statusPos;
 
-        if(!$isNextStatus) $isNextStatus =  ($status === 'processing' || $status === 'declined' && $order->status === 'paid') || ($status == 'done' && $order->status == 'processing') || ($status == 'delivered' && $order->status == 'done' && $user->isVendor() && $order->delivery_method == 'pickup');
+        if(!$isNextStatus) $isNextStatus =  (
+            $status === 'processing' || $status === 'declined' && $order->status === 'paid')
+            ||
+            ($status == 'done' && $order->status == 'processing')
+            ||
+            ($status == 'delivered' && $order->status == 'done' && $user->isVendor() && $order->delivery_method == 'pickup');
 
-        return ($statusPos <= $orderStatusPos) || in_array($order->status, ['cancelled', 'declined', 'terminated', 'failed']) || !$isNextStatus;
+        return
+            ($statusPos <= $orderStatusPos)
+            ||
+            $this->isCompleted($order->status)
+            ||
+            !$isNextStatus
+            ||
+            ($status === 'cancelled' && $this->checkDeliveryTime($order) && $user->isUser() && $this->isCompleted($order->status));
+    }
+
+    function isCompleted($status){
+        return in_array($status, ['cancelled', 'declined', 'terminated', 'failed', 'delivered']);
+    }
+
+    function checkDeliveryTime(Order $order){
+        // Check if the current time has exceeded the set time
+        // It starts counting after the Vendor has accepted the order
+        $orderStatus = $order->orderStatus()->where('status', 'processing')->first();
+        return Date::parse($orderStatus->created_at)->addMinutes($order->avg_time)->greaterThan(now());
     }
 
     function initiatePayment (Request $request, Transaction $transaction, User $user, Order $order){

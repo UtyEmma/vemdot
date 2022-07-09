@@ -31,25 +31,23 @@ class CreateOrderRequest extends FormRequest{
      */
     public function rules() {
         return [
-            'courier_id' => 'required|string|exists:users,unique_id',
+            'rider_id' => 'required|string',
             'vendor_id' => 'required|string|exists:users,unique_id',
-            'address_id' => ['string', Rule::exists('addresses', 'unique_id')->where('user_id', $this->user()->unique_id)],
+            'address_id' => ['nullable','string', Rule::exists('addresses', 'unique_id')->where('user_id', $this->user()->unique_id)],
             'instructions' => 'nullable|string',
-            'amount' => 'required|numeric',
             'receiver_id' => [
                                 'nullable',
                                 Rule::exists('users', 'unique_id'),
                                 Rule::requiredIf(fn () => $this->isNotFilled('address_id') &&  $this->isNotFilled('receiver_name'))
                             ],
-            'delivery_fee' => ['numeric', Rule::requiredIf(fn () => $this->isNotFilled('delivery_distance'))],
             'delivery_distance' => ['numeric',
-                                    'required',
-                                    // Rule::requiredIf(fn () => $this->isNotFilled('delivery_fee'))
+                                    'required'
                                 ],
             'delivery_method' => 'required|in:home,pickup',
             'receiver_name' => [Rule::requiredIf(fn () => $this->isNotFilled('address_id'))],
             'receiver_phone' => [Rule::requiredIf(fn () => $this->isNotFilled('address_id'))],
             'receiver_location' => [Rule::requiredIf(fn () => $this->isNotFilled('address_id'))],
+            'receiver_email' => [Rule::requiredIf(fn () => $this->isNotFilled('address_id')), "email"],
             'meals' => 'required|array',
             'payment_method' => 'required|in:wallet,card',
             'card_id' => ["nullable", Rule::exists('cards', 'unique_id')->where('user_id', $this->user()->unique_id)]
