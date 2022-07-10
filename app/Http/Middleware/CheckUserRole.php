@@ -23,6 +23,6 @@ class CheckUserRole{
 
         if($accountRole->name === $role) return $next($request);
 
-        abort(401, "You are not authorized to make this request");
+        return $this->returnMessageTemplate(false, "You are not authorized to make this request");
     }
 }

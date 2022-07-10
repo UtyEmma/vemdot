@@ -43,16 +43,20 @@ use App\Http\Controllers\Withdrawal\WithdrawalController;
 
 // log users in
 Route::post('login', [LoginController::class,'loginUser']);
+
 //log rider in
 Route::post('login/rider', [RiderController::class, 'loginRider']);
+
 //2fa handler
 Route::post('user/2fa/verify', [LoginController::class, 'processUserlogin']);
 Route::get('/payment/callback', [Controller::class,'verifyPayment']);
 
 //create new accounts for users
 Route::post('register', [RegisterController::class,'register']);
+
 //send verification token to users
 Route::post('send-code', [AccountActivationController::class, 'sendActivationCode']);
+
 //verify token
 Route::post('verify-code', [AccountActivationController::class, 'verifyAndActivateAccount']);
 
@@ -62,12 +66,16 @@ Route::post('resend-reset-code', [ResetPasswordContoller::class, 'resendResetCod
 Route::post('verify-reset-code', [ResetPasswordContoller::class, 'verifySentResetCode']);
 Route::post('reset-password', [ResetPasswordContoller::class, 'resetPassword']);
 
-//advers handler
+//advert handler
 Route::get('/fetch/adverts', [AdvertController::class,'fetchAdvertsForUsers']);
 Route::get('/fetch/single/advert/{id?}', [AdvertController::class,'fetchSingleAdvert']);
 
+//
+Route::get('/account-roles', [UserController::class, 'fetchAccountRoles']);
+
 Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function(){
     //log user out
+    Route::get('/user-role', [UserController::class, 'fetchCurrentUserRole']);
     Route::post('upload', [MediaController::class, 'upload']);
 	Route::get('logout', [Controller::class,'logoutUser']);
 	//update user password
@@ -135,11 +143,13 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
     Route::get('user', [UserController::class, 'show'])->name('users.current');
 
     Route::prefix('users')->group(function(){
+
         Route::prefix('{role}')->group(function(){
             Route::get('/', [UserController::class, 'list'])->name('users.list');
             Route::get('/{id}', [UserController::class, 'single'])->name('users.single');
         });
-        Route::post('update', [UserController::class, 'update'])->name('users.update');
+
+        Route::post('/update', [UserController::class, 'update'])->name('users.update');
         //Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
     });
 
@@ -175,6 +185,7 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
         });
         Route::get('/vendor/{vendor_id?}', [MealsController::class, 'vendorMeals']);
         Route::get('/by/ads', [MealsController::class, 'fetchMealsByAds']);
+
         Route::middleware('kyc.status:Vendor')->group(function(){
             Route::post('/create', [MealsController::class, 'create']);
             Route::prefix('{meal_id}')->group(function(){

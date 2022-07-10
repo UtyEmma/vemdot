@@ -57,30 +57,29 @@ class MealService {
         return $this;
     }
 
-    function orderByCategory($category = 'category'){
-        $this->query = $this->query->when(request()->has($category), function($query, $category){
-            $query->whereRelation('category', $category);
+    function filterByCategory($category = "category"){
+        $this->query = $this->query->when(request()->input($category), function($query, $category){
+            $query->where('category', $category);
         });
         return $this;
     }
 
-    function status($keyword = 'status'){
-        $this->query = $this->query->when(request()->has($keyword), function($query, $status){
-            $availability = $status === 'available' ? 'yes' : 'no';
-            $query->where('availability', $availability);
+    function status($availability = "availability"){
+        $this->query = $this->query->when(request()->input($availability), function($query, $status){
+            $query->where('availability', $status);
         });
         return $this;
     }
 
-    function search($keyword = 'search'){
-        $this->query = $this->query->when(request()->has($keyword), function($query, $keyword){
+    function search($keyword = "keyword"){
+        $this->query = $this->query->when(request()->input($keyword), function($query, $keyword){
             $query->where('name', 'LIKE', "%$keyword%");
         });
         return $this;
     }
 
     function sortByPopularity($keyword = 'sortBy'){
-        $this->query= $this->query->when(request()->has($keyword), function($query, $sort){
+        $this->query= $this->query->when(request()->input($keyword), function($query, $sort){
             if($sort === 'popularity'){
                 $query->orderBy(User::where('unique_id', $query->user_id)->count());
             }
@@ -92,7 +91,7 @@ class MealService {
     function sortByRating($keyword = 'sortBy'){
         $this->query = $this->query->when(request()->input($keyword), function($query, $sort){
             if($sort === 'rating'){
-                $query->orderBy('rating');
+                $query->orderBy('rating', 'desc');
             }
         });
         return $this;

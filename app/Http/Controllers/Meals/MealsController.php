@@ -18,8 +18,6 @@ class MealsController extends Controller{
     function create(CreateMealRequest $request){
         $user = $this->user();
 
-        // return response($request->safe()->all());
-
         if(!MealCategory::find($request->category)) return $this->returnMessageTemplate(false, "The Selected Meal Category Does not Exist");
 
         $unique_id = $this->createUniqueId('meals');
@@ -50,16 +48,17 @@ class MealsController extends Controller{
             $meals = $mealService
                     ->byUser($user->unique_id)
                     ->category()
+                    ->filterByCategory()
                     ->status()
                     ->query();
         }else if($vendor_id){
-                $meals = $mealService
-                        ->byUser($vendor_id)
-                        ->hasVendor()
-                        ->owner()->category()
-                        ->sortByRating()
-                        // ->orders(true)
-                        ->query();
+            $meals = $mealService
+                    ->byUser($vendor_id)
+                    ->hasVendor()
+                    ->filterByCategory()
+                    ->owner()->category()
+                    ->sortByRating()
+                    ->query();
         }else{
             return $this->returnMessageTemplate(false, 'Invalid Request. You are not logged in as a Vendor');
         }
@@ -80,6 +79,8 @@ class MealsController extends Controller{
                         ->owner()->category()
                         ->sortByRating()
                         ->search()
+                        ->filterByCategory()
+                        ->status()
                         // ->orders('withCount')
                         ->query();
 

@@ -15,19 +15,30 @@ class UserController extends Controller{
         $user = $this->user();
 
         $user->update($request->safe()->merge([
-            'verification' => 'pending'
+            'kyc_status' => 'pending'
         ])->all());
 
-        return $this->returnMessageTemplate(true, "Your Profile has been Updated Sucessfully!", [
-            'user' => $user
-        ]);
+        return $this->returnMessageTemplate(true,
+                        "Profile Updated Sucessfully!", [
+                            'user' => $user
+                        ]);
     }
 
     public function update(UpdateUserRequest $request){
         $user = $this->user();
-        $user->update($request->safe()->all());
 
-        return $this->returnMessageTemplate(true, "Your account was updated Successfully", $user);
+        // check unique email except this user
+        if(isset($request->email)){
+            $check = User::where('email', $request->email)
+                     ->where('unique_id', '!=', $user->unique_id)
+                     ->count();
+            if($check > 0){
+                return $this->returnMessageTemplate(false, "This Email Address has already been used");
+            }
+        }
+
+        $user->update($request->safe()->all());
+        return $this->returnMessageTemplate(true, "Profile updated Successfully", $user);
     }
 
     public function show(){
@@ -96,4 +107,14 @@ class UserController extends Controller{
         ]);
     }
 
+    function fetchAccountRoles(){
+        $roles = AccountRole::where('name', '!=', 'Super Admin')->where('name', '!=', 'Admin')->get();
+        return $this->returnMessageTemplate(true, '', $roles);
+    }
+
+    function fetchCurrentUserRole(){
+        $user = $this->user();
+        $role = $user->userRole;
+        return $this->returnMessageTemplate(true, '', $role);
+    }
 }
