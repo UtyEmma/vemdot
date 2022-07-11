@@ -44,8 +44,9 @@ class OrderController extends Controller {
     function create(CreateOrderRequest $request, OrderService $orderService){
         $user = $this->user();
 
-        $rider = User::with('logistic')->find($request->rider_id);
-        if(!$rider->isRider()) return $this->returnMessageTemplate(false, "The Selected User is not registered as a Rider");
+        $rider = User::with(['logistic', 'userRole'])->find($request->bike_id);
+
+        if(!($rider && $rider->isRider())) return $this->returnMessageTemplate(false, "The Selected User is not registered as a Rider");
         if(!User::find($request->vendor_id)->isVendor()) return $this->returnMessageTemplate(false, "The Selected User is not registered as a Vendor");
 
         try {
@@ -58,10 +59,10 @@ class OrderController extends Controller {
 
         $settings = SiteSettings::first();
 
-        // Calculate Delivery fee per
+        // Calculate Delivery fee per Kilometer
         $delivery_fee = $settings->delivery_fee * $request->delivery_distance;
-        $avg_delivery_time = $request->delivery_distance * $settings->delivery_fee;
-        $delivery_time = $meals->sum('time') + $avg_delivery_time;
+        // $avg_delivery_time = $request->delivery_distance * $settings->delivery_fee;
+        $delivery_time = $meals->max('time');
 
         $reference = $this->createRandomNumber(6);
 
@@ -78,6 +79,7 @@ class OrderController extends Controller {
             'delivery_fee' => $delivery_fee,
             'avg_time' => $delivery_time,
             'reference' => $reference,
+            'courier_id' => $rider->logistic->unique_id
         ])->except('address_id')); // Create the order
 
         $transaction = $orderService->createOrderTransaction($order, $request); // Create Transaction for this Order
@@ -145,6 +147,12 @@ class OrderController extends Controller {
 
     function show($order_id){
         $order = Order::with(['orderStatus', 'vendor', 'courier', 'bike', 'user'])->findorFail($order_id);
+        return $this->returnMessageTemplate(true, '', $order);
+    }
+
+    function mealOrders($meal_id){
+        $order = Order::whereJsonContains('meals', ['meal_id' => $meal_id]);
+        return response($order->get());
         return $this->returnMessageTemplate(true, '', $order);
     }
 }

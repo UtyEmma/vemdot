@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Models\Meal\Meal;
 use App\Traits\Options;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
+use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -45,6 +47,10 @@ class Order extends Model {
 
     public function bike(){
         return $this->belongsTo(User::class, 'bike_id', 'unique_id' );
+    }
+
+    public function meals(){
+        return $this->hasMany(Meal::class, 'meals->meal_id', 'unique_id');
     }
 
 }

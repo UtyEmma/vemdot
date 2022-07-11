@@ -93,8 +93,13 @@ class UserController extends Controller{
     }
 
     function fetchRequests (Request $request){
-        $requests = User::where('kyc_status', $this->pending)
-            ->whereRelation('userRole', 'name', 'Vendor')->get();
+        $requests = User::whereRelation('userRole', 'name', '!=', 'Super Admin')
+                        ->whereRelation('userRole', 'name', '!=', 'Admin')
+                        ->whereRelation('userRole', 'name', '!=', 'User')
+                        ->where('kyc_status', $this->pending)
+                        ->get();
+
+
 
         return response()->view('pages.users.kyc', [
             'users' => $requests
@@ -107,18 +112,19 @@ class UserController extends Controller{
         $user->kyc_status = $request->status;
         $user->save();
 
-        if ($request->status === $this->declined) {
+        if ($request->status === $this->confirmed) {
             $notificationService->subject("Your Account Request has been approved")
                 ->text('Congratulations, your '.env('APP_NAME').' account has been approved!')
                 ->text("You can now proceed to your application and enjoy the amazing benefits offered on the ".env('APP_NAME')." platform.")
                 ->send($user, ['mail']);
-        }else{
+        }else if($request->status === $this->declined) {
             $notificationService->subject("Your Account Request has been declined")
                 ->text('Sorry, we could not approve your account verification request at this time because "'.$request->reason.'"')
                 ->text("Please update your information provided on your application and try again!")
                 ->text("You can reach out to our support center via ".env('SUPPORT_EMAIL'))
                 ->send($user, ['mail']);
         }
+
         return redirect()->back()->with('message', "User KYC Request has been $request->status");
     }
 

@@ -25,17 +25,23 @@ class OrderService {
         $items = collect($items);
         $meals = $items->map(function($meal){
             if($model = Meal::find($meal['meal_id'])){
-                $model = $model->with('vendor')->first();
-                $price = $model->discount ? $this->percentageDiff($model->price, $model->discount) : $model->price;
-                $tax = ($model->price * ($model->tax / 100));
+                if($model->availability === $this->yes){
+                    $price = $model->discount ? $this->percentageDiff($model->price, $model->discount) : $model->price;
+                    $tax = ($model->price * ($model->tax / 100));
 
-                $item['meal_id'] = $model->unique_id;
-                $item['vendor_id'] = $model->vendor->unique_id;
-                $item['price'] = ($price + $tax) * $meal['qty'];
-                $item['unit_price'] = ($price + $tax);
-                $item['qty'] = $meal['qty'];
-                $item['time'] = $model->avg_time;
-                return $item;
+                    $item['meal_id'] = $model->unique_id;
+                    $item['vendor_id'] = $model->vendor->unique_id;
+                    $item['price'] = ($price + $tax) * $meal['qty'];
+                    $item['unit_price'] = ($price + $tax);
+                    $item['qty'] = $meal['qty'];
+                    $item['time'] = $model->avg_time;
+                    $item['name'] = $model->name;
+                    $item['thumbnail'] = $model->thumbnail;
+                    $item['discount'] = $model->discount;
+                    $item['tax'] = $model->tax;
+
+                    return $item;
+                }
             }
 
             throw new Exception('Invalid Meal Selected', 400);
@@ -47,21 +53,21 @@ class OrderService {
     function createOrderTransaction(Order $order, Request $request){
         return Transaction::create([
             'type' => 'order',
-            'amount' => $order->amount,
+            'amount' => $order->amount + $order->delivery_fee,
             'orderID' => $order->unique_id,
             'save_card' => $request->save_card,
             'status' => ($request->payment_method == 'wallet') ? $this->confirmed : $this->pending,
             'reference' => $this->createUniqueId('transactions', 'reference'),
             'channel' => $request->payment_method,
             "unique_id" => $this->createUniqueId('transactions'),
-            'description' => "Payment for Order",
+            'description' => "Payment for Meal Ordered on ".env('APP_NAME'),
             'user_id' => $request->user()->unique_id
         ]);
     }
 
     function handleWalletPayment(Order $order, User $user, Transaction $transaction){
-        $wallet_amount = $user->sum('main_balance', 'ref_balance');
-        $amount = $order->amount + $order->delivery_fee;
+        $wallet_amount = $user->main_balance + $user->ref_balance;
+        $amount = $transaction->amount;
         // Check if the wallet (both Main balance and Ref balance) is enough to complete the payment
         if(!$wallet_amount >= $amount) return [false, "Your Wallet balance is insufficent to complete this transaction"];
 
@@ -80,7 +86,7 @@ class OrderService {
 
     function initializePayment(Order $order, User $user, Transaction $transaction){
         return $this->redirectToGateway([
-            "amount" => $order->amount * 100,
+            "amount" => $transaction->amount * 100,
             "reference" => $transaction->reference,
             "email" => $user->email,
             "currency" => "NGN",
@@ -93,7 +99,7 @@ class OrderService {
         if(!$card = Card::find($card_id)) return [false, $this->returnErrorMessage('not_found', 'The Selected')];
 
         $payment = $this->payWithExistingCard([
-            "amount" => $order->amount * 100,
+            "amount" => $transaction->amount * 100,
             "reference" => $transaction->reference,
             "currency" => "NGN",
             "email" => $user->email,
@@ -128,6 +134,8 @@ class OrderService {
 
         $logistics = $order->courier;
         $logistics->pending_balance += $this->percentageDiff($order->delivery_fee, $settings->logistics_service_charge);
+
+        $order->bike;
 
         return $this->returnMessageTemplate(true, "You Order has been Created", ['order' => $order]);
     }

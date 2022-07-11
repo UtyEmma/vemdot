@@ -18,7 +18,9 @@ class RiderController extends Controller
             Alert::error('Error', $this->returnErrorMessage('unknown_error'));
             return redirect()->back();
         }
+
         $logistic = User::where('unique_id', $logistic)->first();
+
         if($logistic == null){
             Alert::error('Error', $this->returnErrorMessage('unknown_error'));
             return redirect()->back();
@@ -56,17 +58,17 @@ class RiderController extends Controller
             return $this->returnMessageTemplate(false, $validator->messages());
 
         if (!Auth::attempt($request->only('email', 'password')))
-            return $this->returnMessageTemplate(false, $this->returnErrorMessage('wrong_crendential'));    
-        
-        $rider = User::where('email', $request->email)->firstOrFail(); 
+            return $this->returnMessageTemplate(false, $this->returnErrorMessage('wrong_crendential'));
+
+        $rider = User::where('email', $request->email)->firstOrFail();
 
         if($rider->status == 'pending'){
             $this->logoutUser();
-            return $this->returnMessageTemplate(false, $this->returnErrorMessage('pending_approval'));   
-        } 
-            
+            return $this->returnMessageTemplate(false, $this->returnErrorMessage('pending_approval'));
+        }
+
         $token = $rider->createToken('auth_token', ['riders'])->plainTextToken;
-    
+
         return $this->returnMessageTemplate(true, $this->returnSuccessMessage('successful_login'), [
             'token' => $token,
             'user' => $rider,

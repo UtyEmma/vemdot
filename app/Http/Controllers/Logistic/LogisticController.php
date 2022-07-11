@@ -49,24 +49,26 @@ class LogisticController extends Controller
     protected function createRiderRequest(Request $request){
         $data = $request->all();
         $user = $request->user();
+
         $validator = Validator::make($data, [
             'role' => 'required',
             'phone' => 'required',
             'name' => 'required|between:2,100',
             'email' => 'required|email|unique:users|max:50',
-            'password' => ['required', Rules\Password::defaults()],
+            'password' =>
+            ['required', Rules\Password::defaults()],
         ]);
         if($validator->fails())
             return $this->returnMessageTemplate(false, $validator->messages());
         //get user role
-        $userRole = AccountRole::find($user->role);  
-        if($userRole == null) 
-            return $this->returnMessageTemplate(false, $this->returnErrorMessage('not_authorized'));  
-        if($userRole->name != 'Logistic') 
+        $userRole = AccountRole::find($user->role);
+        if($userRole == null)
+            return $this->returnMessageTemplate(false, $this->returnErrorMessage('not_authorized'));
+        if($userRole->name != 'Logistic')
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('not_authorized'));
         //create bike
-        $bikeNumb = $this->createConfirmationNumbers('bikes', 'bike_no', 6);
-
+        // $bikeNumb = $this->createConfirmationNumbers('bikes', 'bike_no', 6);
+        $bikeNumb = random_int(1111, 11110);
         $rider = User::create([
             'unique_id' => $this->createUniqueId('users'),
             'business_name' => $user->unique_id,
@@ -82,7 +84,9 @@ class LogisticController extends Controller
             'two_factor' => 'yes',
         ]);
         //notify logistic about new bike/ride
+
         $notification = $this->notification();
+
         $notification->subject('New Rider Was Added')
             ->text('A new rider was successfully added. Please wait for the admin to approve your bike.')
             ->text('Below are the details of the new rider:')
@@ -111,7 +115,7 @@ class LogisticController extends Controller
     protected function fetchSingleRider($uniqueId = null){
         if($uniqueId == null)
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('unknown_error'));
-        $rider = User::where('unique_id', $uniqueId)->first();  
+        $rider = User::where('unique_id', $uniqueId)->first();
         if($rider == null)
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('not_found', 'Rider'));
         $rider->logistic;
@@ -164,6 +168,6 @@ class LogisticController extends Controller
         return $this->returnMessageTemplate(true, $this->returnSuccessMessage('updated', 'Rider Avaliability'), $rider);
     }
 
-  
+
 
 }

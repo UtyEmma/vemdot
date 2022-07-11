@@ -35,7 +35,7 @@ class UpdateUserRequest extends FormRequest{
             'avatar' => 'nullable|string|url',
             'name' => 'required|string',
             'phone' => 'required|string',
-            'email' => ['required', 'emails', Rule::unique('users')->ignore($user->unique_id, 'unique_id')],
+            'email' => ['required', 'email', Rule::unique('users')->ignore($user->unique_id, 'unique_id')],
             'id_number' => [Rule::requiredIf($user->isLogistic() || $user->isVendor()), 'string'],
             'id_image' => [Rule::requiredIf($user->isLogistic() || $user->isVendor()), 'url'],
             'logo' => 'nullable|string|url',

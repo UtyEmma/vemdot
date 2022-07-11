@@ -150,8 +150,9 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
         });
 
         Route::post('/update', [UserController::class, 'update'])->name('users.update');
-        //Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
     });
+
+    Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
 
     Route::middleware('user.status:User')->group(function(){
         Route::prefix('addresses')->group(function(){
@@ -201,12 +202,13 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
 
     // Add a middleware for role here
     Route::middleware('user.status:Vendor')->group(function(){
-        Route::post('complete-profile', [UserController::class, 'completeProfileSetup'])->name('user.setup');
         Route::get('/add-company/{company_id}', [VendorController::class, 'addCompany']);
         Route::prefix('vendors')->group(function(){
             Route::get('/list-companies', [VendorController::class, 'listCompanies']);
         });
     });
+
+    Route::get('/meal-orders/{meal_id}', [OrderController::class, 'mealOrders']);
 
     // logistic handler
     Route::middleware('user.status:Logistic')->group(function(){

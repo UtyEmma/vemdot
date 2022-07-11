@@ -31,7 +31,7 @@ class CreateOrderRequest extends FormRequest{
      */
     public function rules() {
         return [
-            'rider_id' => 'required|string',
+            'bike_id' => 'required|string|exists:users,unique_id',
             'vendor_id' => 'required|string|exists:users,unique_id',
             'address_id' => ['nullable','string', Rule::exists('addresses', 'unique_id')->where('user_id', $this->user()->unique_id)],
             'instructions' => 'nullable|string',

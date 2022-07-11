@@ -10,9 +10,11 @@ use Illuminate\Http\Request;
 class KycController extends Controller{
 
 
-    function fetchRequests (Request $request){
+    function fetchRequests(){
         $requests = User::where('kyc_status', $this->pending)
-                        ->whereRelation('userRole', 'name', 'Vendor')->get();
+                        ->whereRelation('userRole', 'name', 'Vendor')
+                        ->orWhereRelation('userRole', 'name', 'Logistic')
+                        ->get();
 
         return response()->view('pages.users.kyc', [
             'users' => $requests

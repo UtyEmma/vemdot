@@ -9,7 +9,6 @@ use App\Models\Meal\Favourite;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
 class Meal extends Model{
     use HasFactory, SoftDeletes;
 
@@ -38,10 +37,6 @@ class Meal extends Model{
     function categories(){
         return $this->belongsTo(MealCategory::class, 'category', 'unique_id');
     }
-
-    // function orders(){
-    //     return $this->hasMany(Order::class, 'order_id', 'unique_id');
-    // }
 
     function favourites(){
         return $this->hasMany(Favourite::class, 'meal_id', 'unique_id');
