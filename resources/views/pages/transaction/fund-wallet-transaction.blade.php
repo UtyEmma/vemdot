@@ -16,7 +16,11 @@
             <x-filterbydate url="{{url('transaction/fundwallet/by/date')}}" submit="Fetch Transaction" />
         </div>
         <div class="col-md-6">
-            <x-filterByType url="{{url('transaction/fundwallet/by/type')}}" header="Filter Transaction" />
+            <x-filterByType url="{{url('transaction/fundwallet/by/type')}}" header="Filter Transaction">
+                <option>{{__('Vendor')}}</option>
+                <option>{{__('Logistic')}}</option>
+                <option>{{__('User')}}</option>
+            </x-filterByType>
         </div>
         <div class="col-md-12">
              {{-- table section --}}

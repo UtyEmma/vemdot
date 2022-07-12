@@ -95,6 +95,7 @@ trait ReturnTemplate {
             'updated' => "$item updated successfully",
             'deleted' => "$item was deleted successfully",
             'payout' => "Payout was successfully",
+            'ticket_sent' => "Ticket was successfully sent",
         ];
         return $messageArray[$keyword];
     }
