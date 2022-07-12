@@ -16,7 +16,11 @@
             <x-filterbydate url="{{url('withdrawal/interface/by/date')}}" submit="Fetch Request" />
         </div>
         <div class="col-md-6">
-            <x-filterByType url="{{url('withdrawal/interface/by/type')}}" header="Filter Withdrawal Request" />
+            <x-filterByType url="{{url('withdrawal/interface/by/type')}}" header="Filter Withdrawal Request">
+                <option>{{__('Vendor')}}</option>
+                <option>{{__('Logistic')}}</option>
+                <option>{{__('User')}}</option>
+            </x-filterByType>
         </div>
         <div class="col-md-12">
              {{-- table section --}}
@@ -31,6 +35,7 @@
                     <th class="text-center">{{ __('Bank Details')}}</th>
                     <th class="text-center">{{ __('Status')}}</th>
                     <th class="text-center">{{ __('Requested Date')}}</th>
+                    <th class="text-center">{{ __('Payout')}}</th>
                     <th class="text-center">{{ __('Payout')}}</th>
                     <th class="text-right">{{ __('Action')}}</th>
                 </x-slot>
@@ -60,6 +65,9 @@
                         <td class="text-center">
                             <button data-toggle="modal" data-target="#payOut{{$withdrawal->unique_id}}" class="btn btn-danger">Pay Out</button>
                         </td>
+                        <td>
+                            <button data-toggle="modal" data-target="#confirmRequest{{$withdrawal->unique_id}}" class="btn btn-warning">Confirm Request</button> 
+                        </td>
                         <td class="text-center">
                             <div class="table-actions">
                                 <a data-toggle="modal" data-target="#declineWithdrawal{{$withdrawal->unique_id}}"><i class="ik ik-eye"></i></a>
@@ -70,6 +78,7 @@
                     {{-- modal section --}}
                     <x-modal call="payOut{{$withdrawal->unique_id}}" header="Payout Withdrawal Request">
                         <x-slot name="message">
+                            <p class="alert alert-success">Withdrawal request is handledand settled by Paystack, please ensure to have enough balance on your paystack wallet dashboard before initiating performing this action </p>
                             <div class="form-group">
                                 <label for="bank_name">Bank Name</label>
                                 <input type="text" class="form-control" readonly id="bank_name" value="{{$withdrawal->bankDetails->bank->name}}">
@@ -88,6 +97,31 @@
                             </div>
                         </x-slot>
                         <form action="{{url('withdrawal/payout')}}" method="POST">@csrf
+                            <input type="hidden" name="unique_id" value="{{$withdrawal->unique_id}}">
+                            <button type="submit" class="btn btn-primary">{{ __('Continue')}}</button>
+                        </form>
+                    </x-modal>
+                    <x-modal call="confirmRequest{{$withdrawal->unique_id}}" header="Confirm Withdrawal Request">
+                        <x-slot name="message">
+                            <p class="alert alert-warning">By confirming this request, ensure you have made payment to the account details provided above. </p>
+                            <div class="form-group">
+                                <label for="bank_name">Bank Name</label>
+                                <input type="text" class="form-control" readonly id="bank_name" value="{{$withdrawal->bankDetails->bank->name}}">
+                            </div>
+                            <div class="form-group">
+                                <label for="name">Account Name</label>
+                                <input type="text" class="form-control" readonly id="name" value="{{$withdrawal->bankDetails->account_name}}">
+                            </div>
+                            <div class="form-group">
+                                <label for="number">Account Number</label>
+                                <input type="number" class="form-control" readonly id="number" value="{{$withdrawal->bankDetails->account_no}}">
+                            </div>
+                            <div class="form-group">
+                                <label for="amount">Amount</label>
+                                <input type="number" class="form-control" readonly id="amount" value="{{$withdrawal->amount}}">
+                            </div>
+                        </x-slot>
+                        <form action="{{url('withdrawal/confirm')}}" method="POST">@csrf
                             <input type="hidden" name="unique_id" value="{{$withdrawal->unique_id}}">
                             <button type="submit" class="btn btn-primary">{{ __('Continue')}}</button>
                         </form>

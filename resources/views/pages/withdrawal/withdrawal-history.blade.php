@@ -16,7 +16,11 @@
             <x-filterbydate url="{{url('withdrawal/histroy/interface/by/date')}}" submit="Fetch Withdrawals" />
         </div>
         <div class="col-md-6">
-            <x-filterByType url="{{url('withdrawal/histroy/interface/by/type')}}" header="Filter Withdrawal History" />
+            <x-filterByType url="{{url('withdrawal/histroy/interface/by/type')}}" header="Filter Withdrawal History">
+                <option>{{__('Vendor')}}</option>
+                <option>{{__('Logistic')}}</option>
+                <option>{{__('User')}}</option>
+            </x-filterByType>
         </div>
         <div class="col-md-12">
              {{-- table section --}}

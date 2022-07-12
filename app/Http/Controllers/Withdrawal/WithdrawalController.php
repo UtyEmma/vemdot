@@ -244,4 +244,13 @@ class WithdrawalController extends Controller
         Alert::success('Success', $this->returnSuccessMessage('updated', 'Withdraw Request'));
         return redirect()->back();
     }
+    protected function confirmWithdrawal(Withdrawal $withdraw, Request $request){
+        $response = $withdraw->updateWalletWithdrawalStatus($request->unique_id, $this->confirmed);
+        if(!$response){
+            Alert::error('Error', $this->returnErrorMessage('not_found', 'Withdraw Request'));
+            return redirect()->back();
+        }
+        Alert::success('Success', $this->returnSuccessMessage('updated', 'Withdraw Request'));
+        return redirect()->back();
+    }
 }

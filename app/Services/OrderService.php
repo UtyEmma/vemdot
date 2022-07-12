@@ -115,11 +115,11 @@ class OrderService {
         $admin->main_balance += $order->amount;
         $admin->save();
 
-        $vendor = $order->vendor();
+        $vendor = $order->vendor;
         $vendor->pending_balance += $this->percentageDiff($order->amount, $settings->vendor_service_charge);
         $vendor->save();
 
-        $logistics = $order->courier();
+        $logistics = $order->courier;
         $logistics->pending_balance += $this->percentageDiff($order->delivery_fee, $settings->logistics_service_charge);
 
         return $this->returnMessageTemplate(true, "You Order has been Created", ['order' => $order]);
@@ -232,5 +232,29 @@ class OrderService {
         if ($response[0]) return $this->completeOrder($order, $transaction, $user);
 
         return $this->returnMessageTemplate(false, $response[1]);
+    }
+
+    function getAllOrders($condition, $paginate){
+        return Order::where($condition)
+            ->orderBy('id', 'desc')
+            ->paginate($paginate);
+    }
+
+    function getSingleOrder($uniqueID){
+        return Order::where('unique_id', $uniqueID)->first();
+    }
+
+    public function updateOrderStatus($uniqueID, $status){
+        $order = $this->getSingleOrder($uniqueID);
+        if(!$order)
+            return false;
+        return $order->update(['status' => $status]);  
+    }
+
+    public function deleteOrder($uniqueID){
+        $order = $this->getSingleOrder($uniqueID);
+        if(!$order)
+            return false;
+        return $order->delete();  
     }
 }

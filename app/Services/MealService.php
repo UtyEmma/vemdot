@@ -30,7 +30,7 @@ class MealService {
         return $this;
     }
 
-    function hasVendor($status = 'active'){
+    function hasVendor($status = 'confirmed'){
         $this->query = $this->query->whereRelation('vendor', 'status', $status);
         return $this;
     }
@@ -41,7 +41,7 @@ class MealService {
     }
 
     function category(){
-        $this->query = $this->query->with('category');
+        $this->query = $this->query->with('categories');
         return $this;
     }
 
@@ -105,6 +105,10 @@ class MealService {
     function reviews(){
         // return $this->query = $query;
         return $this;
+    }
+
+    function getOrder($condition, $paginate){
+        return Meal::where($condition)->orderBy('id', 'desc')->paginate($paginate);
     }
 }
 

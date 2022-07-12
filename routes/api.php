@@ -29,6 +29,7 @@ use App\Http\Controllers\Logistic\RiderController;
 use App\Http\Controllers\Review\ReviewController;
 use App\Http\Controllers\Advert\AdvertController;
 use App\Http\Controllers\Withdrawal\WithdrawalController;
+use App\Http\Controllers\Ticket\TicketController;
 
 /*
 |--------------------------------------------------------------------------
@@ -115,6 +116,11 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
     Route::get('/fetch/single/bank/detail/{id?}', [WithdrawalController::class,'fetchSingleBankDetails']);
     Route::post('/initiate/withdrawal', [WithdrawalController::class,'initiateWithdrawal']);
 
+    Route::prefix('tickets')->group(function(){
+        Route::post('create', [TicketController::class, 'createTicketByUser']);
+        Route::get('fetch{user_id?}', [TicketController::class, 'fectchUsersTicket']);
+    });  
+    
     Route::prefix('cards')->group(function(){
         Route::get('/', [CardController::class, 'list']);
         Route::prefix('{id}')->group(function(){

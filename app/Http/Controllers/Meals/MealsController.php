@@ -76,6 +76,7 @@ class MealsController extends Controller{
                         ->hasVendor()
                         ->owner()->category()
                         ->sortByRating()
+                        ->search()
                         // ->orders('withCount')
                         ->query();
 
