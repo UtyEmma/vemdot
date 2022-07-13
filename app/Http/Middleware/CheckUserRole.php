@@ -20,6 +20,7 @@ class CheckUserRole{
     public function handle(Request $request, Closure $next, $role){
         $user = $request->user();
         $accountRole = AccountRole::find($user->role);
+        // dd($accountRole);
 
         if($accountRole->name === $role) return $next($request);
 

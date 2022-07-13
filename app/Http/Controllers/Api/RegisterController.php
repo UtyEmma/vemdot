@@ -33,7 +33,7 @@ class RegisterController extends Controller
             'city' => 'required',
             'country' => 'required',
             'phone' => 'required',
-            'role' => 'required',
+            'role' => 'required|exists:account_roles,unique_id',
             'email' => 'required|email|unique:users|max:50',
             'gender' => 'required|string',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],

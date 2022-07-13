@@ -29,41 +29,44 @@ class MealsController extends Controller{
             'images' => $request->images
         ])->all());
 
-        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('created', 'Meal'), [
-            'meal' => $meal
-        ]);
+        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('created', 'Meal'), $meal->with('categories')->first());
     }
 
     function update(CreateMealRequest $request, $meal_id){
-        $meal = Meal::findOrFail($meal_id);
-        $meal->update($request->safe()->all());
+        $user = $this->user();
+        if(!$meal = Meal::findOrFail($meal_id)) return $this->returnMessageTemplate(false, "Meal does not exist");
+        if(!$meal->user_id && $user->unique_id) return $this->returnMessageTemplate(false, "The Meal does not belong to this user");
 
-        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('updated', "Meal"), [
-            'meal' => $meal
-        ]);
+        $images = $meal->images;
+
+        if($request->filled('images')) $images = $request->images;
+
+        if(!MealCategory::find($request->category)) return $this->returnMessageTemplate(false, "The Selected Meal Category Does not Exist");
+
+        $meal->update($request->safe()->merge([
+            'images' => $images
+        ])->all());
+
+        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('updated', "Meal"), $meal->with('categories')->first());
     }
 
     function vendorMeals(MealService $mealService, $vendor_id = null){
         $user = $this->user();
 
-        if($user->userRole->name === 'Vendor') {
-            $meals = $mealService
-                        ->byUser($user->unique_id)
-                        ->category()
-                        ->filterByCategory()
-                        ->status()
-                        ->query()->paginate();
+        $meals = $mealService->category()
+                            ->filterByCategory()
+                            ->status()->orderBy()
+                            ->hasVendor()->owner();
+
+        if($user && $user->userRole->name === 'Vendor') {
+            $meals->byUser($user->unique_id);
         }else if($vendor_id){
-            $meals = $mealService
-                        ->byUser($vendor_id)
-                        ->hasVendor()
-                        ->filterByCategory()
-                        ->owner()->category()
-                        ->sortByRating()
-                        ->query()->paginate();
+            $meals->byUser($vendor_id);
         }else{
             return $this->returnMessageTemplate(false, 'Invalid Request. You are not logged in as a Vendor');
         }
+
+        $meals = $meals->query()->paginate($this->paginate);
 
         foreach ($meals as $meal) {
             $orders = Order::whereJsonContains('meals', ['meal_id' => $meal->unique_id])->get();
@@ -71,10 +74,9 @@ class MealsController extends Controller{
             $meal->order_count = $orders->count();
         }
 
-        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('fetched_all', "Meal"), [
-            'meals' => $meals
-        ]);
+        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('fetched_all', "Meal"), $meals);
     }
+
 
     function delete(Request $request, MealService $mealService, $meal_id){
         $mealService->find($meal_id)->delete();
@@ -83,23 +85,19 @@ class MealsController extends Controller{
 
     function fetchAllMeals(MealService $mealService, $vendor_id = null){
         $meals = $mealService
+                        ->byUser($vendor_id)
                         ->hasVendor()
-                        ->owner()->category()
-                        ->sortByRating()
+                        ->owner()
+                        ->category()
+                        ->orderBy()
                         ->search()
                         ->filterByCategory()
                         ->status()
-                        ->query()->paginate();
+                        ->query();
 
-        foreach ($meals as $meal) {
-            $orders = Order::whereJsonContains('meals', ['meal_id' => $meal->unique_id])->get();
-            $meal->orders = $orders;
-            $meal->order_count = $orders->count();
-        }
+        $meals = $meals->paginate($this->paginate);
 
-        return $this->returnMessageTemplate(true, '', [
-            'meals' => $meals
-        ]);
+        return $this->returnMessageTemplate(true, '', $meals);
     }
 
     function vendorFetchSingleMeal(MealService $mealService, $meal_id){
@@ -109,9 +107,7 @@ class MealsController extends Controller{
         $meal = $meal->first();
         $meal->orders = $orders;
 
-        return $this->returnMessageTemplate(true, '', [
-            'meal' => $meal
-        ]);
+        return $this->returnMessageTemplate(true, '', $meal);
     }
 
     function single(MealService $mealService, $meal_id){
@@ -120,17 +116,11 @@ class MealsController extends Controller{
         $orders = Order::whereJsonContains('meals', ['meal_id' => $meal_id])->count();
         $meal = $meal->first();
         $meal->order_count = $orders;
-        return $this->returnMessageTemplate(true, '', [
-            'meal' => $meal,
-        ]);
+        return $this->returnMessageTemplate(true, '', $meal);
     }
 
     function fetchMealsByAds(){
-        $meals = Meal::where('promoted', $this->yes)->paginate($this->paginate);
-        foreach($meals as $meal){
-            $meal->categories;
-            $meal->vendor;
-        }
+        $meals = Meal::where('promoted', $this->yes)->with(['categories', 'vendor'])->paginate($this->paginate);
         return $this->returnMessageTemplate(true, $this->returnSuccessMessage('fetched_all', 'Meal'), $meals);
     }
 }

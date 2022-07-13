@@ -35,7 +35,7 @@ class CreateMealRequest extends FormRequest{
             'video' => 'nullable|url',
             'discount' => 'nullable|numeric|max:100|min:0',
             'tax' => 'nullable|numeric|max:100|min:0',
-            'category' => 'required|string',
+            'category' => 'required|string|exists:meal_categories,unique_id',
             'availability' => 'required|string|in:yes,no',
             'avg_time' => 'required|numeric'
         ];

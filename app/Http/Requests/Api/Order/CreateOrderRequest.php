@@ -31,9 +31,13 @@ class CreateOrderRequest extends FormRequest{
      */
     public function rules() {
         return [
-            'bike_id' => 'required|string|exists:users,unique_id',
+            'bike_id' => 'required_unless:delivery_method,pickup|string|exists:users,unique_id',
             'vendor_id' => 'required|string|exists:users,unique_id',
-            'address_id' => ['nullable','string', Rule::exists('addresses', 'unique_id')->where('user_id', $this->user()->unique_id)],
+            'address_id' => [
+                'required_without_all:receiver_name,receiver_phone,receiver_location,receiver_email',
+                'string',
+                "nullable",
+                Rule::exists('addresses', 'unique_id')],
             'instructions' => 'nullable|string',
             'receiver_id' => [
                                 'nullable',
@@ -60,9 +64,10 @@ class CreateOrderRequest extends FormRequest{
             'address_id' => "Address",
             'receiver_id' => "Receiver",
             'delivery_method' => "Delivery Method",
-            "delivery_fee" => "Delivery Fee",
             "delivery_distance" => "Delivery Distance",
-            "reciever_name" => "Receiver Name"
+            "reciever_name" => "Receiver Name",
+            'bike_id' => "Rider",
+            'vendor_id' => "Vendor",
         ];
     }
 }

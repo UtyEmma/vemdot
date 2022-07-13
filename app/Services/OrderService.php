@@ -21,11 +21,11 @@ use Illuminate\Support\Facades\Date;
 class OrderService {
     use Generics, PaymentHandler, Options;
 
-    function confirmMeals($items){
+    function confirmMeals($items, $vendor_id){
         $items = collect($items);
-        $meals = $items->map(function($meal){
+        $meals = $items->map(function($meal) use($vendor_id){
             if($model = Meal::find($meal['meal_id'])){
-                if($model->availability === $this->yes){
+                if($model->availability === $this->yes && $model->user_id === $vendor_id){
                     $price = $model->discount ? $this->percentageDiff($model->price, $model->discount) : $model->price;
                     $tax = ($model->price * ($model->tax / 100));
 
@@ -57,7 +57,7 @@ class OrderService {
             'orderID' => $order->unique_id,
             'save_card' => $request->save_card,
             'status' => ($request->payment_method == 'wallet') ? $this->confirmed : $this->pending,
-            'reference' => $this->createUniqueId('transactions', 'reference'),
+            'reference' => "VM-".$this->createUniqueId('transactions', 'reference'),
             'channel' => $request->payment_method,
             "unique_id" => $this->createUniqueId('transactions'),
             'description' => "Payment for Meal Ordered on ".env('APP_NAME'),
@@ -119,13 +119,15 @@ class OrderService {
     function completeOrder(Order $order, Transaction $transaction, User $user){
         $transaction->status = $this->confirmed;
         $transaction->save();
+
         $order->status = $this->paid;
+        $order->transaction_id = $transaction->unique_id;
         $order->save();
 
         $settings = SiteSettings::first();
 
         $admin = User::admin();
-        $admin->main_balance += $order->amount;
+        $admin->main_balance = $admin->main_balance + $order->amount;
         $admin->save();
 
         $vendor = $order->vendor;
@@ -134,6 +136,7 @@ class OrderService {
 
         $logistics = $order->courier;
         $logistics->pending_balance += $this->percentageDiff($order->delivery_fee, $settings->logistics_service_charge);
+        $logistics->save();
 
         $order->bike;
 
@@ -141,10 +144,6 @@ class OrderService {
     }
 
     function sendOrderUpdateNotification(Order $order){
-
-    }
-
-    function onOrderTermination(){
 
     }
 
@@ -159,7 +158,19 @@ class OrderService {
             'status' => $order->status
         ]);
 
-        if($status === 'cancelled' || 'terminated' || 'declined') $this->refundToWallet($order, $user);
+        $progress = $this->orderProgression;
+
+        if($status === array_pop($progress)){
+            $meals = $order->meals;
+
+            foreach($meals as $meal){
+                $meal = Meal::find($meal['meal_id']);
+                $meal->total_orders = $meal->total_orders + 1;
+                $meal->save();
+            }
+        }
+
+        if($status === 'cancelled' || 'terminated' || 'declined' || 'failed') $this->refundToWallet($order, $user);
         return $order->refresh();
     }
 
@@ -234,6 +245,8 @@ class OrderService {
             ||
             ($status == 'done' && $order->status == 'processing')
             ||
+            ($status == 'delivered' && $order->status == 'pickedup' && $user->isRider() && $order->delivery_method == 'home')
+            ||
             ($status == 'delivered' && $order->status == 'done' && $user->isVendor() && $order->delivery_method == 'pickup');
 
         return
@@ -246,7 +259,7 @@ class OrderService {
             ($status === 'cancelled' && $this->checkDeliveryTime($order) && $user->isUser() && $this->isCompleted($order->status));
     }
 
-    function isCompleted($status){
+    function isCompleted($status) {
         return in_array($status, ['cancelled', 'declined', 'terminated', 'failed', 'delivered']);
     }
 

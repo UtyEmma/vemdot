@@ -49,8 +49,4 @@ class Order extends Model {
         return $this->belongsTo(User::class, 'bike_id', 'unique_id' );
     }
 
-    public function meals(){
-        return $this->hasMany(Meal::class, 'meals->meal_id', 'unique_id');
-    }
-
 }

@@ -7,8 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
 
-class Review extends Model
-{
+class Review extends Model{
     use HasFactory, SoftDeletes;
 
     protected $fillable = ['unique_id', 'user_id', 'type', 'data_id', 'rate', 'comment', 'status'];

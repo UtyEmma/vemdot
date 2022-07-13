@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Transaction\AdsTransaction;
 use App\Http\Controllers\Transaction\WalletFundTransaction;
 use App\Http\Controllers\Advert\AdvertController;
+use App\Http\Controllers\Orders\OrderController;
 use App\Http\Controllers\Withdrawal\WithdrawalController;
 
 /*
@@ -32,6 +33,11 @@ use App\Http\Controllers\Withdrawal\WithdrawalController;
 |
 */
 Route::get('/', function () { return view('home'); });
+
+Route::get('/order/invoice/{order_id}', [OrderController::class, 'downloadInvoice']);
+Route::get('firebase', function(){
+    return view('firebase-test');
+});
 
 
 Route::get('login', [LoginController::class,'showLoginForm'])->name('login');
@@ -111,8 +117,8 @@ Route::group(['middleware' => 'auth'], function(){
 		Route::get('fundwallet/interface/{start?}/{end?}', [WalletFundTransaction::class, 'fundWalletTransactionInterface']);
 		Route::post('fundwallet/by/date', [WalletFundTransaction::class, 'getTransactionByDate']);
 		Route::post('fundwallet/by/type', [WalletFundTransaction::class, 'getTransactionByType']);
-    });	
-	
+    });
+
 	//transaction management
 	Route::prefix('withdrawal')->group(function(){
 		//ads section
@@ -130,7 +136,7 @@ Route::group(['middleware' => 'auth'], function(){
 			Route::post('interface/by/type', [WithdrawalController::class, 'getWithdrawalalByType']);
 		});
     });
-	
+
 	//transaction management
 	Route::prefix('advert')->group(function(){
 		//advert section

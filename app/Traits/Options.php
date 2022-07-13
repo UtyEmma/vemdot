@@ -29,8 +29,8 @@ trait Options {
     public $orderUserActions = [
         'User' => ['cancelled'],
         'Vendor' => ['declined', 'processing', 'done', 'delivered', 'terminated'],
-        'Logistic' => ['enroute', 'failed', 'delivered'],
-        'Rider' => ['enroute', 'delivered'],
+        'Logistic' => ['enroute', 'pickedup', 'failed', 'delivered'],
+        'Rider' => ['enroute', 'pickedup', 'delivered'],
     ];
 }
 

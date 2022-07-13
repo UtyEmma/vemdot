@@ -13,7 +13,9 @@ use App\Models\Site\SiteSettings;
 use App\Models\User;
 use App\Services\OrderService;
 use App\Traits\PaymentHandler;
+use Carbon\CarbonInterval;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -43,14 +45,18 @@ class OrderController extends Controller {
 
     function create(CreateOrderRequest $request, OrderService $orderService){
         $user = $this->user();
+        $isHomeDelivery = $request->filled("bike_id") && ($request->delivery_method === 'home');
 
-        $rider = User::with(['logistic', 'userRole'])->find($request->bike_id);
+        if($isHomeDelivery){
+            $rider = User::with(['logistic', 'userRole'])->find($request->bike_id);
+            if(!($rider && $rider->isRider())) return $this->returnMessageTemplate(false, "The Selected User is not registered as a Rider");
+        }
 
-        if(!($rider && $rider->isRider())) return $this->returnMessageTemplate(false, "The Selected User is not registered as a Rider");
         if(!User::find($request->vendor_id)->isVendor()) return $this->returnMessageTemplate(false, "The Selected User is not registered as a Vendor");
 
         try {
-            $meals = $orderService->confirmMeals($request->meals); // Confirm the meals and prices
+            // Confirm the meals and prices
+            $meals = $orderService->confirmMeals($request->meals, $request->vendor_id);
         } catch (\Throwable $th) {
             return $this->returnMessageTemplate(false, $th->getMessage());
         }
@@ -61,7 +67,6 @@ class OrderController extends Controller {
 
         // Calculate Delivery fee per Kilometer
         $delivery_fee = $settings->delivery_fee * $request->delivery_distance;
-        // $avg_delivery_time = $request->delivery_distance * $settings->delivery_fee;
         $delivery_time = $meals->max('time');
 
         $reference = $this->createRandomNumber(6);
@@ -79,7 +84,7 @@ class OrderController extends Controller {
             'delivery_fee' => $delivery_fee,
             'avg_time' => $delivery_time,
             'reference' => $reference,
-            'courier_id' => $rider->logistic->unique_id
+            'courier_id' => $isHomeDelivery ? $rider->logistic->unique_id : null
         ])->except('address_id')); // Create the order
 
         $transaction = $orderService->createOrderTransaction($order, $request); // Create Transaction for this Order
@@ -116,7 +121,6 @@ class OrderController extends Controller {
         $order = Order::with(['orderStatus'])->find($order->unique_id);
 
         $orderService->sendOrderUpdateNotification($order);
-        // $orderService->onOrderTermination();
         return $this->returnMessageTemplate(true, "Order Status has been updated successfully", $order);
     }
 
@@ -129,7 +133,10 @@ class OrderController extends Controller {
         });
 
         $query->when($user->isRider(), function($query) use($user){
-            $query->where('courier_id', $user->unique_id);
+            $query->where([
+                'bike_id' => $user->unique_id,
+                'delivery_method' => 'home'
+            ]);
         });
 
         $query->when($user->isVendor(), function($query) use($user) {
@@ -152,7 +159,22 @@ class OrderController extends Controller {
 
     function mealOrders($meal_id){
         $order = Order::whereJsonContains('meals', ['meal_id' => $meal_id]);
-        return response($order->get());
-        return $this->returnMessageTemplate(true, '', $order);
+        return $this->returnMessageTemplate(true, '', $order->get());
+    }
+
+    function downloadInvoice($order_id) {
+        $order = Order::find($order_id);
+        $vendor = User::find($order->vendor_id);
+        $user = User::find($order->user_id);
+        $interval = CarbonInterval::minutes($order->avg_time);
+        $avg_time = CarbonInterval::make($interval)->cascade()->forHumans(['short' => true]);
+
+        return view('emails.order-email', [
+            'vendor' => $vendor,
+            'user' => $user,
+            'order' => $order,
+            'date' => Date::parse($order->created_at)->format('jS, F Y'),
+            'avg_time' => $avg_time
+        ]);
     }
 }

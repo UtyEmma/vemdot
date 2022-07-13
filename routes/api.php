@@ -28,6 +28,8 @@ use App\Http\Controllers\Logistic\LogisticController;
 use App\Http\Controllers\Logistic\RiderController;
 use App\Http\Controllers\Review\ReviewController;
 use App\Http\Controllers\Advert\AdvertController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\TestController;
 use App\Http\Controllers\Withdrawal\WithdrawalController;
 
 /*
@@ -40,6 +42,8 @@ use App\Http\Controllers\Withdrawal\WithdrawalController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Route::post('/test', [TestController::class, 'testPush']);
 
 // log users in
 Route::post('login', [LoginController::class,'loginUser']);
@@ -122,6 +126,8 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
     Route::get('/fetch/bank/details', [WithdrawalController::class,'fetchUserBankDetails']);
     Route::get('/fetch/single/bank/detail/{id?}', [WithdrawalController::class,'fetchSingleBankDetails']);
     Route::post('/initiate/withdrawal', [WithdrawalController::class,'initiateWithdrawal']);
+
+    Route::post('/search', [SearchController::class, 'search']);
 
     Route::prefix('cards')->group(function(){
         Route::get('/', [CardController::class, 'list']);

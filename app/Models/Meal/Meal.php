@@ -6,13 +6,14 @@ use App\Models\Order;
 use App\Models\Restaurant\Restaurant;
 use App\Models\User;
 use App\Models\Meal\Favourite;
+use App\Models\Review\Review;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 class Meal extends Model{
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['unique_id', 'user_id', 'category', 'name', 'thumbnail', 'description', 'price', 'images', 'video', 'price', 'discount', 'tax', 'rating', 'availability', 'promoted', 'avg_time'];
+    protected $fillable = ['unique_id', 'user_id', 'category', 'name', 'thumbnail', 'description', 'price', 'images', 'video', 'price', 'discount', 'tax', 'rating', 'availability', 'promoted', 'avg_time', 'total_orders'];
 
     protected $keyType = 'string';
     protected $primaryKey = 'unique_id';
@@ -40,6 +41,10 @@ class Meal extends Model{
 
     function favourites(){
         return $this->hasMany(Favourite::class, 'meal_id', 'unique_id');
+    }
+
+    function reviews(){
+        return $this->hasMany(Review::class, 'data_id', 'unique_id');
     }
 
 
