@@ -10,7 +10,14 @@ use App\Models\Order;
 use App\Models\Site\SiteSettings;
 use App\Models\User;
 use App\Services\OrderService;
+use App\Traits\PaymentHandler;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\CarbonInterval;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use RealRashid\SweetAlert\Facades\Alert;
 use Carbon\Carbon;
 
@@ -29,23 +36,43 @@ use Carbon\Carbon;
      * permitted_daily_cancellations, order_charges, can_cancel_order, PRICE_PER_KM
      *
      * cancelled | declined | confirmed | inprogress | terminated | enroute | pickup | delivered
+     *
+     *
+     * ///
+     *
+     * Order Reference
+     * Email Address
 */
 
 class OrderController extends Controller {
 
     function create(CreateOrderRequest $request, OrderService $orderService){
         $user = $this->user();
+        $isHomeDelivery = $request->filled("bike_id") && ($request->delivery_method === 'home');
 
-        if(!User::find($request->courier_id)->isLogistic()) return $this->returnMessageTemplate(false, "The Selected Courier is not registered");
-        if(!User::find($request->vendor_id)->isVendor()) return $this->returnMessageTemplate(false, "The Selected Vendor is not registered");
+        if($isHomeDelivery){
+            $rider = User::with(['logistic', 'userRole'])->find($request->bike_id);
+            if(!($rider && $rider->isRider())) return $this->returnMessageTemplate(false, "The Selected User is not registered as a Rider");
+        }
 
-        $meals = $orderService->confirmMeals($request->meals); // Confirm the meals and prices
+        if(!User::find($request->vendor_id)->isVendor()) return $this->returnMessageTemplate(false, "The Selected User is not registered as a Vendor");
+
+        try {
+            // Confirm the meals and prices
+            $meals = $orderService->confirmMeals($request->meals, $request->vendor_id);
+        } catch (\Throwable $th) {
+            return $this->returnMessageTemplate(false, $th->getMessage());
+        }
+
         $address = $request->address_id ? Address::find($request->address_id)->location : $request->receiver_location; // Handle Address
 
         $settings = SiteSettings::first();
 
-        // Calculate Delivery fee per
-        $delivery_fee = $request->delivery_distance ? $settings->delivery_fee * $request->delivery_distance : $request->delivery_fee;
+        // Calculate Delivery fee per Kilometer
+        $delivery_fee = $settings->delivery_fee * $request->delivery_distance;
+        $delivery_time = $meals->max('time');
+
+        $reference = $this->createRandomNumber(6);
 
         $order = Order::create($request->safe()->merge([
             'user_id' => $user->unique_id,
@@ -55,11 +82,16 @@ class OrderController extends Controller {
             'receiver_name' => $request->receiver_name ?? $user->name,
             'receiver_phone' => $request->receiver_phone ?? $user->phone,
             'receiver_location' => $address,
+            'receiver_email' => $request->receiver_email ?? $user->email,
             'amount' => $meals->sum('price'), //Calculate the price by sum
-            'delivery_fee' => $delivery_fee
+            'delivery_fee' => $delivery_fee,
+            'avg_time' => $delivery_time,
+            'reference' => $reference,
+            'courier_id' => $isHomeDelivery ? $rider->logistic->unique_id : null
         ])->except('address_id')); // Create the order
 
         $transaction = $orderService->createOrderTransaction($order, $request); // Create Transaction for this Order
+
         return $orderService->initiatePayment($request, $transaction, $user, $order);
     }
 
@@ -82,7 +114,7 @@ class OrderController extends Controller {
 
         if($notUpdateable)
             return $this->returnMessageTemplate(false,
-                        "Order Update failed because because it is set to ".ucfirst($order->status), ['order' => $order]);
+                    "Order Update failed because because it is set to ".ucfirst($order->status), ['order' => $order]);
 
         $vendorCanUpdateDelivered = (($user->userRole->name === 'Vendor') && ($status === 'delivered') && ($order->delivery_method !== 'pickup'));
 
@@ -92,16 +124,22 @@ class OrderController extends Controller {
         $order = Order::with(['orderStatus'])->find($order->unique_id);
 
         $orderService->sendOrderUpdateNotification($order);
-        // $orderService->onOrderTermination();
         return $this->returnMessageTemplate(true, "Order Status has been updated successfully", $order);
     }
 
-    function list(Request $request, $user_id = null){
+    function list($user_id = null){
         $user = User::find($user_id) ?? $this->user();
         $query = Order::query();
 
         $query->when($user->isLogistic(), function($query) use($user){
             $query->where('courier_id', $user->unique_id);
+        });
+
+        $query->when($user->isRider(), function($query) use($user){
+            $query->where([
+                'bike_id' => $user->unique_id,
+                'delivery_method' => 'home'
+            ]);
         });
 
         $query->when($user->isVendor(), function($query) use($user) {
@@ -120,6 +158,32 @@ class OrderController extends Controller {
     function show($order_id){
         $order = Order::with(['orderStatus', 'vendor', 'courier', 'bike', 'user'])->findorFail($order_id);
         return $this->returnMessageTemplate(true, '', $order);
+    }
+
+    function mealOrders($meal_id){
+        $order = Order::whereJsonContains('meals', ['meal_id' => $meal_id]);
+        return $this->returnMessageTemplate(true, '', $order->get());
+    }
+
+    function downloadInvoice($order_id) {
+        $order = Order::find($order_id);
+        $vendor = User::find($order->vendor_id);
+        $user = User::find($order->user_id);
+        $interval = CarbonInterval::minutes($order->avg_time);
+        $avg_time = CarbonInterval::make($interval)->cascade()->forHumans(['short' => true]);
+
+        $pdf = Pdf::loadView('emails.order-email', [
+            'vendor' => $vendor,
+            'user' => $user,
+            'order' => $order,
+            'date' => Date::parse($order->created_at)->format('jS, F Y'),
+            'avg_time' => $avg_time
+        ]);
+
+        $path = "invoice/$order->reference-invoice.pdf";
+        Storage::put($path, $pdf);
+        return $pdf->download("$order->reference-invoice.pdf");
+
     }
 
     protected function getOnGoingOrder($startDate = null, $endDate = null){
@@ -202,7 +266,7 @@ class OrderController extends Controller {
         Alert::success('Success', $this->returnSuccessMessage('updated', 'Order'));
         return redirect()->back();
     }
-    
+
     protected function deleteOrder(OrderService $orderService, Request $request){
         $response = $orderService->deleteOrder($request->unique_id);
         if(!$response){

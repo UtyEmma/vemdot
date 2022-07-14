@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Meal\Meal;
+use App\Models\Order;
 use App\Models\User;
 use App\Traits\Generics;
 use App\Traits\ReturnTemplate;
@@ -45,8 +46,10 @@ class MealService {
         return $this;
     }
 
-    function byUser($user_id){
-        $this->query = $this->query->where('user_id', $user_id);
+    function byUser($user_id = null){
+        $this->query = $this->query->when($user_id, function($query, $user_id){
+            $query->where('user_id', $user_id);
+        });
         return $this;
     }
 
@@ -57,42 +60,35 @@ class MealService {
         return $this;
     }
 
-    function orderByCategory($category = 'category'){
-        $this->query = $this->query->when(request()->has($category), function($query, $category){
-            $query->whereRelation('category', $category);
+    function filterByCategory($category = "category"){
+        $this->query = $this->query->when(request()->input($category), function($query, $category){
+            $query->where('category', $category);
         });
         return $this;
     }
 
-    function status($keyword = 'status'){
-        $this->query = $this->query->when(request()->has($keyword), function($query, $status){
-            $availability = $status === 'available' ? 'yes' : 'no';
-            $query->where('availability', $availability);
+    function status($availability = "availability"){
+        $this->query = $this->query->when(request()->input($availability), function($query, $status){
+            $query->where('availability', $status);
         });
         return $this;
     }
 
-    function search($keyword = 'search'){
-        $this->query = $this->query->when(request()->has($keyword), function($query, $keyword){
-            $query->where('name', '%like%', $keyword);
+    function search($keyword = "keyword"){
+        $this->query = $this->query->when(request()->input($keyword), function($query, $keyword){
+            $query->where('name', 'LIKE', "%$keyword%");
         });
         return $this;
     }
 
-    function sortByPopularity($keyword = 'sortBy'){
-        $this->query= $this->query->when(request()->has($keyword), function($query, $sort){
-            if($sort === 'popularity'){
-                $query->orderBy(User::where('unique_id', $query->user_id)->count());
+    function orderBy($keyword = 'order'){
+        $this->query = $this->query->when(request()->input($keyword), function($query, $order){
+            if($order === 'rating'){
+                $query->orderBy('rating', 'desc');
             }
-        });
 
-        return $this;
-    }
-
-    function sortByRating($keyword = 'sortBy'){
-        $this->query = $this->query->when(request()->input($keyword), function($query, $sort){
-            if($sort === 'rating'){
-                $query->orderBy('rating');
+            if($order === 'popular'){
+                $query->orderBy('total_orders', 'desc');
             }
         });
         return $this;
@@ -103,54 +99,17 @@ class MealService {
     }
 
     function reviews(){
-        // return $this->query = $query;
+        $this->query->with('reviews')->withCount('reviews');
         return $this;
     }
 
-    function getOrder($condition, $paginate){
-        return Meal::where($condition)->orderBy('id', 'desc')->paginate($paginate);
+    function groupCategory(){
+        $this->query = $this->query->groupBy('category_id');
+        return $this;
+    }
+
+    function mealCategories () {
+        // $this->query = $this->query->groupBy('category');
+        return $this;
     }
 }
-
-// $meals = Meal::query();
-
-// $meals->whereRelation('owner', 'status', $this->active);
-
-// $meals->withCount('orders');
-
-// $meals->when($request->has('category'), function($query, $category){
-//     $query->whereRelation('category', $category);
-// });
-
-// $meals->when($request->has('status'), function($query, $status){
-//     $availability = $status === 'available';
-//     $query->where('availability', $availability);
-// });
-
-// $meals->when($request->has('keyword'), function($query, $keyword){
-//     $query->where('name', '%like%', $keyword);
-// });
-
-// $meals->when($request->has('sortBy'), function($query, $sort){
-//     if($sort === 'rating'){
-//         $query->orderBy($sort);
-//     }
-
-//     if($sort === 'popularity'){
-//         $query->orderBy(User::where('unique_id', $query->user_id)->count());
-//     }
-// });
-
-// $meals->when($request->has('delivery'), function($query, $delivery) use($request){
-//     if($delivery === 'lessThan'){
-//         $query->where('avg_time', '<==', $request->time);
-//     }
-
-//     if($delivery === 'equalTo'){
-//         $query->where('avg_time', '===', $request->time);
-//     }
-
-//     if($delivery === 'greaterThan'){
-//         $query->where('avg_time', '>==', $request->time);
-//     }
-// });

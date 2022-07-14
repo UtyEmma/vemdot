@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Traits\Generics;
 use App\Traits\Options;
 use App\Traits\PaymentHandler;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
@@ -20,18 +21,30 @@ use Illuminate\Support\Facades\Date;
 class OrderService {
     use Generics, PaymentHandler, Options;
 
-    function confirmMeals($items){
+    function confirmMeals($items, $vendor_id){
         $items = collect($items);
-        $meals = $items->map(function($meal){
-            $meal = json_decode($meal);
-            $model = Meal::find($meal->meal_id)->with('vendor')->first();
-            $price = $model->discount ? $this->percentageDiff($model->price, $model->discount) : $model->price;
-            $item['meal_id'] = $model->unique_id;
-            $item['vendor_id'] = $model->vendor->unique_id;
-            $item['price'] = $price * $meal->qty;
-            $item['unit_price'] = $price;
-            $item['qty'] = $meal->qty;
-            return $item;
+        $meals = $items->map(function($meal) use($vendor_id) {
+            if($model = Meal::find($meal['meal_id'])){
+                if($model->availability === $this->yes && $model->user_id === $vendor_id){
+                    $price = $model->discount ? $this->percentageDiff($model->price, $model->discount) : $model->price;
+                    $tax = ($model->price * ($model->tax / 100));
+
+                    $item['meal_id'] = $model->unique_id;
+                    $item['vendor_id'] = $model->vendor->unique_id;
+                    $item['price'] = ($price + $tax) * $meal['qty'];
+                    $item['unit_price'] = ($price + $tax);
+                    $item['qty'] = $meal['qty'];
+                    $item['time'] = $model->avg_time;
+                    $item['name'] = $model->name;
+                    $item['thumbnail'] = $model->thumbnail;
+                    $item['discount'] = $model->discount;
+                    $item['tax'] = $model->tax;
+
+                    return $item;
+                }
+            }
+
+            throw new Exception('Invalid Meal Selected', 400);
         });
 
         return collect($meals);
@@ -40,21 +53,21 @@ class OrderService {
     function createOrderTransaction(Order $order, Request $request){
         return Transaction::create([
             'type' => 'order',
-            'amount' => $order->amount,
+            'amount' => $order->amount + $order->delivery_fee,
             'orderID' => $order->unique_id,
             'save_card' => $request->save_card,
             'status' => ($request->payment_method == 'wallet') ? $this->confirmed : $this->pending,
-            'reference' => $this->createUniqueId('transactions', 'reference'),
+            'reference' => "VM-".$this->createUniqueId('transactions', 'reference'),
             'channel' => $request->payment_method,
             "unique_id" => $this->createUniqueId('transactions'),
-            'description' => "Payment for Order",
+            'description' => "Payment for Meal Ordered on ".env('APP_NAME'),
             'user_id' => $request->user()->unique_id
         ]);
     }
 
     function handleWalletPayment(Order $order, User $user, Transaction $transaction){
-        $wallet_amount = $user->sum('main_balance', 'ref_balance');
-        $amount = $order->amount + $order->delivery_fee;
+        $wallet_amount = $user->main_balance + $user->ref_balance;
+        $amount = $transaction->amount;
         // Check if the wallet (both Main balance and Ref balance) is enough to complete the payment
         if(!$wallet_amount >= $amount) return [false, "Your Wallet balance is insufficent to complete this transaction"];
 
@@ -73,7 +86,7 @@ class OrderService {
 
     function initializePayment(Order $order, User $user, Transaction $transaction){
         return $this->redirectToGateway([
-            "amount" => $order->amount * 100,
+            "amount" => $transaction->amount * 100,
             "reference" => $transaction->reference,
             "email" => $user->email,
             "currency" => "NGN",
@@ -86,7 +99,7 @@ class OrderService {
         if(!$card = Card::find($card_id)) return [false, $this->returnErrorMessage('not_found', 'The Selected')];
 
         $payment = $this->payWithExistingCard([
-            "amount" => $order->amount * 100,
+            "amount" => $transaction->amount * 100,
             "reference" => $transaction->reference,
             "currency" => "NGN",
             "email" => $user->email,
@@ -97,8 +110,7 @@ class OrderService {
 
         $data = $payment['data'];
 
-        if(!($data['status'] === 'success' && $data['gateway_response'] === 'Approved'))
-                    return [false, $this->returnErrorMessage('unknown_error')];
+        if(!($data['status'] === 'success' && $data['gateway_response'] === 'Approved')) return [false, $this->returnErrorMessage('unknown_error')];
 
         return  [true, ''];
     }
@@ -106,13 +118,17 @@ class OrderService {
     function completeOrder(Order $order, Transaction $transaction, User $user){
         $transaction->status = $this->confirmed;
         $transaction->save();
+
+        $notification = new NotificationService();
+
         $order->status = $this->paid;
+        $order->transaction_id = $transaction->unique_id;
         $order->save();
 
         $settings = SiteSettings::first();
 
         $admin = User::admin();
-        $admin->main_balance += $order->amount;
+        $admin->main_balance = $admin->main_balance + $order->amount;
         $admin->save();
 
         $vendor = $order->vendor;
@@ -121,16 +137,25 @@ class OrderService {
 
         $logistics = $order->courier;
         $logistics->pending_balance += $this->percentageDiff($order->delivery_fee, $settings->logistics_service_charge);
+        $logistics->save();
+
+        $order->bike;
+
+        $notification->subject("Your Order has been created. Here's your Receipt!")
+                        ->text("Your order with reference <strong>$order->reference</strong> has been created successfully!")
+                        ->text("Please click the button below to download the receipt for your order!")
+                        ->action("Download Receipt", route('order.invoice', ['reference' => $order->reference]))
+                        ->text('<small>Please Note that you will be required to present this receipt to the Courier if your delivery method is Home Delivery.</small>')
+                        ->text("<small>If you are picking up your order yourself, please show this receipt to the Vendor to confirm your order!</small>")
+                        ->send($user, ['mail']);
 
         return $this->returnMessageTemplate(true, "You Order has been Created", ['order' => $order]);
     }
 
     function sendOrderUpdateNotification(Order $order){
-
-    }
-
-    function onOrderTermination(){
-
+        $push = new PushNotificationService();
+        $user = $order->user;
+        $push->send($order, $user);
     }
 
     function handleStatusUpdate(Order $order, User $user, $status){
@@ -144,7 +169,19 @@ class OrderService {
             'status' => $order->status
         ]);
 
-        if($status === 'cancelled' || 'terminated' || 'declined') $this->refundToWallet($order, $user);
+        $progress = $this->orderProgression;
+
+        if($status === array_pop($progress)){
+            $meals = $order->meals;
+
+            foreach($meals as $meal){
+                $meal = Meal::find($meal['meal_id']);
+                $meal->total_orders = $meal->total_orders + 1;
+                $meal->save();
+            }
+        }
+
+        if($status === 'cancelled' || 'terminated' || 'declined' || 'failed') $this->refundToWallet($order, $user);
         return $order->refresh();
     }
 
@@ -214,9 +251,34 @@ class OrderService {
         $orderStatusPos = array_search($order->status, $progression);
         $isNextStatus = $orderStatusPos + 1 === $statusPos;
 
-        if(!$isNextStatus) $isNextStatus =  ($status === 'processing' || $status === 'declined' && $order->status === 'paid') || ($status == 'done' && $order->status == 'processing') || ($status == 'delivered' && $order->status == 'done' && $user->isVendor() && $order->delivery_method == 'pickup');
+        if(!$isNextStatus) $isNextStatus =  (
+            $status === 'processing' || $status === 'declined' && $order->status === 'paid')
+            ||
+            ($status == 'done' && $order->status == 'processing')
+            ||
+            ($status == 'delivered' && $order->status == 'pickedup' && $user->isRider() && $order->delivery_method == 'home')
+            ||
+            ($status == 'delivered' && $order->status == 'done' && $user->isVendor() && $order->delivery_method == 'pickup');
 
-        return ($statusPos <= $orderStatusPos) || in_array($order->status, ['cancelled', 'declined', 'terminated', 'failed']) || !$isNextStatus;
+        return
+            ($statusPos <= $orderStatusPos)
+            ||
+            $this->isCompleted($order->status)
+            ||
+            !$isNextStatus
+            ||
+            ($status === 'cancelled' && $this->checkDeliveryTime($order) && $user->isUser() && $this->isCompleted($order->status));
+    }
+
+    function isCompleted($status) {
+        return in_array($status, ['cancelled', 'declined', 'terminated', 'failed', 'delivered']);
+    }
+
+    function checkDeliveryTime(Order $order){
+        // Check if the current time has exceeded the set time
+        // It starts counting after the Vendor has accepted the order
+        $orderStatus = $order->orderStatus()->where('status', 'processing')->first();
+        return Date::parse($orderStatus->created_at)->addMinutes($order->avg_time)->greaterThan(now());
     }
 
     function initiatePayment (Request $request, Transaction $transaction, User $user, Order $order){

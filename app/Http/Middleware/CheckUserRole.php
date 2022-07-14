@@ -20,9 +20,10 @@ class CheckUserRole{
     public function handle(Request $request, Closure $next, $role){
         $user = $request->user();
         $accountRole = AccountRole::find($user->role);
+        // dd($accountRole);
 
         if($accountRole->name === $role) return $next($request);
 
-        abort(401, "You are not authorized to make this request");
+        return $this->returnMessageTemplate(false, "You are not authorized to make this request");
     }
 }

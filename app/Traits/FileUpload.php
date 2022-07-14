@@ -49,5 +49,12 @@ trait FileUpload {
         return $file_hold;
     }
 
+    function uploadFile($file, $folder = 'files'){
+        $file = Cloudinary::uploadFile($file->getRealPath(), [
+            'folder' => "vemdot/$folder"
+        ])->getSecurePath();
+        return $file;
+    }
+
 
 }

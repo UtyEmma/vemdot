@@ -26,13 +26,13 @@ trait Options {
     public $unread = 'unread';
     public $read = 'read';
 
-    public $orderProgression = ['paid', 'cancelled', 'declined', 'processing', 'terminated', 'done', 'enroute', 'pickedup', 'failed', 'delivered'];
+    public $orderProgression = ['paid', 'cancelled', 'declined', 'processing', 'terminated', 'done', 'enroute', 'pickedup', 'returned', 'delivered'];
 
     public $orderUserActions = [
         'User' => ['cancelled'],
-        'Vendor' => ['declined', 'processing', 'done', 'delivered', 'terminated'],
-        'Logistic' => ['enroute', 'failed', 'delivered'],
-        'Rider' => ['enroute', 'delivered'],
+        'Vendor' => ['declined', 'processing', 'done', 'delivered', 'returned', 'terminated'],
+        'Logistic' => ['enroute', 'pickedup', 'failed', 'delivered'],
+        'Rider' => ['enroute', 'pickedup', 'delivered'],
     ];
 }
 

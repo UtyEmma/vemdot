@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\Users;
 
+use App\Models\User;
 use App\Traits\ReturnTemplate;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -29,18 +30,22 @@ class UpdateUserRequest extends FormRequest{
      * @return array
      */
     public function rules(){
+        $user = User::find($this->user()->unique_id);
         return [
-            'avatar' => 'nullable|image|max:2000000',
+            'avatar' => 'nullable|string|url',
             'name' => 'required|string',
             'phone' => 'required|string',
-            'id_number' => [Rule::requiredIf(in_array($this->role, ['vendor', 'logistics'])), 'string'],
-            'id_image' => [Rule::requiredIf(in_array($this->role, ['vendor', 'logistics'])), 'image', 'max:2000000'],
-            'logo' => 'nullable|image|max:2000000',
-            'business_name' => [Rule::requiredIf(in_array($this->role, ['vendor', 'logistics'])), 'string'],
-            'city' => [Rule::requiredIf(in_array($this->role, ['vendor', 'logistics'])), 'string'],
-            'state' => [Rule::requiredIf(in_array($this->role, ['vendor', 'logistics'])), 'string'],
-            'address' => [Rule::requiredIf(in_array($this->role, ['vendor', 'logistics'])), 'string'],
-            'avg_time' => [Rule::requiredIf(in_array($this->role, ['vendor', 'logistics'])), 'string'],
+            'email' => ['required', 'email', Rule::unique('users')->ignore($user->unique_id, 'unique_id')],
+            'id_number' => [Rule::requiredIf($user->isLogistic() || $user->isVendor()), 'string'],
+            'id_image' => [Rule::requiredIf($user->isLogistic() || $user->isVendor()), 'url'],
+            'logo' => 'nullable|string|url',
+            'business_name' => [Rule::requiredIf($user->isLogistic() || $user->isVendor()), 'string'],
+            'city' => [Rule::requiredIf($user->isLogistic() || $user->isVendor()), 'string'],
+            'state' => [Rule::requiredIf($user->isLogistic() || $user->isVendor()), 'string'],
+            'address' => [Rule::requiredIf($user->isLogistic() || $user->isVendor()), 'string'],
+            'avg_time' => [Rule::requiredIf($user->isLogistic() || $user->isVendor()), 'string'],
+            'password' => 'nullable|confirmed',
+            'old_password' => 'required_with:password'
         ];
     }
 }

@@ -182,6 +182,10 @@ class User extends Authenticatable{
     function isUser(){
         return $this->where('unique_id', $this->unique_id)->with('userRole')->whereRelation('userRole', 'name', 'User')->exists();
     }
+
+    function isRider(){
+        return $this->where('unique_id', $this->unique_id)->with('userRole')->whereRelation('userRole', 'name', 'Rider')->exists();
+    }
     function logistic(){
         return $this->belongsTo(User::class, 'business_name', 'unique_id');
     }

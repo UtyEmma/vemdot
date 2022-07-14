@@ -19,8 +19,9 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Transaction\AdsTransaction;
 use App\Http\Controllers\Transaction\WalletFundTransaction;
 use App\Http\Controllers\Advert\AdvertController;
-use App\Http\Controllers\Withdrawal\WithdrawalController;
 use App\Http\Controllers\Orders\OrderController;
+use App\Http\Controllers\TestController;
+use App\Http\Controllers\Withdrawal\WithdrawalController;
 use App\Http\Controllers\Meals\AdminMealController;
 use App\Http\Controllers\Ticket\TicketController;
 
@@ -36,6 +37,9 @@ use App\Http\Controllers\Ticket\TicketController;
 */
 Route::get('/', function () { return view('home'); });
 
+Route::get('/order/invoice/{reference}', [OrderController::class, 'downloadInvoice'])->name('order.invoice');
+
+// Route::get('receipt/{order_id}', [TestController::class, 'testOrderReceipt'])->name("download.invoice");
 
 Route::get('login', [LoginController::class,'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class,'login']);
@@ -114,8 +118,8 @@ Route::group(['middleware' => 'auth'], function(){
 		Route::get('fundwallet/interface/{start?}/{end?}', [WalletFundTransaction::class, 'fundWalletTransactionInterface']);
 		Route::post('fundwallet/by/date', [WalletFundTransaction::class, 'getTransactionByDate']);
 		Route::post('fundwallet/by/type', [WalletFundTransaction::class, 'getTransactionByType']);
-    });	
-	
+    });
+
 	//transaction management
 	Route::prefix('withdrawal')->group(function(){
 		//ads section
@@ -134,7 +138,7 @@ Route::group(['middleware' => 'auth'], function(){
 			Route::post('interface/by/type', [WithdrawalController::class, 'getWithdrawalalByType']);
 		});
     });
-	
+
 	//transaction management
 	Route::prefix('advert')->group(function(){
 		//advert section
@@ -158,7 +162,7 @@ Route::group(['middleware' => 'auth'], function(){
         	Route::post('interface/by/type', [OrderController::class, 'getOrderByType']);
 		});
     });
-	
+
 	Route::prefix('meals')->group(function(){
 		//advert section
         Route::get('interface/{start?}/{end?}', [AdminMealController::class, 'getAvaliableMeals']);
@@ -170,8 +174,8 @@ Route::group(['middleware' => 'auth'], function(){
 			Route::post('interface/by/date', [AdminMealController::class, 'getMealsByDate']);
         	Route::post('interface/by/type', [AdminMealController::class, 'getMealsByCategory']);
 		});
-    });	
-	
+    });
+
 	Route::prefix('tickets')->group(function(){
 		//advert section
         Route::get('interface/{start?}/{end?}', [TicketController::class, 'getTickets']);

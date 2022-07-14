@@ -31,25 +31,28 @@ class CreateOrderRequest extends FormRequest{
      */
     public function rules() {
         return [
-            'courier_id' => 'required|string|exists:users,unique_id',
+            'bike_id' => 'required_unless:delivery_method,pickup|string|exists:users,unique_id',
             'vendor_id' => 'required|string|exists:users,unique_id',
-            'address_id' => ['string', Rule::exists('addresses', 'unique_id')->where('user_id', $this->user()->unique_id)],
+            'address_id' => [
+                'required_without_all:receiver_name,receiver_phone,receiver_location,receiver_email',
+                'string',
+                "nullable",
+                Rule::exists('addresses', 'unique_id')],
             'instructions' => 'nullable|string',
             'receiver_id' => [
                                 'nullable',
                                 Rule::exists('users', 'unique_id'),
                                 Rule::requiredIf(fn () => $this->isNotFilled('address_id') &&  $this->isNotFilled('receiver_name'))
                             ],
-            'delivery_fee' => ['numeric', Rule::requiredIf(fn () => $this->isNotFilled('delivery_distance'))],
             'delivery_distance' => ['numeric',
-                                    'required',
-                                    // Rule::requiredIf(fn () => $this->isNotFilled('delivery_fee'))
+                                    'required'
                                 ],
             'delivery_method' => 'required|in:home,pickup',
             'receiver_name' => [Rule::requiredIf(fn () => $this->isNotFilled('address_id'))],
             'receiver_phone' => [Rule::requiredIf(fn () => $this->isNotFilled('address_id'))],
             'receiver_location' => [Rule::requiredIf(fn () => $this->isNotFilled('address_id'))],
-            'meals' => 'required',
+            'receiver_email' => [Rule::requiredIf(fn () => $this->isNotFilled('address_id')), "email"],
+            'meals' => 'required|array',
             'payment_method' => 'required|in:wallet,card',
             'card_id' => ["nullable", Rule::exists('cards', 'unique_id')->where('user_id', $this->user()->unique_id)]
         ];
@@ -61,9 +64,10 @@ class CreateOrderRequest extends FormRequest{
             'address_id' => "Address",
             'receiver_id' => "Receiver",
             'delivery_method' => "Delivery Method",
-            "delivery_fee" => "Delivery Fee",
             "delivery_distance" => "Delivery Distance",
-            "reciever_name" => "Receiver Name"
+            "reciever_name" => "Receiver Name",
+            'bike_id' => "Rider",
+            'vendor_id' => "Vendor",
         ];
     }
 }
