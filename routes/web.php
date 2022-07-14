@@ -35,17 +35,9 @@ use App\Http\Controllers\Withdrawal\WithdrawalController;
 */
 Route::get('/', function () { return view('home'); });
 
-Route::get('/order/invoice/{order_id}', [OrderController::class, 'downloadInvoice'])->name('order.invoice');
+Route::get('/order/invoice/{reference}', [OrderController::class, 'downloadInvoice'])->name('order.invoice');
 
-Route::get('/show', function(){
-    return view('firebase-test');
-});
-
-Route::get('firebase', function(){
-    return view('firebase-test');
-});
-
-Route::get('receipt/{order_id}', [TestController::class, 'testOrderReceipt']);
+// Route::get('receipt/{order_id}', [TestController::class, 'testOrderReceipt'])->name("download.invoice");
 
 Route::get('login', [LoginController::class,'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class,'login']);

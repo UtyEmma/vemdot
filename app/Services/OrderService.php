@@ -74,8 +74,7 @@ class OrderService {
         // Charge the Referal Balance first, if it is not enough, then charge the Ref Balance
         if($user->ref_balance >= $amount){
             $user->ref_balance -= $wallet_amount;
-        }else{
-            // If the Ref balance is not enough, set the ref_balance to 0 and change the difference to the main balance
+        }else{ // If the Ref balance is not enough, set the ref_balance to 0 and change the difference to the main balance
             $bal = $wallet_amount - $user->ref_balance;
             $user->ref_balance = 0;
             $user->main_balance -= $bal;
@@ -111,8 +110,7 @@ class OrderService {
 
         $data = $payment['data'];
 
-        if(!($data['status'] === 'success' && $data['gateway_response'] === 'Approved'))
-                    return [false, $this->returnErrorMessage('unknown_error')];
+        if(!($data['status'] === 'success' && $data['gateway_response'] === 'Approved')) return [false, $this->returnErrorMessage('unknown_error')];
 
         return  [true, ''];
     }
@@ -120,6 +118,8 @@ class OrderService {
     function completeOrder(Order $order, Transaction $transaction, User $user){
         $transaction->status = $this->confirmed;
         $transaction->save();
+
+        $notification = new NotificationService();
 
         $order->status = $this->paid;
         $order->transaction_id = $transaction->unique_id;
@@ -140,6 +140,14 @@ class OrderService {
         $logistics->save();
 
         $order->bike;
+
+        $notification->subject("Your Order has been created. Here's your Receipt!")
+                        ->text("Your order with reference <strong>$order->reference</strong> has been created successfully!")
+                        ->text("Please click the button below to download the receipt for your order!")
+                        ->action("Download Receipt", route('order.invoice', ['reference' => $order->reference]))
+                        ->text('<small>Please Note that you will be required to present this receipt to the Courier if your delivery method is Home Delivery.</small>')
+                        ->text("<small>If you are picking up your order yourself, please show this receipt to the Vendor to confirm your order!</small>")
+                        ->send($user, ['mail']);
 
         return $this->returnMessageTemplate(true, "You Order has been Created", ['order' => $order]);
     }
