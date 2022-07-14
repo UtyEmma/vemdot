@@ -23,7 +23,7 @@ class OrderService {
 
     function confirmMeals($items, $vendor_id){
         $items = collect($items);
-        $meals = $items->map(function($meal) use($vendor_id){
+        $meals = $items->map(function($meal) use($vendor_id) {
             if($model = Meal::find($meal['meal_id'])){
                 if($model->availability === $this->yes && $model->user_id === $vendor_id){
                     $price = $model->discount ? $this->percentageDiff($model->price, $model->discount) : $model->price;
@@ -144,7 +144,9 @@ class OrderService {
     }
 
     function sendOrderUpdateNotification(Order $order){
-
+        $push = new PushNotificationService();
+        $user = $order->user;
+        $push->send($order, $user);
     }
 
     function handleStatusUpdate(Order $order, User $user, $status){

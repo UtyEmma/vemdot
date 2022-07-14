@@ -15,7 +15,6 @@
     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.9.0/firebase-analytics.js";
         import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/9.9.0/firebase-messaging.js";
 
         // TODO: Add SDKs for Firebase products that you want to use
@@ -34,37 +33,32 @@
         };
 
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        // const analytics = getAnalytics(app);
-        // Initialize Firebase Cloud Messaging and get a reference to the service
-        const messaging = getMessaging(app);
-        const response = await getToken(messaging, { vapidKey: "BAvMnSSbXOTZTWxQ8Ui_Kvd8hksl0W_YNDWOFlXCaY0-8xGj3W1Lz2Ufj6X1yiulJsrQwuIQDfEl643yMmWyvrc" })
-        // .then((currentToken) => {
-        //     if (currentToken) {
-        //         // Send the token to your server and update the UI if necessary
-        //         // ...
-        //     } else {
-        //         // Show permission request UI
-        //         console.log('No registration token available. Request permission to generate one.');
-        //         // ...
-        //     }
-        // }).catch((err) => {
-        //     console.log(err);
+        const app = await initializeApp(firebaseConfig);
+        const messaging = await getMessaging();
+
+        // await messaging.onMessage((payload) => {
+        //     console.log('Message received. ', payload);
+        //     // Update the UI to include the received message.
+        //     // appendMessage(payload);
         // });
+
+        const response = await getToken(messaging, { vapidKey: "BAvMnSSbXOTZTWxQ8Ui_Kvd8hksl0W_YNDWOFlXCaY0-8xGj3W1Lz2Ufj6X1yiulJsrQwuIQDfEl643yMmWyvrc" }).then((currentToken) => {
+            console.log(currentToken)
+        })
 
         console.log(response)
 
-        async function requestPermission() {
-            console.log('Requesting permission...');
+        // async function requestPermission() {
+            // console.log('Requesting permission...');
 
-            Notification.requestPermission().then((permission) => {
-                if (permission === 'granted') {
-                    const item = response()
-                    console.log(item)
-                    console.log('Notification permission granted.');
-                }
-            })
-        }
+            // Notification.requestPermission().then((permission) => {
+            //     if (permission === 'granted') {
+            //         const item = response()
+            //         console.log(item)
+            //         console.log('Notification permission granted.');
+            //     }
+            // })
+        // }
 
 
       </script>

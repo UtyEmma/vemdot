@@ -6,18 +6,23 @@ use Illuminate\Support\Facades\Http;
 
 class PushNotificationService {
 
-    function send (){
+    function send ($order, $user){
+        $url = "https://fcm.googleapis.com/v1/projects/new-project/messages:send";
+        $token = $user->device_id;
+
         $notification = [
-            "registration_ids" => "",
-            "notification" => [
-                "title" => "Affdghj",
-                "body" => "Adv bh bjhb ygih uuho oijij i oijo",
+            "message" => [
+                "token" => $token,
+                "notification" => [
+                    "body" => "This is the Notification",
+                    "title" => "This is the message from the Notificiation"
+                ]
             ]
         ];
 
-        $url = env('FIREBASE_URL');
         $response = Http::withHeaders([
-            "Authorization" => "key=".env("FIREBASE_KEY")
+            "Content-Type" => "application/json",
+            "Authorization" => "Bearer ".env("FIREBASE_KEY")
         ])->post($url, $notification);
 
         return $response;

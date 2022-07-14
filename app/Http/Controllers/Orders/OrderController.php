@@ -13,10 +13,13 @@ use App\Models\Site\SiteSettings;
 use App\Models\User;
 use App\Services\OrderService;
 use App\Traits\PaymentHandler;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\CarbonInterval;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 /**
      * ORDER PROCESS
@@ -169,12 +172,16 @@ class OrderController extends Controller {
         $interval = CarbonInterval::minutes($order->avg_time);
         $avg_time = CarbonInterval::make($interval)->cascade()->forHumans(['short' => true]);
 
-        return view('emails.order-email', [
+        $pdf = Pdf::loadView('emails.order-email', [
             'vendor' => $vendor,
             'user' => $user,
             'order' => $order,
             'date' => Date::parse($order->created_at)->format('jS, F Y'),
             'avg_time' => $avg_time
         ]);
+
+        $path = "invoice/$order->reference-invoice.pdf";
+        Storage::put($path, $pdf);
+        return $pdf->download("$order->reference-invoice.pdf");
     }
 }

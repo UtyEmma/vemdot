@@ -20,6 +20,7 @@ use App\Http\Controllers\Transaction\AdsTransaction;
 use App\Http\Controllers\Transaction\WalletFundTransaction;
 use App\Http\Controllers\Advert\AdvertController;
 use App\Http\Controllers\Orders\OrderController;
+use App\Http\Controllers\TestController;
 use App\Http\Controllers\Withdrawal\WithdrawalController;
 
 /*
@@ -34,11 +35,17 @@ use App\Http\Controllers\Withdrawal\WithdrawalController;
 */
 Route::get('/', function () { return view('home'); });
 
-Route::get('/order/invoice/{order_id}', [OrderController::class, 'downloadInvoice']);
+Route::get('/order/invoice/{order_id}', [OrderController::class, 'downloadInvoice'])->name('order.invoice');
+
+Route::get('/show', function(){
+    return view('firebase-test');
+});
+
 Route::get('firebase', function(){
     return view('firebase-test');
 });
 
+Route::get('receipt/{order_id}', [TestController::class, 'testOrderReceipt']);
 
 Route::get('login', [LoginController::class,'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class,'login']);
