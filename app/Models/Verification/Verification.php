@@ -47,7 +47,7 @@ class Verification extends Model
 
         //call the function that creates the confirmation code
         $dataToSave = $this->returnObject([
-            'unique_id' => $this->createUniqueId('verifications', 'unique_id'),
+            'unique_id' => $this->createUniqueId('verifications'),
             'user_id' => $user->unique_id,
             'token' => $token,
             'type' => $type,
@@ -71,36 +71,33 @@ class Verification extends Model
     }
 
     //verify token
-    function verifyTokenValidity($token, string $token_type, $user) : array {
-        try{
-            //validate the token from the verification table
-            $tokenDetails = $this->getSingleVerification([
-                ["user_id", $user->unique_id],
-                ["token", $token],
-                ["type", $token_type],
-            ]);
+    function verifyTokenValidity($token, $token_type, $user) {
+        //validate the token from the verification table
+        $tokenDetails = $this->getSingleVerification([
+            ["user_id", $user->unique_id],
+            ["token", $token],
+            ["type", $token_type],
+            ["status", "un-used"],
+        ]);
 
-            //send the error message to the view
-            if($tokenDetails === null){
-                return $this->returnMessageTemplate(false, $this->returnErrorMessage('invalid_token'));
-            }
-
-            //add fifty minutes to the time for the code that was created
-            $currentTime = Carbon::now()->toDateTimeString();
-            $expirationTime = Carbon::parse($tokenDetails->created_at)->addMinutes(50)->toDateTimeString();
-            //compare the dates
-            if ($currentTime > $expirationTime) {
-                return $this->returnMessageTemplate(false, $this->returnErrorMessage('expired_token'));
-            }
-
-            //mark token as used token
-            $tokenDetails->status = "used";
-            $tokenDetails->save();
-            //return the true status to the front end
-            return $this->returnMessageTemplate(true, $this->returnSuccessMessage('valid_token'));
-        }catch(\Exception $e){
-            return $this->returnMessageTemplate(false, $e->getMessage());
+        //send the error message to the view
+        if($tokenDetails == null){
+            return ['status' => false, 'message'=>$this->returnErrorMessage('invalid_token')];
         }
+
+        //add fifty minutes to the time for the code that was created
+        $currentTime = Carbon::now()->toDateTimeString();
+        $expirationTime = Carbon::parse($tokenDetails->created_at)->addMinutes(50)->toDateTimeString();
+        //compare the dates
+        if ($currentTime > $expirationTime) {
+            return ['status' => false, 'message'=>$this->returnErrorMessage('expired_token')];
+        }
+
+        //mark token as used token
+        $tokenDetails->status = "used";
+        $tokenDetails->save();
+        //return the true status to the front end
+        return ['status' => true, 'message'=>$this->returnSuccessMessage('account_verified')];
     }
 
     //send the email to the user involved

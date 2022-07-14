@@ -25,7 +25,7 @@ class User extends Authenticatable{
     protected $keyType = 'string';
 
     protected $fillable = [
-        'unique_id', 'name', 'email', 'referral_id', 'referred_id', 'role',
+        'unique_id', 'name', 'email', 'referral_id', 'referred_id', 'role','email_verified_at','two_factor',
         'status',
         'country',
         'phone',

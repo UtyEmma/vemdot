@@ -82,7 +82,7 @@ class AccountActivationController extends Controller
 
         //verify the token
         $verificationCode = $this->verification->verifyTokenValidity($data['code'], 'account-activation', $user);
-        if($verificationCode['status'] == 'error'){
+        if($verificationCode['status'] == false){
             return $this->returnMessageTemplate(false, $verificationCode['message']);
         }
 
@@ -91,13 +91,13 @@ class AccountActivationController extends Controller
             'two_factor' => 'yes',
             'status' => $this->confirmed,
         ]);
-
+       
         if($appSettings->welcome_message != 'no'){
             //send welcome message to newly registerd user
             $this->verification->sendWelcomeMail($user, $appSettings);
         }
 
         $payload = ['user' => $user];
-        return $this->returnMessageTemplate(true, $this->returnSuccessMessage('account_verified'), $payload);
+        return $this->returnMessageTemplate(true, $verificationCode['message'], $payload);
     }
 }
