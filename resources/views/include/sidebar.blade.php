@@ -159,7 +159,7 @@
                     <a href="#" data-toggle="modal" data-target="#logoutUser"><i class="ik ik-power"></i><span>{{ __('Logout')}}</span> </a>
                 </div>
 
-                <div class="nav-lavel">{{ __('Not Using')}} </div>
+                {{-- <div class="nav-lavel">{{ __('Not Using')}} </div>
                 <div class="nav-item {{ ($segment1 == 'permission-example') ? 'active' : '' }}">
                     <a href="{{url('permission-example')}}"><i class="ik ik-unlock"></i><span>{{ __('Laravel Permission')}}</span> </a>
                 </div>
@@ -278,7 +278,7 @@
                 </div>
                 <div class="nav-item">
                     <a href="javascript:void(0)" class="disabled"><i class="ik ik-slash"></i><span>{{ __('Disabled Menu')}}</span></a>
-                </div>
+                </div> --}}
 
         </div>
     </div>
