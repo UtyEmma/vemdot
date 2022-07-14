@@ -23,6 +23,8 @@ trait Options {
     public $yes = 'yes';
     public $no = 'no';
     public $paid = 'paid';
+    public $unread = 'unread';
+    public $read = 'read';
 
     public $orderProgression = ['paid', 'cancelled', 'declined', 'processing', 'terminated', 'done', 'enroute', 'pickedup', 'returned', 'delivered'];
 

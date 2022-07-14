@@ -22,6 +22,9 @@ use App\Http\Controllers\Advert\AdvertController;
 use App\Http\Controllers\Orders\OrderController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\Withdrawal\WithdrawalController;
+use App\Http\Controllers\Orders\OrderController;
+use App\Http\Controllers\Meals\AdminMealController;
+use App\Http\Controllers\Ticket\TicketController;
 
 /*
 |--------------------------------------------------------------------------
@@ -123,6 +126,7 @@ Route::group(['middleware' => 'auth'], function(){
 		//ads section
         Route::get('interface/{start?}/{end?}', [WithdrawalController::class, 'withdrawalRequestInterface']);
         Route::post('payout', [WithdrawalController::class, 'withdrawalPayout']);
+        Route::post('confirm', [WithdrawalController::class, 'confirmWithdrawal']);
         Route::get('otp/interface/{code?}/{id?}', [WithdrawalController::class, 'processOTPInterface']);
         Route::post('process-otp', [WithdrawalController::class, 'processOTP']);
         Route::post('delete', [WithdrawalController::class, 'deleteWithdrawal']);
@@ -144,6 +148,43 @@ Route::group(['middleware' => 'auth'], function(){
         Route::get('fetch', [AdvertController::class, 'fetchAdvertInterface']);
         Route::post('update/status', [AdvertController::class, 'updateAdvertStatus']);
         Route::post('delete', [AdvertController::class, 'deleteAdvert']);
+    });
+	//transaction management
+	Route::prefix('orders')->group(function(){
+		//advert section
+        Route::get('interface/{start?}/{end?}', [OrderController::class, 'getOnGoingOrder']);
+        Route::post('interface/by/date', [OrderController::class, 'getOngoingOrderByDate']);
+        Route::post('interface/by/type', [OrderController::class, 'getOngoingOrderByType']);
+        Route::post('delete', [OrderController::class, 'deleteOrder']);
+        Route::post('terminate', [OrderController::class, 'terminateOrder']);
+		Route::prefix('history')->group(function(){
+			Route::get('interface/{start?}/{end?}', [OrderController::class, 'getOnFinishedOrder']);
+			Route::post('interface/by/date', [OrderController::class, 'getOrderByDate']);
+        	Route::post('interface/by/type', [OrderController::class, 'getOrderByType']);
+		});
+    });
+	
+	Route::prefix('meals')->group(function(){
+		//advert section
+        Route::get('interface/{start?}/{end?}', [AdminMealController::class, 'getAvaliableMeals']);
+        Route::post('interface/by/date', [AdminMealController::class, 'getMealByDate']);
+        Route::post('interface/by/type', [AdminMealController::class, 'getByCategory']);
+        Route::post('delete', [AdminMealController::class, 'deleteMeal']);
+		Route::prefix('history')->group(function(){
+			Route::get('interface/{start?}/{end?}', [AdminMealController::class, 'getPromotedMeals']);
+			Route::post('interface/by/date', [AdminMealController::class, 'getMealsByDate']);
+        	Route::post('interface/by/type', [AdminMealController::class, 'getMealsByCategory']);
+		});
+    });	
+	
+	Route::prefix('tickets')->group(function(){
+		//advert section
+        Route::get('interface/{start?}/{end?}', [TicketController::class, 'getTickets']);
+        Route::post('interface/by/date', [TicketController::class, 'getTicketByDate']);
+        Route::post('interface/by/type', [TicketController::class, 'getTicketByType']);
+        Route::get('mark-read/{uniqueId?}', [TicketController::class, 'markAsRead']);
+        Route::get('reply-ticket/{uniqueId?}', [TicketController::class, 'replyTicketInterface']);
+        Route::post('reply', [TicketController::class, 'replyTicket']);
     });
 
     Route::prefix('users')->group(function(){

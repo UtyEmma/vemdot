@@ -17,10 +17,9 @@ class Withdrawal {
     }
 
     public function getWithdrawal($condition, $paginate){
-        $walletWithdraw = WalletWithdrawal::where($condition)
+        return WalletWithdrawal::where($condition)
             ->orderBy('id', 'desc')
-            ->paginate($paginate); 
-        return $walletWithdraw;    
+            ->paginate($paginate);    
     }
 
     function getSigleWithdrawal($uniqueID){

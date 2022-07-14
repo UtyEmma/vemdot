@@ -295,4 +295,28 @@ class OrderService {
 
         return $this->returnMessageTemplate(false, $response[1]);
     }
+
+    function getAllOrders($condition, $paginate){
+        return Order::where($condition)
+            ->orderBy('id', 'desc')
+            ->paginate($paginate);
+    }
+
+    function getSingleOrder($uniqueID){
+        return Order::where('unique_id', $uniqueID)->first();
+    }
+
+    public function updateOrderStatus($uniqueID, $status){
+        $order = $this->getSingleOrder($uniqueID);
+        if(!$order)
+            return false;
+        return $order->update(['status' => $status]);  
+    }
+
+    public function deleteOrder($uniqueID){
+        $order = $this->getSingleOrder($uniqueID);
+        if(!$order)
+            return false;
+        return $order->delete();  
+    }
 }

@@ -6,9 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Order\CreateOrderRequest;
 use App\Http\Requests\Api\Order\OrderStatusRequest;
 use App\Models\Address\Address;
-use App\Models\Card;
 use App\Models\Order;
-use App\Models\OrderStatus;
 use App\Models\Site\SiteSettings;
 use App\Models\User;
 use App\Services\OrderService;
@@ -20,6 +18,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use RealRashid\SweetAlert\Facades\Alert;
+use Carbon\Carbon;
 
 /**
      * ORDER PROCESS
@@ -183,5 +183,97 @@ class OrderController extends Controller {
         $path = "invoice/$order->reference-invoice.pdf";
         Storage::put($path, $pdf);
         return $pdf->download("$order->reference-invoice.pdf");
+
+    }
+
+    protected function getOnGoingOrder($startDate = null, $endDate = null){
+        $options = ['cancelled', 'declined', 'terminated', 'failed', 'delivered'];
+        $order = Order::whereNotIn('status', $options)
+            ->orderBy('id', 'desc')
+            ->paginate($this->paginate);
+
+        //if the start date and end date are not null add the
+        if($startDate !== null && $endDate !== null){
+            $order = Order::whereNotIn('status', $options)
+                ->where('created_at', '>=', $startDate)
+                ->where('created_at', '<', $endDate)
+                ->orderBy('id', 'desc')
+                ->paginate($this->paginate);
+        }
+        if($startDate != null){
+            $order = Order::where('status', $startDate)
+                ->orderBy('id', 'desc')
+                ->paginate($this->paginate);
+        }
+        //return $order;
+        $payload = [
+            'orders' => $order,
+        ];
+        return view('pages.order.ongoing-order', $payload);
+    }
+    protected function getOngoingOrderByDate(Request $request){
+        $startDate = Carbon::parse($request->start_date)->toDateString();
+        $endDate = Carbon::parse($request->end_date)->toDateString();
+        return redirect()->to('orders/interface/'.$startDate.'/'.$endDate);
+    }
+    protected function getOngoingOrderByType(Request $request){
+        $type = $request->user_type;
+        return redirect()->to('orders/interface/'.$type);
+    }
+
+    //get the list of order history
+    protected function getOnFinishedOrder($startDate = null, $endDate = null){
+        $options = ['paid', 'processing', 'done', 'enroute', 'pickedup'];
+        $order = Order::whereNotIn('status', $options)
+            ->orderBy('id', 'desc')
+            ->paginate($this->paginate);
+
+        //if the start date and end date are not null add the
+        if($startDate !== null && $endDate !== null){
+            $order = Order::whereNotIn('status', $options)
+                ->where('created_at', '>=', $startDate)
+                ->where('created_at', '<', $endDate)
+                ->orderBy('id', 'desc')
+                ->paginate($this->paginate);
+        }
+        if($startDate != null){
+            $order = Order::where('status', $startDate)
+                ->orderBy('id', 'desc')
+                ->paginate($this->paginate);
+        }
+        //return $order;
+        $payload = [
+            'orders' => $order,
+        ];
+        return view('pages.order.order-history', $payload);
+    }
+    protected function getOrderByDate(Request $request){
+        $startDate = Carbon::parse($request->start_date)->toDateString();
+        $endDate = Carbon::parse($request->end_date)->toDateString();
+        return redirect()->to('orders/history/interface/'.$startDate.'/'.$endDate);
+    }
+    protected function getOrderByType(Request $request){
+        $type = $request->user_type;
+        return redirect()->to('orders/history/interface/'.$type);
+    }
+
+    protected function terminateOrder(OrderService $orderService, Request $request){
+        $response = $orderService->updateOrderStatus($request->unique_id, $this->failed);
+        if(!$response){
+            Alert::error('Error', $this->returnErrorMessage('not_found', 'Order'));
+            return redirect()->back();
+        }
+        Alert::success('Success', $this->returnSuccessMessage('updated', 'Order'));
+        return redirect()->back();
+    }
+
+    protected function deleteOrder(OrderService $orderService, Request $request){
+        $response = $orderService->deleteOrder($request->unique_id);
+        if(!$response){
+            Alert::error('Error', $this->returnErrorMessage('not_found', 'Order'));
+            return redirect()->back();
+        }
+        Alert::success('Success', $this->returnSuccessMessage('deleted', 'Order'));
+        return redirect()->back();
     }
 }

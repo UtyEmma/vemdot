@@ -70,6 +70,18 @@
                         </a>
                     </div>
                 </div>
+                {{-- orders section --}}
+                <div class="nav-item {{ ($segment1 == 'orders' || $segment1 == 'roles'||$segment1 == 'permission' ||$segment1 == 'orders') ? 'active open' : '' }} has-sub">
+                    <a href="#"><i class="ik ik-command"></i><span>{{ __('Orders')}}</span></a>
+                    <div class="submenu-content">
+                        <a class="menu-item {{ ($segment1 == 'orders') ? 'active' : '' }}" href="{{url('orders/interface')}}">
+                            <span>{{ __('Ongoing Order')}}</span>
+                        </a>
+                        <a class="menu-item {{ ($segment1 == 'orders') ? 'active' : '' }}" href="{{url('orders/history/interface')}}">
+                            <span>{{ __('Order History')}}</span>
+                        </a>
+                    </div>
+                </div>
                 {{-- transactions section --}}
                 <div class="nav-item {{ ($segment1 == 'transaction' || $segment1 == 'roles'||$segment1 == 'permission' ||$segment1 == 'transaction') ? 'active open' : '' }} has-sub">
                     <a href="#"><i class="ik ik-credit-card"></i><span>{{ __('Transactions')}}</span></a>
@@ -122,6 +134,22 @@
                         </a>
                     </div>
                 </div>
+                {{-- meals section --}}
+                <div class="nav-item {{ ($segment1 == 'meals' || $segment1 == 'roles'||$segment1 == 'permission' ||$segment1 == 'meals') ? 'active open' : '' }} has-sub">
+                    <a href="#"><i class="ik ik-server"></i><span>{{ __('Meals')}}</span></a>
+                    <div class="submenu-content">
+                        <a class="menu-item {{ ($segment1 == 'meals') ? 'active' : '' }}" href="{{url('meals/interface')}}">
+                            <span>{{ __('Avaliable Meals')}}</span>
+                        </a>
+                        <a class="menu-item {{ ($segment1 == 'meals') ? 'active' : '' }}" href="{{url('meals/history/interface')}}">
+                            <span>{{ __('Promoted Meal')}}</span>
+                        </a>
+                    </div>
+                </div>
+                 {{-- support section --}}
+                 <div class="nav-item {{ ($segment1 == 'tickets') ? 'active' : '' }}">
+                    <a href="{{url('tickets/interface')}}"><i class="ik ik-inbox"></i><span>{{ __('Tickets')}}</span> </a>
+                </div>
                 {{-- site section --}}
                 <div class="nav-item {{ ($segment1 == 'site-settings') ? 'active' : '' }}">
                     <a href="{{url('site/settings')}}"><i class="ik ik-unlock"></i><span>{{ __('Site Settings')}}</span> </a>
@@ -131,7 +159,7 @@
                     <a href="#" data-toggle="modal" data-target="#logoutUser"><i class="ik ik-power"></i><span>{{ __('Logout')}}</span> </a>
                 </div>
 
-                <div class="nav-lavel">{{ __('Not Using')}} </div>
+                {{-- <div class="nav-lavel">{{ __('Not Using')}} </div>
                 <div class="nav-item {{ ($segment1 == 'permission-example') ? 'active' : '' }}">
                     <a href="{{url('permission-example')}}"><i class="ik ik-unlock"></i><span>{{ __('Laravel Permission')}}</span> </a>
                 </div>
@@ -250,7 +278,7 @@
                 </div>
                 <div class="nav-item">
                     <a href="javascript:void(0)" class="disabled"><i class="ik ik-slash"></i><span>{{ __('Disabled Menu')}}</span></a>
-                </div>
+                </div> --}}
 
         </div>
     </div>

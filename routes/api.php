@@ -31,6 +31,7 @@ use App\Http\Controllers\Advert\AdvertController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\Withdrawal\WithdrawalController;
+use App\Http\Controllers\Ticket\TicketController;
 
 /*
 |--------------------------------------------------------------------------
@@ -128,6 +129,11 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
     Route::post('/initiate/withdrawal', [WithdrawalController::class,'initiateWithdrawal']);
 
     Route::post('/search', [SearchController::class, 'search']);
+
+    Route::prefix('tickets')->group(function(){
+        Route::post('create', [TicketController::class, 'createTicketByUser']);
+        Route::get('fetch{user_id?}', [TicketController::class, 'fectchUsersTicket']);
+    });
 
     Route::prefix('cards')->group(function(){
         Route::get('/', [CardController::class, 'list']);
