@@ -22,7 +22,6 @@ use App\Http\Controllers\Advert\AdvertController;
 use App\Http\Controllers\Orders\OrderController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\Withdrawal\WithdrawalController;
-use App\Http\Controllers\Orders\OrderController;
 use App\Http\Controllers\Meals\AdminMealController;
 use App\Http\Controllers\Ticket\TicketController;
 
@@ -163,7 +162,7 @@ Route::group(['middleware' => 'auth'], function(){
         	Route::post('interface/by/type', [OrderController::class, 'getOrderByType']);
 		});
     });
-	
+
 	Route::prefix('meals')->group(function(){
 		//advert section
         Route::get('interface/{start?}/{end?}', [AdminMealController::class, 'getAvaliableMeals']);
@@ -175,8 +174,8 @@ Route::group(['middleware' => 'auth'], function(){
 			Route::post('interface/by/date', [AdminMealController::class, 'getMealsByDate']);
         	Route::post('interface/by/type', [AdminMealController::class, 'getMealsByCategory']);
 		});
-    });	
-	
+    });
+
 	Route::prefix('tickets')->group(function(){
 		//advert section
         Route::get('interface/{start?}/{end?}', [TicketController::class, 'getTickets']);
