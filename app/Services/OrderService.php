@@ -74,7 +74,8 @@ class OrderService {
         // Charge the Referal Balance first, if it is not enough, then charge the Ref Balance
         if($user->ref_balance >= $amount){
             $user->ref_balance -= $wallet_amount;
-        }else{ // If the Ref balance is not enough, set the ref_balance to 0 and change the difference to the main balance
+        }else{
+            // If the Ref balance is not enough, set the ref_balance to 0 and change the difference to the main balance
             $bal = $wallet_amount - $user->ref_balance;
             $user->ref_balance = 0;
             $user->main_balance -= $bal;
