@@ -21,29 +21,6 @@ use Illuminate\Support\Facades\Storage;
 use RealRashid\SweetAlert\Facades\Alert;
 use Carbon\Carbon;
 
-/**
-     * ORDER PROCESS
-     *
-     * 1. User makes the order and pays for the order
-     * 2. User can cancel the order in as much as the vendor has not accepted the order - the paid amount will be refunded to the user based on a fixed percentage by the admin.
-     * 2. Vendor Accepts or Rejects the Order
-     * 3. If accepted, the order status changes to processing or inprogress
-     * 4. When the order is ready, the vendor can mark it as ready - an alert is sent to the rider that the order is ready for pickup
-     * 5. The rider or logistics company can mark the order as picked up
-     * 6. The rider or logistics company can mark the order as delivered
-     *
-     * Site Settings
-     * permitted_daily_cancellations, order_charges, can_cancel_order, PRICE_PER_KM
-     *
-     * cancelled | declined | confirmed | inprogress | terminated | enroute | pickup | delivered
-     *
-     *
-     * ///
-     *
-     * Order Reference
-     * Email Address
-*/
-
 class OrderController extends Controller {
 
     function create(CreateOrderRequest $request, OrderService $orderService){
@@ -52,10 +29,12 @@ class OrderController extends Controller {
 
         if($isHomeDelivery){
             $rider = User::with(['logistic', 'userRole'])->find($request->bike_id);
-            if(!($rider && $rider->isRider())) return $this->returnMessageTemplate(false, "The Selected User is not registered as a Rider");
+            if(!($rider && $rider->isRider()))
+                return $this->returnMessageTemplate(false, "The Selected User is not registered as a Rider");
         }
 
-        if(!User::find($request->vendor_id)->isVendor()) return $this->returnMessageTemplate(false, "The Selected User is not registered as a Vendor");
+        if(!User::find($request->vendor_id)->isVendor())
+            return $this->returnMessageTemplate(false, "The Selected User is not registered as a Vendor");
 
         try {
             // Confirm the meals and prices
@@ -116,9 +95,9 @@ class OrderController extends Controller {
             return $this->returnMessageTemplate(false,
                     "Order Update failed because because it is set to ".ucfirst($order->status), ['order' => $order]);
 
-        $vendorCanUpdateDelivered = (($user->userRole->name === 'Vendor') && ($status === 'delivered') && ($order->delivery_method !== 'pickup'));
+        $vendorCannotUpdateDelivered = (($user->userRole->name === 'Vendor') && ($status === 'delivered') && ($order->delivery_method !== 'pickup'));
 
-        if($vendorCanUpdateDelivered) return $this->returnMessageTemplate(false, "You cannot update this order's status to $status");
+        if($vendorCannotUpdateDelivered) return $this->returnMessageTemplate(false, "You cannot update this order's status to $status");
 
         $orderService->handleStatusUpdate($order, $user, $status);
         $order = Order::with(['orderStatus'])->find($order->unique_id);
@@ -165,8 +144,8 @@ class OrderController extends Controller {
         return $this->returnMessageTemplate(true, '', $order->get());
     }
 
-    function downloadInvoice($order_id) {
-        $order = Order::find($order_id);
+    function downloadInvoice($reference) {
+        $order = Order::where(['reference' => $reference])->first();
         $vendor = User::find($order->vendor_id);
         $user = User::find($order->user_id);
         $interval = CarbonInterval::minutes($order->avg_time);
@@ -180,8 +159,6 @@ class OrderController extends Controller {
             'avg_time' => $avg_time
         ]);
 
-        $path = "invoice/$order->reference-invoice.pdf";
-        Storage::put($path, $pdf);
         return $pdf->download("$order->reference-invoice.pdf");
 
     }

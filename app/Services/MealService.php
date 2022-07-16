@@ -54,9 +54,9 @@ class MealService {
     }
 
     function orders(string|bool $count = false){
+        if($count === 'withCount') $this->query = $this->query->with('orders')->withCount('orders');
         if(!$count) $this->query = $this->query->with('orders');
         if($count) $this->query = $this->query->withCount('orders');
-        if($count === 'withCount') $this->query = $this->query->with('orders')->withCount('orders');
         return $this;
     }
 
@@ -96,6 +96,10 @@ class MealService {
 
     function delete(){
         $this->query = $this->query->delete();
+    }
+
+    function isFavourite(){
+        // $this->query = $this->query->
     }
 
     function reviews(){

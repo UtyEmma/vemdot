@@ -30,6 +30,6 @@ class CheckKycStatus{
             return $next($request);
         }
 
-        return $this->returnMessageTemplate(false, $this->returnErrorMessage('kyc_error'));
+        return $this->returnMessageTemplate(false, "Your $userRole->name Account has not been verified");
     }
 }

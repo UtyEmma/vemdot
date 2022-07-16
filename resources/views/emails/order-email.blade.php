@@ -84,7 +84,7 @@
                         <table class="table table-borderless">
                             <tbody>
                                 @forelse ($order->meals as $meal)
-                                    {{dd($meal)}}
+                                    {{-- {{dd($meal)}} --}}
                                     <tr>
                                         <td width="20%">
                                             <img src="{{$meal['thumbnail']}}" width="90">
@@ -143,7 +143,7 @@
                                         </td>
                                         <td>
                                             <div class="text-right">
-                                                <span>&#x20A6; {{$tax}}</span>
+                                                {{-- <span>&#x20A6; {{$tax}}</span> --}}
                                             </div>
                                         </td>
                                     </tr>
