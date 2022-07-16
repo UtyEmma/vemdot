@@ -23,23 +23,25 @@ class OrderService {
 
     function confirmMeals($items, $vendor_id){
         $items = collect($items);
+
         $meals = $items->map(function($meal) use($vendor_id) {
             if($model = Meal::find($meal['meal_id'])){
                 if($model->availability === $this->yes && $model->user_id === $vendor_id){
-                    $price = $model->discount ? $this->percentageDiff($model->price, $model->discount) : $model->price;
-                    $tax = ($model->price * ($model->tax / 100));
+                    $main_price = $model->price * $meal['qty'];
+                    $price = $model->discount ? $this->percentageDiff($main_price, $model->discount) : $main_price;
+                    $tax = ($main_price * ($model->tax / 100));
 
                     $item['meal_id'] = $model->unique_id;
                     $item['vendor_id'] = $model->vendor->unique_id;
-                    $item['price'] = ($price + $tax) * $meal['qty'];
-                    $item['unit_price'] = ($price + $tax);
+                    $item['price'] = $price + $tax;
+                    $item['original_price'] = $model->price;
+                    $item['unit_price'] = ($price + $tax) / $meal['qty'];
                     $item['qty'] = $meal['qty'];
                     $item['time'] = $model->avg_time;
                     $item['name'] = $model->name;
                     $item['thumbnail'] = $model->thumbnail;
                     $item['discount'] = $model->discount;
                     $item['tax'] = $model->tax;
-
                     return $item;
                 }
             }
@@ -116,6 +118,7 @@ class OrderService {
     }
 
     function completeOrder(Order $order, Transaction $transaction, User $user){
+        // dd($order);
         $transaction->status = $this->confirmed;
         $transaction->save();
 
@@ -125,29 +128,23 @@ class OrderService {
         $order->transaction_id = $transaction->unique_id;
         $order->save();
 
-        $settings = SiteSettings::first();
-
         $admin = User::admin();
         $admin->main_balance = $admin->main_balance + $order->amount;
         $admin->save();
 
-        $vendor = $order->vendor;
-        $vendor->pending_balance += $this->percentageDiff($order->amount, $settings->vendor_service_charge);
-        $vendor->save();
-
-        $logistics = $order->courier;
-        $logistics->pending_balance += $this->percentageDiff($order->delivery_fee, $settings->logistics_service_charge);
-        $logistics->save();
-
+        $order->vendor;
+        $order->courier;
         $order->bike;
 
-        $notification->subject("Your Order has been created. Here's your Receipt!")
-                        ->text("Your order with reference <strong>$order->reference</strong> has been created successfully!")
-                        ->text("Please click the button below to download the receipt for your order!")
-                        ->action("Download Receipt", route('order.invoice', ['reference' => $order->reference]))
-                        ->text('<small>Please Note that you will be required to present this receipt to the Courier if your delivery method is Home Delivery.</small>')
-                        ->text("<small>If you are picking up your order yourself, please show this receipt to the Vendor to confirm your order!</small>")
-                        ->send($user, ['mail']);
+        try {
+            $notification->subject("Your Order has been created. Here's your Receipt!")
+                            ->text("Your order with reference <strong>$order->reference</strong> has been created successfully!")
+                            ->text("Please click the button below to download the receipt for your order!")
+                            ->action("Download Receipt", route('order.invoice', ['reference' => $order->reference]))
+                            ->text('<small>Please Note that you will be required to present this receipt to the Courier if your delivery method is Home Delivery.</small>')
+                            ->text("<small>If you are picking up your order yourself, please show this receipt to the Vendor to confirm your order!</small>")
+                            ->send($user, ['mail']);
+        } catch (\Throwable $th) {}
 
         return $this->returnMessageTemplate(true, "You Order has been Created", ['order' => $order]);
     }
@@ -179,9 +176,19 @@ class OrderService {
                 $meal->total_orders = $meal->total_orders + 1;
                 $meal->save();
             }
+
+            $settings = SiteSettings::first();
+
+            $vendor = $order->vendor;
+            $vendor->pending_balance += $this->percentageDiff($order->amount, $settings->vendor_service_charge);
+            $vendor->save();
+
+            $logistics = $order->courier;
+            $logistics->pending_balance += $this->percentageDiff($order->delivery_fee, $settings->logistics_service_charge);
+            $logistics->save();
         }
 
-        if($status === 'cancelled' || 'terminated' || 'declined' || 'failed') $this->refundToWallet($order, $user);
+        if($status === 'cancelled' || 'terminated' || 'declined' || 'returned') $this->refundToWallet($order, $user);
         return $order->refresh();
     }
 
@@ -237,7 +244,7 @@ class OrderService {
      *
      * These are the rules of this logic
      * 1. If the position (index) of an incoming status is below that of it's predecessor in the array, the update fails
-     * 2. If the existing order status is set to cancelled|declined|terminated|failed the update fails because the order process has been terminated
+     * 2. If the existing order status is set to cancelled|declined|terminated|returned the update fails because the order process has been terminated
      * 3. If the incoming Status is more than one step above it's predecessor, the update fails because there is an attempt to jump the process (hackers😊)
      * 4. The exclusion to rule 3 is in any of the following instances:
      *  a. Incoming Status is processing or declined and current status is paid
@@ -271,7 +278,7 @@ class OrderService {
     }
 
     function isCompleted($status) {
-        return in_array($status, ['cancelled', 'declined', 'terminated', 'failed', 'delivered']);
+        return in_array($status, ['cancelled', 'declined', 'terminated', 'returned', 'delivered']);
     }
 
     function checkDeliveryTime(Order $order){
@@ -310,13 +317,13 @@ class OrderService {
         $order = $this->getSingleOrder($uniqueID);
         if(!$order)
             return false;
-        return $order->update(['status' => $status]);  
+        return $order->update(['status' => $status]);
     }
 
     public function deleteOrder($uniqueID){
         $order = $this->getSingleOrder($uniqueID);
         if(!$order)
             return false;
-        return $order->delete();  
+        return $order->delete();
     }
 }

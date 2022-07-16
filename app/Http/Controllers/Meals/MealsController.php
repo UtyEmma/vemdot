@@ -56,6 +56,7 @@ class MealsController extends Controller{
         $meals = $mealService->category()
                             ->filterByCategory()
                             ->status()->orderBy()
+                            ->search()->orders("withCount")
                             ->hasVendor()->owner();
 
         if($user && $user->userRole->name === 'Vendor') {
@@ -63,10 +64,13 @@ class MealsController extends Controller{
         }else if($vendor_id){
             $meals->byUser($vendor_id);
         }else{
-            return $this->returnMessageTemplate(false, 'Invalid Request. You are not logged in as a Vendor');
+            return $this->returnMessageTemplate(false, 'Invalid Request. Vendor not provided');
         }
 
-        $meals = $meals->query()->paginate($this->paginate);
+        $meals = $meals->query()->withExists([
+            'favourites as is_favourite' => function($query) use($user){
+                return $query->where('user_id', $user->unique_id);
+            }])->paginate($this->paginate);
 
         foreach ($meals as $meal) {
             $orders = Order::whereJsonContains('meals', ['meal_id' => $meal->unique_id])->get();
@@ -84,18 +88,24 @@ class MealsController extends Controller{
     }
 
     function fetchAllMeals(MealService $mealService, $vendor_id = null){
+        $user = $this->user();
+
         $meals = $mealService
                         ->byUser($vendor_id)
                         ->hasVendor()
                         ->owner()
                         ->category()
                         ->orderBy()
+                        ->orders('withCount')
                         ->search()
                         ->filterByCategory()
                         ->status()
                         ->query();
 
-        $meals = $meals->paginate($this->paginate);
+        $meals = $meals->withExists([
+            'favourites as is_favourite' => function($query) use($user){
+                return $query->where('user_id', $user->unique_id);
+            }])->paginate($this->paginate);
 
         return $this->returnMessageTemplate(true, '', $meals);
     }

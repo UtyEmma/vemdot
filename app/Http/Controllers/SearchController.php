@@ -10,8 +10,11 @@ class SearchController extends Controller {
 
     function search(Request $request){
         $keyword = $request->keyword;
-        $vendors = User::where('name', 'LIKE', "%$keyword%")->whereRelation('userRole', 'name', 'Vendors')->get();
-        $meals = Meal::where('name', 'LIKE', "%$keyword%")->where('availability', $this->yes)->get();
+        $vendors = User::where('name', 'LIKE', "%$keyword%")->whereRelation('userRole', 'name', 'Vendor')->get();
+        $meals = Meal::where('name', 'LIKE', "%$keyword%")
+                        ->orWhereRelation('categories', 'name', "%$keyword$")
+                        ->with(['categories', 'orders', 'vendor'])
+                        ->where('availability', $this->yes)->get();
 
         return $this->returnMessageTemplate(true, "", [
             'meals' => $meals,
