@@ -115,7 +115,8 @@ class User extends Authenticatable{
     }
 
     static function admin(){
-        return static::whereRelation('userRole', 'name', 'Super Admin')->first();
+        // return static::whereRelation('role', 'name', 'Super Admin')->first();
+        return static::where('role', 'super_admin')->first();
     }
 
     public function meals (){

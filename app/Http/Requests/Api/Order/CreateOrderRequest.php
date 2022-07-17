@@ -31,7 +31,7 @@ class CreateOrderRequest extends FormRequest{
      */
     public function rules() {
         return [
-            'bike_id' => 'required_unless:delivery_method,pickup|string|exists:users,unique_id',
+            'bike_id' => ['required_if:delivery_method,home', 'string', 'exists:users,unique_id'],
             'vendor_id' => 'required|string|exists:users,unique_id',
             'address_id' => [
                 'required_without_all:receiver_name,receiver_phone,receiver_location,receiver_email',

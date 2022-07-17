@@ -10,8 +10,10 @@ use App\Models\Review\Review;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Staudenmeir\EloquentJsonRelations\HasJsonRelationships;
+
 class Meal extends Model{
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasJsonRelationships;
 
     protected $fillable = ['unique_id', 'user_id', 'category', 'name', 'thumbnail', 'description', 'price', 'images', 'video', 'price', 'discount', 'tax', 'rating', 'availability', 'promoted', 'avg_time', 'total_orders'];
 
@@ -41,6 +43,10 @@ class Meal extends Model{
 
     function favourites(){
         return $this->hasMany(Favourite::class, 'meal_id', 'unique_id');
+    }
+
+    function orders(){
+        return $this->hasMany(Order::class, 'meals->meal_id', 'unique_id');
     }
 
     function reviews(){

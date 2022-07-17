@@ -43,7 +43,7 @@ class FavouriteController extends Controller{
     function list(){
         $user = auth()->user();
         $meals = Meal::whereRelation('favourites', 'user_id', $user->unique_id)
-                        ->with(['vendor', 'category', 'orders'])
+                        ->with(['vendor', 'categories', 'orders'])
                         ->withExists([
                             'favourites as is_favourite' => function($query) use($user){
                                 return $query->where('user_id', $user->unique_id);

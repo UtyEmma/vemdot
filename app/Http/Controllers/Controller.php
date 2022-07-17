@@ -51,7 +51,6 @@ class Controller extends BaseController{
     public function verifyPayment(Request $request){
         $searchQuery = $request->query();
         $response = $this->handleGatewayCallback($searchQuery['reference']);
-
         if($response['status'] == true){
             $data = $response['data'];
             $amount = $data['amount'] / 100;

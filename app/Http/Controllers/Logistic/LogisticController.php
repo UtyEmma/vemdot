@@ -55,8 +55,8 @@ class LogisticController extends Controller
             'phone' => 'required',
             'name' => 'required|between:2,100',
             'email' => 'required|email|unique:users|max:50',
-            'password' =>
-            ['required', Rules\Password::defaults()],
+            'password' => ['required', Rules\Password::defaults()],
+            'role' => 'required|exists:account_roles,unique_id'
         ]);
         if($validator->fails())
             return $this->returnMessageTemplate(false, $validator->messages());

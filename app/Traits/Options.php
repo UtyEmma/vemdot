@@ -30,10 +30,25 @@ trait Options {
 
     public $orderUserActions = [
         'User' => ['cancelled'],
-        'Vendor' => ['declined', 'processing', 'done', 'delivered', 'returned', 'terminated'],
-        'Logistic' => ['enroute', 'pickedup', 'failed', 'delivered'],
-        'Rider' => ['enroute', 'pickedup', 'delivered'],
+        'Vendor' => ['declined', 'processing', 'done', 'delivered', 'terminated'],
+        'Logistic' => ['enroute', 'pickedup', 'returned', 'delivered'],
+        'Rider' => ['enroute', 'pickedup', 'returned', 'delivered'],
     ];
+
+    public $orderNotificationReceivers = [
+        'User' => ['declined', 'processing', 'terminated', 'enroute', 'pickedup', 'delivered', 'returned'],
+        'Vendor' => ['paid', 'enroute', 'delivered'],
+        'Rider' => ['paid', 'done', 'terminated']
+    ];
+
+    public function formatOrderMessages($order, $user, $vendor, $logistics){
+        $messages = [
+            'paid' => [
+                "You have received a new food order"
+            ],
+            'cancelled' => ""
+        ];
+    }
 }
 
 
