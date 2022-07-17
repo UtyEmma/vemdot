@@ -23,7 +23,6 @@ class RegisterController extends Controller
     }
 
     public function register(Request $request){
-
         $data = $request->all();
 
         // return Response::json(['data' => $data]);
@@ -39,18 +38,17 @@ class RegisterController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        if($validator->fails()){
+        if($validator->fails())
             return $this->returnMessageTemplate(false, $validator->messages());
-        }
 
         if($data['referred_id'] != ''){
             $users = $this->user->getUser([
                 ['referral_id', $data['referred_id']]
             ]);
 
-            if($users == null){
+            if($users == null)
                 return $this->returnMessageTemplate(false, $this->returnErrorMessage('refferral_not_found'));
-            }
+
         }
 
         $user = User::create([
@@ -97,10 +95,8 @@ class RegisterController extends Controller
             }
         }
 
-        if($appSettings->welcome_message != 'no'){
-            //send welcome message to newly registerd user
+        if($appSettings->welcome_message != 'no') //send welcome message to newly registerd user
             $this->verification->sendWelcomeMail($user, $appSettings);
-        }
 
         $payload = ['user' => $user];
 
