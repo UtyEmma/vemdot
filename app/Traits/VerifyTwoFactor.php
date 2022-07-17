@@ -11,12 +11,11 @@ trait VerifyTwoFactor {
 
     public function verifyTwofactor($data)
     {
-        $user = User::where('unique_id', $data['user_id'])
-            ->first();
+        $user = User::where('unique_id', $data['user_id'])->first();
+        if(!$user)
+            return['status' => false, 'message' => $this->returnErrorMessage('user_not_found')];
        
-        $find = UserCode::where('user_id', $user->unique_id)
-            ->where('code', $data['code'])
-            ->first();
+        $find = UserCode::where('user_id', $user->unique_id)->where('code', $data['code'])->first();
            
         if($find->status == 'used'){
             return ['status' => false, 'message' => $this->returnErrorMessage('used_code')];

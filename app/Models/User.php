@@ -13,7 +13,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
-use Twilio\Rest\Client;
 use App\Traits\Generics;
 use Exception;
 
@@ -72,33 +71,10 @@ class User extends Authenticatable{
         'first_time_login' => 'yes',
     ];
 
-    public function generateCode($auth){
-        $code = $this->generateCodeFor2fa($auth);
-
-        $message = "Your 2FA login code is ". $code['code'];
-
-        try {
-            $account_sid = env("TWILIO_SID");
-            $auth_token = env("TWILIO_TOKEN");
-            $twilio_number = env("TWILIO_FROM");
-
-            $client = new Client($account_sid, $auth_token);
-            $client->messages->create($auth->phone, [
-                'from' => $twilio_number,
-                'body' => $message
-            ]);
-
-            return ['status' => true, 'code' => $code['code']];
-        } catch (Exception $e) {
-            info("Error: ". $e->getMessage());
-            return ['status' => false, 'message' => $e->getMessage()];
-        }
-    }
-
     public function generateCodeFor2fa($user){
         $code = rand(1000, 9999);
 
-         $faildCode = UserCode::where([
+         $faildCode = UserCode::where([ 
              ['user_id', $user->unique_id],
              ['status', 'un-used']
          ])->first();
