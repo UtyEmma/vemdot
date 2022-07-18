@@ -10,6 +10,7 @@ use App\Models\OrderStatus;
 use App\Models\Site\SiteSettings;
 use App\Models\Transaction\Transaction;
 use App\Models\User;
+use App\Notifications\OrderStatusNotification;
 use App\Traits\Generics;
 use App\Traits\Options;
 use App\Traits\PaymentHandler;
@@ -17,6 +18,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Notification;
 
 class OrderService {
     use Generics, PaymentHandler, Options;
@@ -150,9 +152,17 @@ class OrderService {
     }
 
     function sendOrderUpdateNotification(Order $order){
-        $push = new PushNotificationService();
         $user = $order->user;
-        $push->send($order, $user);
+        $vendor = $order->vendor;
+        $rider = $order->bike;
+        $order->orderStatus;
+
+        if($userMessages = $this->userMessages($order->status))
+            $user->device_id ? Notification::send($user, new OrderStatusNotification($userMessages, ['order' => $order])) : null;
+        if($vendorMessages = $this->userMessages($order->status))
+            $vendor->device_id ? Notification::send($vendor, new OrderStatusNotification($vendorMessages, ['order' => $order])) : null;
+        if($riderMessages = $this->userMessages($order->status))
+            $rider->device_id ? Notification::send($rider, new OrderStatusNotification($riderMessages, ['order' => $order])) : null;
     }
 
     function handleStatusUpdate(Order $order, User $user, $status){

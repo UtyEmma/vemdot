@@ -153,6 +153,7 @@ Route::group(['middleware' => 'auth:sanctum', 'ability:full_access'], function()
     });
 
     Route::get('user', [UserController::class, 'show'])->name('users.current');
+    Route::post('user/update/device-id', [UserController::class, 'updateDeviceId']);
 
     Route::prefix('users')->group(function(){
 

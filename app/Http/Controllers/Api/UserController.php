@@ -24,6 +24,17 @@ class UserController extends Controller{
                         ]);
     }
 
+    public function updateDeviceId(Request $request){
+
+        if(!$request->device_id) return $this->returnMessageTemplate(false, 'Device Id Required');
+        $user = $this->user();
+        $user->device_id = $request->device_id;
+        $user->save();
+
+        return $this->returnMessageTemplate(true, "", ['user' => $user]);
+
+    }
+
     public function update(UpdateUserRequest $request){
         $user = $this->user();
 

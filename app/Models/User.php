@@ -195,5 +195,9 @@ class User extends Authenticatable{
         return 'NGN';
     }
 
+    public function routeNotificationForFcm(){
+        return $this->device_id;
+    }
+
 
 }
