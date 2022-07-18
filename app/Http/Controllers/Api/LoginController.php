@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Verification\Verification;
+use App\Services\SendTextMessage;
 use Carbon\Carbon;
 
 class LoginController extends Controller
@@ -20,14 +21,14 @@ class LoginController extends Controller
     }
     //
 
-    public function loginUser(Request $request){
+    public function loginUser(SendTextMessage $sendTextMessage, Request $request){
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required',
         ]);
         if($validator->fails())
             return $this->returnMessageTemplate(false, $validator->messages());
-
+       
         if (!Auth::attempt($request->only('email', 'password')))
             return $this->returnMessageTemplate(false, $this->returnErrorMessage('wrong_crendential'));
 
@@ -66,18 +67,22 @@ class LoginController extends Controller
         $user->two_factor_verified_at = null;
         $user->save();
 
+        $data = $user->generateCodeFor2fa($user);
+        $notification = $this->notification();
         if($user->two_factor_access == 'text'){
-            $data = $user->generateCode($user);
-        }else{
-            $data = $user->generateCodeFor2fa($user);
-            $notification = $this->notification();
-            $notification->subject("2FA On ".$appSettings->site_name)
-            ->text('Your 2FA login code is ')
-            ->code($data['code'])
-            ->text('provide this code on your app to authenticate your login')
-            ->send($user, ['mail']);
+            $message = "We have detected an account sign-in request. To verify your account, please use the following code to sign-in to your account : ".$data['code'];
+            //send text message to the user
+            $sendTextMessage->sendTextMessage($user->phone, $appSettings->site_name, $message);
         }
-
+        //send mail incase of an error
+        $notification->subject('Your confirmation code')
+        ->text('Verification Needed')
+        ->text('Please confirm your sign-in request')
+        ->text('We have detected an account sign-in request from a device we don`t recognize')
+        ->code($data['code'])
+        ->text('To verify your account, please use the following code to sign-in to your account')
+        ->send($user, ['mail']);
+  
         $payload = [
             '2fa_code' => $data['code'],
             'user' => $user->with('userRole')->find($user->unique_id),
@@ -124,4 +129,5 @@ class LoginController extends Controller
             return $this->returnMessageTemplate(false, $process['message']);
         }
     }
+    
 }

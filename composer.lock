@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4697242179150f3083dc1a9b012fb9d4",
+    "content-hash": "918cb12c91054de3ac09049a88ab4416",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -8795,6 +8795,42 @@
             "time": "2021-12-08T09:12:39+00:00"
         },
         {
+
+            "name": "verumconsilium/laravel-browsershot",
+            "version": "v1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/verumconsilium/laravel-browsershot.git",
+                "reference": "e06d7bfaa78914d83fd08f1d40c29b418b24e490"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/verumconsilium/laravel-browsershot/zipball/e06d7bfaa78914d83fd08f1d40c29b418b24e490",
+                "reference": "e06d7bfaa78914d83fd08f1d40c29b418b24e490",
+                "shasum": ""
+            },
+            "require": {
+                "spatie/browsershot": "^3.19"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^3.6",
+                "phpunit/phpunit": "^7.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "VerumConsilium\\Browsershot\\BrowsershotServiceProvider"
+                    ],
+                    "aliases": {
+                        "PDF": "VerumConsilium\\Browsershot\\Facades\\PDF",
+                        "Screenshot": "VerumConsilium\\Browsershot\\Facades\\Screenshot"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "VerumConsilium\\Browsershot\\": "src/"
             "name": "twilio/sdk",
             "version": "6.38.0",
             "source": {
@@ -8830,6 +8866,18 @@
             ],
             "authors": [
                 {
+
+                    "name": "Verum Consilium",
+                    "homepage": "https://verumconsilium.com"
+                }
+            ],
+            "description": "Browsershot Laravel wrapper to generate PDF files and Screenshots using Headless Chrome",
+            "support": {
+                "issues": "https://github.com/verumconsilium/laravel-browsershot/issues",
+                "source": "https://github.com/verumconsilium/laravel-browsershot/tree/v1.3.0"
+            },
+            "time": "2020-10-15T19:04:13+00:00"
+
                     "name": "Twilio API Team",
                     "email": "api@twilio.com"
                 }
@@ -8842,6 +8890,7 @@
                 "twilio"
             ],
             "time": "2022-06-29T19:22:16+00:00"
+
         },
         {
             "name": "vlucas/phpdotenv",
@@ -11586,5 +11635,5 @@
         "php": "^8.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.3.0"
 }
