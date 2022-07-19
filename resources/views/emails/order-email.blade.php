@@ -84,7 +84,6 @@
                         <table class="table table-borderless">
                             <tbody>
                                 @forelse ($order->meals as $meal)
-                                    {{-- {{dd($meal)}} --}}
                                     <tr>
                                         <td width="20%">
                                             <img src="{{$meal['thumbnail']}}" width="90">
@@ -167,7 +166,7 @@
                                         </td>
                                         <td>
                                             <div class="text-right">
-                                                <span class="font-weight-bold">$238.50</span>
+                                                <span class="font-weight-bold">&#x20A6; {{$order->amount}}</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -180,8 +179,8 @@
                     <p class="font-weight-bold mb-0">Thanks for shopping with us!</p> <span>Nike Team</span>
                     </div>
                     <div class="d-flex justify-content-between footer p-3">
-                        <span>Need Help? visit our <a href="#"> help center</a></span>
-                        <span>12 June, 2020</span>
+                        <span>Need Help? Visit our <a href="#"> help center</a></span>
+                        <span>{{now('jS F, Y')}}</span>
                     </div>
                 </div>
             </div>

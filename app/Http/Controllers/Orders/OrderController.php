@@ -159,15 +159,14 @@ class OrderController extends Controller {
             'avg_time' => $avg_time
         ]);
 
-        return $pdf->download("$order->reference-invoice.pdf");
-
+        return $pdf->download();
     }
 
     protected function getOnGoingOrder($startDate = null, $endDate = null){
         $options = ['cancelled', 'declined', 'terminated', 'failed', 'delivered'];
         $order = Order::whereNotIn('status', $options)
-            ->orderBy('id', 'desc')
-            ->paginate($this->paginate);
+                            ->orderBy('id', 'desc')
+                            ->paginate($this->paginate);
 
         //if the start date and end date are not null add the
         if($startDate !== null && $endDate !== null){
