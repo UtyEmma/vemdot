@@ -51,28 +51,26 @@
                                 <tr>
                                     <td>
                                         <div class="py-2">
-                                            <span class="d-block text-muted">Order Date</span>
+                                            <small class="d-block text-muted">Order Date</small>
                                             <span>{{$date}}</span>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="py-2">
-                                            <span class="d-block text-muted">Order No</span>
+                                            <small class="d-block text-muted">Order No</small>
                                             <span>VM-{{$order->reference}}</span>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="py-2">
-                                            <span class="d-block text-muted">Expected Time</span>
-                                            <span>
-                                                {{$avg_time}}
-                                            </span>
+                                            <small class="d-block text-muted">Expected Time</small>
+                                            <span>{{$avg_time}}</span>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="py-2">
-                                            <span class="d-block text-muted">Shiping Address</span>
-                                            <span>{{$order->receiver_location}}</span>
+                                            <small class="d-block text-muted">Shiping Address</small>
+                                            <span>{{$order->receiver_location}}</s>
                                         </div>
                                     </td>
                                 </tr>
@@ -96,7 +94,7 @@
                                         </td>
                                         <td width="20%">
                                             <div class="text-right">
-                                                <span class="font-weight-bold">&#x20A6; {{$meal['unit_price']}} * {{$meal['qty']}}</span>
+                                                <span class="font-weight-bold">&#x20A6; {{number_format($meal['unit_price'])}} * {{$meal['qty']}}</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -118,7 +116,7 @@
                                         </td>
                                         <td>
                                             <div class="text-right">
-                                                <span>&#x20A6; {{$order->amount}}</span>
+                                                <span>&#x20A6; {{number_format($order->amount)}}</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -130,11 +128,11 @@
                                         </td>
                                         <td>
                                             <div class="text-right">
-                                                <span>&#x20A6; {{$order->delivery_fee}}</span>
+                                                <span>&#x20A6; {{number_format($order->delivery_fee)}}</span>
                                             </div>
                                         </td>
                                     </tr>
-                                    <tr>
+                                    {{-- <tr>
                                         <td>
                                             <div class="text-left">
                                                 <span class="text-muted">Tax Fee</span>
@@ -142,10 +140,10 @@
                                         </td>
                                         <td>
                                             <div class="text-right">
-                                                {{-- <span>&#x20A6; {{$tax}}</span> --}}
+                                                <span>&#x20A6; {{$tax}}</span>
                                             </div>
                                         </td>
-                                    </tr>
+                                    </tr> --}}
                                     {{-- <tr>
                                         <td>
                                             <div class="text-left">
@@ -161,12 +159,12 @@
                                     <tr class="border-top border-bottom">
                                         <td>
                                             <div class="text-left">
-                                                <span class="font-weight-bold">Subtotal</span>
+                                                <span class="font-weight-bold">Total</span>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="text-right">
-                                                <span class="font-weight-bold">&#x20A6; {{$order->amount}}</span>
+                                                <span class="font-weight-bold">&#x20A6; {{number_format($order->amount + $order->delivery_fee)}}</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -176,11 +174,11 @@
                     </div>
 
                     <p>We will be sending shipping confirmation email when the item shipped successfully!</p>
-                    <p class="font-weight-bold mb-0">Thanks for shopping with us!</p> <span>Nike Team</span>
+                    <p class="font-weight-bold mb-0">Thanks for shopping with us!</p> <span>{{env('APP_NAME')}} Team</span>
                     </div>
                     <div class="d-flex justify-content-between footer p-3">
                         <span>Need Help? Visit our <a href="#"> help center</a></span>
-                        <span>{{now('jS F, Y')}}</span>
+                        <span>{{now()->format('jS F, Y')}}</span>
                     </div>
                 </div>
             </div>

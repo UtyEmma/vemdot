@@ -151,15 +151,16 @@ class OrderController extends Controller {
         $interval = CarbonInterval::minutes($order->avg_time);
         $avg_time = CarbonInterval::make($interval)->cascade()->forHumans(['short' => true]);
 
-        $pdf = Pdf::loadView('emails.order-email', [
+        $data = [
             'vendor' => $vendor,
             'user' => $user,
             'order' => $order,
             'date' => Date::parse($order->created_at)->format('jS, F Y'),
             'avg_time' => $avg_time
-        ]);
+        ];
 
-        return $pdf->download();
+        $pdf = Pdf::loadView('emails.order-email', $data);
+        return $pdf->download('download.pdf');
     }
 
     protected function getOnGoingOrder($startDate = null, $endDate = null){
